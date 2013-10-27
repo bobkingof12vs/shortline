@@ -145,8 +145,12 @@ scene.add(group);
 console.log("'group'",group)
 
 //add track line object
-obj['trackLines'] = new THREE.Object3D();
-console.log('asdf',obj['trackLines']);
+obj['trkPreLine'] = new THREE.Object3D();
+console.log('preline',obj['trkPreLine']);
+
+//add track line object
+obj['trkLine'] = new THREE.Object3D();
+console.log('drawline',obj['trkLine']);
 
 //add lights
 var ambientLight = new THREE.AmbientLight(0xbbbbbb);
