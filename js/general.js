@@ -3,6 +3,10 @@ function angleBetweenVectors(a,b,o){
   if (o == undefined) {
     o = new THREE.Vector3(0,0,0);
   }
+  else {
+    a = new THREE.Vector3 (a.x - o.x, a.y - o.y, a.z - o.z)
+    b = new THREE.Vector3 (b.x - o.x, b.y - o.y, b.z - o.z)
+  }
   
   dotAB = a.dot(b)
   
@@ -14,13 +18,14 @@ function angleBetweenVectors(a,b,o){
 }
 
 function angleBetweenFlattenedVectors(a,b,o){
-  if (o == undefined) {
-    o = new THREE.Vector3(0,0,0);
+  if (o != undefined) {
+    a = new THREE.Vector3 (a.x - o.x, 0, a.z - o.z)
+    b = new THREE.Vector3 (b.x - o.x, 0, b.z - o.z)
   }
+  
   return angleBetweenVectors(
     new THREE.Vector3(a.x,0,a.z),
-    new THREE.Vector3(b.x,0,b.z),
-    new THREE.Vector3(o.x,0,o.z)
+    new THREE.Vector3(b.x,0,b.z)
   );
 }
 
