@@ -37,10 +37,8 @@ function layTrack(i){
 	
 	if (obj['trkPreLine'].part == 'init') {
 		obj['trkPreLine'].part = 'part2';
-		obj['trkPreLine'].curTrack++;
 		obj['trkPreLine'].curSeg++;
 		obj['trkPreLine'].origin = point;
-		obj['trkPreLine'].children[obj['trkPreLine'].curTrack] = {children: []};
 		
 		var geom = new THREE.Geometry();
 		geom.vertices.push(point);
@@ -55,7 +53,7 @@ function layTrack(i){
 			mouse.x = e.clientX;
 			mouse.y = e.clientY;
 			
-			scene.remove(obj['trkPreLine'].children[obj['trkPreLine'].curTrack].children[obj['trkPreLine'].curSeg]);
+			scene.remove(obj['trkPreLine'].children[obj['trkPreLine'].curSeg]);
 			
 			if (m['m_tra_lay'].clicked == 1 & mouseInMenu == 0) {
 				getMouseIntersect(mouse, [obj['plane'].children[1]],function(i){
@@ -74,16 +72,15 @@ function layTrack(i){
 						var geom = new THREE.Geometry();
 						geom.vertices = gridPointsOnLine(100,obj['trkPreLine'].origin,i[0].point);
 						
-						obj['trkPreLine'].children[obj['trkPreLine'].curTrack].children[obj['trkPreLine'].curSeg] = new THREE.Line( geom, obj['trkPreLine'].blinemat)
-						scene.add(obj['trkPreLine'].children[obj['trkPreLine'].curTrack].children[obj['trkPreLine'].curSeg]);
+						obj['trkPreLine'].children[obj['trkPreLine'].curSeg] = new THREE.Line( geom, obj['trkPreLine'].blinemat)
+						scene.add(obj['trkPreLine'].children[obj['trkPreLine'].curSeg]);
 						
-						//console.log(obj['trkPreLine'].children[obj['trkPreLine'].curSeg].geometry.vertices)
 					}
+					
 				});
 			}
-			else if (m['m_tra_lay'].clicked == 0 & mouseInMenu == 0){
-				obj['trkPreLine'].part = 'init';
-				obj['trkPreLine'].curSeg = -1;
+			
+			else if (m['m_tra_lay'].clicked != 1){
 				document.body.removeEventListener('mousemove',listener,false);
 			}
 			
@@ -92,7 +89,6 @@ function layTrack(i){
 	}
 	
 	else if (obj['trkPreLine'].part == 'part3') {
-		//obj['trkPreLine'].part = 'part2'
 		
 		if (trackPoints.length > 1) {
 			if (angleBetweenFlattenedVectors(
@@ -117,7 +113,6 @@ function layTrack(i){
 	
 	generateDrawTrack();
 		renderTrack();
-	console.log('dt',drawTrack,'sw',switches);
 }
 
 drawTrack = [];
@@ -232,12 +227,8 @@ function generateDrawTrack() {
 	}
 	
 	switches = switches.filter(function(elem) {
-		console.log('dl',elem.d.length)
 		return elem.d.length > 2
 	});
-	
-	console.log('dratrack',drawTrack);
-	console.log('switches',switches);
 }
 
 function renderTrack(){
@@ -253,7 +244,7 @@ function renderTrack(){
 		while (j > 0.01) {
 			j -= .1;
 			
-			current = recalcY(lerp(drawTrack[i].p1,drawTrack[i].p2,drawTrack[i].p2,drawTrack[i].p3,j));
+			current = recalcY(lerp(drawTrack[i].p1,drawTrack[i].p2,drawTrack[i].p2,drawTrack[i].p3,j),1);
 			
 			if (last != -1) {	
 				geom.vertices.push(last);
@@ -267,4 +258,28 @@ function renderTrack(){
 	
 	obj['trkLine'].obj = new THREE.Line( geom, obj['trkLine'].blinemat, THREE.LinePieces );
 	scene.add(obj['trkLine'].obj);
+}
+
+checkTrack = 0;
+function endTrack(){
+	if (checkTrack == 1 & m['m_tra_lay'].clicked != 1) {
+		checkTrack = 0;
+		
+		obj['trkPreLine'].part = 'init';
+		
+		var j = obj['trkPreLine'].children.length;
+		while (j>0){
+			j--;
+			scene.remove(obj['trkPreLine'].children[j]);
+		}
+	}
+	if (checkTrack == 0 & m['m_tra_lay'].clicked == 1) {
+		checkTrack = 1;
+		
+		var j = obj['trkPreLine'].children.length;
+		while (j>0){
+			j--;
+			scene.add(obj['trkPreLine'].children[j]);
+		}
+	}
 }

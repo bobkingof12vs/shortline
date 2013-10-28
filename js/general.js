@@ -57,8 +57,9 @@ function findY(x,z){
   return where[0].point.y;
 }
 
-function recalcY(p){
-  return new THREE.Vector3(p.x,findY(p.x,p.z),p.z)
+function recalcY(p,y){
+  if (y == undefined) {y = 0;}
+  return new THREE.Vector3(p.x,findY(p.x,p.z)+y,p.z)
 }
 
 function lineLineIntersect(m1,b1,m2,b2) {
