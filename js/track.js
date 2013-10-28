@@ -174,7 +174,7 @@ function generateDrawTrack() {
 				
 				switches[k].d.push(d1)
 				switches[k].d.push(d2)
-				switches[k].d.filter(function(elem, pos, self) {
+				switches[k].d = switches[k].d.filter(function(elem, pos, self) {
 					return self.indexOf(elem) == pos;
 				});
 				
@@ -202,32 +202,40 @@ function generateDrawTrack() {
 		j = drawTrack.length;
 		while(j>0){
 			j--;
-			if (equalXZ(drawTrack[i].p1,drawTrack[j].p1) == 1) {
-				addSwtich(
-					drawTrack[i].p1,
-					drawTrack[i].p2,
-					drawTrack[i].p3,
-					drawTrack[j].p3
-				);
-			}
-			else if (equalXZ(drawTrack[i].p1,drawTrack[j].p3) == 1) {
-				addSwtich(
-					drawTrack[i].p1,
-					drawTrack[i].p2,
-					drawTrack[i].p3,
-					drawTrack[j].p1
-				);
-			}
-			else if (equalXZ(drawTrack[i].p3,drawTrack[j].p3) == 1) {
-				addSwtich(
-					drawTrack[i].p3,
-					drawTrack[i].p2,
-					drawTrack[i].p1,
-					drawTrack[j].p1
-				);
+			if (i != j) {
+				if (equalXZ(drawTrack[i].p1,drawTrack[j].p1) == 1 ) {
+					addSwtich(
+						drawTrack[i].p1,
+						drawTrack[i].p2,
+						drawTrack[i].p3,
+						drawTrack[j].p3
+					);
+				}
+				else if (equalXZ(drawTrack[i].p1,drawTrack[j].p3) == 1) {
+					addSwtich(
+						drawTrack[i].p1,
+						drawTrack[i].p2,
+						drawTrack[i].p3,
+						drawTrack[j].p1
+					);
+				}
+				else if (equalXZ(drawTrack[i].p3,drawTrack[j].p3) == 1) {
+					addSwtich(
+						drawTrack[i].p3,
+						drawTrack[i].p2,
+						drawTrack[i].p1,
+						drawTrack[j].p1
+					);
+				}
 			}
 		}
 	}
+	
+	switches = switches.filter(function(elem) {
+		console.log('dl',elem.d.length)
+		return elem.d.length > 2
+	});
+	
 	console.log('dratrack',drawTrack);
 	console.log('switches',switches);
 }
