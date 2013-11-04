@@ -152,6 +152,10 @@ console.log('preline',obj['trkPreLine']);
 obj['trkLine'] = new THREE.Object3D();
 console.log('drawline',obj['trkLine']);
 
+//add track line object
+obj['switches'] = new THREE.Object3D();
+console.log('switches',obj['switches']);
+
 //add lights
 var ambientLight = new THREE.AmbientLight(0xbbbbbb);
 scene.add(ambientLight);

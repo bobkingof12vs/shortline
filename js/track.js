@@ -7,8 +7,11 @@ obj['trkPreLine'].blinemat = new THREE.LineBasicMaterial( { color: 0xff0000, lin
 obj['trkLine'].blinemat = new THREE.LineBasicMaterial( { color: 0x0000ff, linewidth: 5 } );
 trackPoints = [];
 
+var firstClick = 1;
+
 function layTrack(i){
 	
+	firstClick = 1;
 	var closePoint = function(point){
 		var j = trackPoints.length;
 		var far = 50;
@@ -66,7 +69,7 @@ function layTrack(i){
 								trackPoints[trackPoints.length-1].p1,
 								i[0].point,
 								trackPoints[trackPoints.length-1].p3
-							) <= 90) {return}
+							) <= 90 & firstClick == 0) {return}
 						}
 						
 						var geom = new THREE.Geometry();
@@ -95,8 +98,10 @@ function layTrack(i){
 				trackPoints[trackPoints.length-1].p1,
 				point,
 				obj['trkPreLine'].origin
-			) <= 90) { return;}
+			) <= 90 & firstClick == 0) { return;}
 		}
+		
+		firstClick = 0;
 		
 		var w = midpoint(obj['trkPreLine'].origin,point);
 		
@@ -160,6 +165,7 @@ function generateDrawTrack() {
 	//add a line object to show where switches are and what switches are being added, it looks currently
 	//like avery point is being added as a switch....
 	addSwtich = function(o,p,d1,d2){
+		if (d1 == d2) {return;}
 		var k = switches.length;
 		while(k>0){
 			k--;
@@ -182,11 +188,7 @@ function generateDrawTrack() {
 			o: o,
 			p: p,
 			d: [d1,d2],
-			s: 1,
-			switchTrack: function(){
-				if (this.s == this.s.length) {this.s = 0;}
-				else{this.s++;}
-			}
+			s: 1
 		});
 		return;
 	}
@@ -198,37 +200,84 @@ function generateDrawTrack() {
 		while(j>0){
 			j--;
 			if (i != j) {
-				if (equalXZ(drawTrack[i].p1,drawTrack[j].p1) == 1 ) {
-					addSwtich(
-						drawTrack[i].p1,
-						drawTrack[i].p2,
-						drawTrack[i].p3,
-						drawTrack[j].p3
-					);
-				}
-				else if (equalXZ(drawTrack[i].p1,drawTrack[j].p3) == 1) {
-					addSwtich(
-						drawTrack[i].p1,
-						drawTrack[i].p2,
-						drawTrack[i].p3,
-						drawTrack[j].p1
-					);
-				}
-				else if (equalXZ(drawTrack[i].p3,drawTrack[j].p3) == 1) {
-					addSwtich(
-						drawTrack[i].p3,
-						drawTrack[i].p2,
-						drawTrack[i].p1,
-						drawTrack[j].p1
-					);
+				if (equalXZ(drawTrack[i].p2,drawTrack[j].p2) == 1){
+					if (equalXZ(drawTrack[i].p1,drawTrack[j].p1) == 1 ) {
+						addSwtich(
+							drawTrack[i].p1,
+							drawTrack[i].p2,
+							drawTrack[i].p3,
+							drawTrack[j].p3
+						);
+					}
+					else if (equalXZ(drawTrack[i].p1,drawTrack[j].p3) == 1) {
+						addSwtich(
+							drawTrack[i].p1,
+							drawTrack[i].p2,
+							drawTrack[i].p3,
+							drawTrack[j].p1
+						);
+					}
+					else if (equalXZ(drawTrack[i].p3,drawTrack[j].p3) == 1) {
+						addSwtich(
+							drawTrack[i].p3,
+							drawTrack[i].p2,
+							drawTrack[i].p1,
+							drawTrack[j].p1
+						);
+					}
 				}
 			}
 		}
+		
 	}
 	
 	switches = switches.filter(function(elem) {
-		return elem.d.length > 2
+		return elem.d.length > 1
 	});
+	
+	var j = obj['switches'].children.length;
+	while (j>0){
+		j--;
+		scene.remove(obj['switches'].children[j]);
+	}
+	
+	var cubeMat = new THREE.MeshBasicMaterial({color: 0x8833ff});
+	var cubeGeom = new THREE.CubeGeometry(3, 20, 10);
+	
+	var j = switches.length;
+	obj['switches'].children = [];
+	while (j>0){
+		j--;
+		obj['switches'].children[j] = new THREE.Mesh( cubeGeom, cubeMat );
+		obj['switches'].children[j].position.set(switches[j].o.x,switches[j].o.y,switches[j].o.z);
+				console.log(yAngleOfLine(switches[j].o,switches[j].p),switches[j].s,switches[j].d.length-1);
+		obj['switches'].children[j].rotation.y = yAngleOfLine(switches[j].o,switches[j].p) + (-30 + (switches[j].s*(60/(switches[j].d.length-1))));
+		scene.add(obj['switches'].children[j]);
+	}
+}
+
+function checkSwitches(i){
+	var count = 0;
+	var j = i.length;
+	while (j>0) {
+		j--;
+		var k = switches.length;
+		while(k>0){
+			k--;
+			if (obj['switches'].children[k].id == i[j].object.id) {
+				console.log(switches[k])
+				if (switches[k].s >= switches[k].d.length-1) {
+					switches[k].s = 0;
+				}
+				else{
+					switches[k].s++;
+				}
+				console.log(yAngleOfLine(switches[k].o,switches[k].p),(-30 + (switches[k].s*(60/(switches[k].d.length-1)))));
+				obj['switches'].children[k].rotation.y = yAngleOfLine(switches[k].o,switches[k].p) + (-30 + (switches[k].s*(60/(switches[k].d/length-1))));
+				obj['switches'].children[k].rotationNeedsUpdate = true;
+			}
+		}
+	}
 }
 
 function renderTrack(){
@@ -275,6 +324,8 @@ function endTrack(){
 	}
 	if (checkTrack == 0 & m['m_tra_lay'].clicked == 1) {
 		checkTrack = 1;
+		
+		obj['trkPreLine'].children.pop();
 		
 		var j = obj['trkPreLine'].children.length;
 		while (j>0){

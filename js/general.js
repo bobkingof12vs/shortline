@@ -17,6 +17,11 @@ function angleBetweenVectors(a,b,o){
   return (Math.acos(val))*(180/Math.PI);
 }
 
+function yAngleOfLine(a,b){
+  var c = new THREE.Vector3(a.x,0,a.z+10);
+  return angleBetweenFlattenedVectors(c,b,a);
+}
+
 function angleBetweenFlattenedVectors(a,b,o){
   if (o != undefined) {
     a = new THREE.Vector3 (a.x - o.x, 0, a.z - o.z)
