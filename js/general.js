@@ -12,14 +12,17 @@ function angleBetweenVectors(a,b,o){
   
   magA = o.distanceTo(a);
   magB = o.distanceTo(b);
+  if (magA == 0 | magB == 0) {
+    console.log('0 distance found in angleBetweenVectors');
+    return 0;
+  }
   val = Math.round(dotAB/(magA * magB)*1000)/1000;
-  //console.log ((Math.acos(val))*(180/Math.PI));
   return (Math.acos(val))*(180/Math.PI);
 }
 
 function yAngleOfLine(a,b){
-  var c = new THREE.Vector3(a.x,0,a.z+10);
-  return angleBetweenFlattenedVectors(c,b,a);
+  var c = new THREE.Vector3(a.x+10,0,a.z);
+  return angleBetweenFlattenedVectors(b,c,a);
 }
 
 function angleBetweenFlattenedVectors(a,b,o){

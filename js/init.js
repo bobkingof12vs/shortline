@@ -3,6 +3,7 @@
 
 //global variables
 var obj = [];
+var globalMesh = [];
 var id = -1;
 var mouse = {};
 var click = 0;
@@ -20,72 +21,84 @@ var toonMaterial = new THREE.MeshLambertMaterial
 //load trains
 var loader = new THREE.JSONLoader();
 loader.load("js/trains/shunter.js", modelToScene('shunter'));
+loader.load("js/trains/switchArrow.js", jsObjToGlobalMesh('switchArrow'));
 
 //load train function
 function modelToScene (name){
+  opts = {};
+  opts.scale = new THREE.Vector3(10, 10, 10);
+  opts.castShadow = true;
+  opts.receiveShadow = true;
+  return jsObjToGlobalMesh(name,opts,function(objName){
+    obj[objName] = globalMesh[objName];
+    scene.add(obj[objName]);
+  });
+}
 
-  return function (geometry, materials) {
-  var material = new THREE.MeshFaceMaterial(materials);
-
-  obj[name] = {};
-  obj[name] = new THREE.Mesh(geometry, material);
-  obj[name].scale.set(10, 10, 10);
-  obj[name].castShadow = true;
-  obj[name].receiveShadow = true;
-  
-  var start = geometry.faces.length - 1;
-  var i = start;
-  var lineVecs = [];
-  while(i >= 0){
-    var j = start;
-    while(j >= 0){
-      var set1 = -1;
-      var set2 = -1;
-      if (geometry.faces[i].a == geometry.faces[j].a 
-      | geometry.faces[i].a == geometry.faces[j].b
-      | geometry.faces[i].a == geometry.faces[j].c
-      ){set1 = geometry.faces[i].a}
-      if (geometry.faces[i].b == geometry.faces[j].a 
-      | geometry.faces[i].b == geometry.faces[j].b
-      | geometry.faces[i].b == geometry.faces[j].c
-      ){
-        if(set1 != -1){set2 = geometry.faces[i].b}
-        else{set1 = geometry.faces[i].b}
-      }
-      if (geometry.faces[i].c == geometry.faces[j].a 
-      | geometry.faces[i].c == geometry.faces[j].b
-      | geometry.faces[i].c == geometry.faces[j].c
-      ){if(set2 != -1){j--; break;}
-        else if(set1 != -1){set2 = geometry.faces[i].c}}
-      
-      if (set2 >= 0) {
-        var caught = 0;
-        for(k = lineVecs.length-1; k = 0; k--){
-          if((set1 == lineVecs[k][0] & set2 == lineVecs[k][1])
-          |  (set1 == lineVecs[k][1] & set2 == lineVecs[k][0])
-          ) {caught = 1;}
+function jsObjToGlobalMesh(name,opts,callback){
+  return function(geometry,materials){
+    
+    globalMesh[name] = {};
+    globalMesh[name] = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial(materials));
+    sc = (opts.scale !== undefined) ? opts.scale : new THREE.Vector3(10,10,10);
+    globalMesh[name].scale.set(sc.x,sc.y,sc.z);
+    globalMesh[name].castShadow = (opts.castShadow !== undefined) ? opts.castShadow : false;
+    globalMesh[name].receiveShadow = (opts.receiveShadow !== undefined) ? opts.receiveShadow : false;
+    
+    var start = geometry.faces.length - 1;
+    var i = start;
+    var lineVecs = [];
+    while(i >= 0){
+      var j = start;
+      while(j >= 0){
+        var set1 = -1;
+        var set2 = -1;
+        if (geometry.faces[i].a == geometry.faces[j].a 
+        | geometry.faces[i].a == geometry.faces[j].b
+        | geometry.faces[i].a == geometry.faces[j].c
+        ){set1 = geometry.faces[i].a}
+        if (geometry.faces[i].b == geometry.faces[j].a 
+        | geometry.faces[i].b == geometry.faces[j].b
+        | geometry.faces[i].b == geometry.faces[j].c
+        ){
+          if(set1 != -1){set2 = geometry.faces[i].b}
+          else{set1 = geometry.faces[i].b}
         }
+        if (geometry.faces[i].c == geometry.faces[j].a 
+        | geometry.faces[i].c == geometry.faces[j].b
+        | geometry.faces[i].c == geometry.faces[j].c
+        ){if(set2 != -1){j--; break;}
+          else if(set1 != -1){set2 = geometry.faces[i].c}}
         
-        if(caught <= 0 
-        & (angleBetweenVectors(geometry.faces[i].normal,geometry.faces[j].normal) > 15
-          |angleBetweenVectors(geometry.faces[i].normal,geometry.faces[j].normal) < -10)
-        ){lineVecs.push([set1,set2]);}
+        if (set2 >= 0) {
+          var caught = 0;
+          for(k = lineVecs.length-1; k = 0; k--){
+            if((set1 == lineVecs[k][0] & set2 == lineVecs[k][1])
+            |  (set1 == lineVecs[k][1] & set2 == lineVecs[k][0])
+            ) {caught = 1;}
+          }
+          
+          if(caught <= 0 
+          & (angleBetweenVectors(geometry.faces[i].normal,geometry.faces[j].normal) > 15
+            |angleBetweenVectors(geometry.faces[i].normal,geometry.faces[j].normal) < -10)
+          ){lineVecs.push([set1,set2]);}
+        }
+        j--;
       }
-      j--;
+      i--;
     }
-    i--;
-  }
-  var outlineGeometry = new THREE.Geometry();
-  for (i = 0; i < lineVecs.length; i++) { 
-    outlineGeometry.vertices.push(geometry.vertices[lineVecs[i][0]]);
-    outlineGeometry.vertices.push(geometry.vertices[lineVecs[i][1]]);
-  }
-  var lineMaterial = new THREE.LineBasicMaterial( { color: 0x222222, linewidth: 3 } );
-  var mline = new THREE.Line( outlineGeometry, lineMaterial, THREE.LinePieces);
-  mline.scale.set(10, 10, 10);
-  obj[name].children.push(mline);
-  scene.add(obj[name]);
-  console.log("'obj["+name+"]'",obj[name]);
+    var outlineGeometry = new THREE.Geometry();
+    for (i = 0; i < lineVecs.length; i++) { 
+      outlineGeometry.vertices.push(geometry.vertices[lineVecs[i][0]]);
+      outlineGeometry.vertices.push(geometry.vertices[lineVecs[i][1]]);
+    }
+    var lineMaterial = new THREE.LineBasicMaterial( { color: 0x222222, linewidth: 3 } );
+    var mline = new THREE.Line( outlineGeometry, lineMaterial, THREE.LinePieces);
+    mline.scale.set(sc.x,sc.y,sc.z);
+    globalMesh[name].children.push(mline);
+    
+    callback(name);
+    
   }
 }
 

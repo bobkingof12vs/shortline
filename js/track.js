@@ -250,8 +250,8 @@ function generateDrawTrack() {
 		j--;
 		obj['switches'].children[j] = new THREE.Mesh( cubeGeom, cubeMat );
 		obj['switches'].children[j].position.set(switches[j].o.x,switches[j].o.y,switches[j].o.z);
-				console.log(yAngleOfLine(switches[j].o,switches[j].p),switches[j].s,switches[j].d.length-1);
-		obj['switches'].children[j].rotation.y = yAngleOfLine(switches[j].o,switches[j].p) + (-30 + (switches[j].s*(60/(switches[j].d.length-1))));
+		obj['switches'].children[j].lookAt(switches[j].p)
+		obj['switches'].children[j].rotation.y += (-60 + (switches[j].s * (120/(switches[j].d.length-1))));
 		scene.add(obj['switches'].children[j]);
 	}
 }
@@ -265,15 +265,14 @@ function checkSwitches(i){
 		while(k>0){
 			k--;
 			if (obj['switches'].children[k].id == i[j].object.id) {
-				console.log(switches[k])
 				if (switches[k].s >= switches[k].d.length-1) {
 					switches[k].s = 0;
 				}
 				else{
 					switches[k].s++;
 				}
-				console.log(yAngleOfLine(switches[k].o,switches[k].p),(-30 + (switches[k].s*(60/(switches[k].d.length-1)))));
-				obj['switches'].children[k].rotation.y = yAngleOfLine(switches[k].o,switches[k].p) + (-30 + (switches[k].s*(60/(switches[k].d/length-1))));
+				obj['switches'].children[k].lookAt(switches[k].p)
+				obj['switches'].children[k].rotation.y += (-60 + (switches[k].s * (120/(switches[k].d.length-1))));
 				obj['switches'].children[k].rotationNeedsUpdate = true;
 			}
 		}
