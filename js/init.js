@@ -21,7 +21,7 @@ var toonMaterial = new THREE.MeshLambertMaterial
 //load trains
 var loader = new THREE.JSONLoader();
 loader.load("js/trains/shunter.js", modelToScene('shunter'));
-loader.load("js/trains/switchArrow.js", jsObjToGlobalMesh('switchArrow'));
+loader.load("js/trains/switchArrow.js", jsObjToGlobalMesh('switchArrow',{scale: new THREE.Vector3(10,10,10)}));
 
 //load train function
 function modelToScene (name){
@@ -97,7 +97,7 @@ function jsObjToGlobalMesh(name,opts,callback){
     mline.scale.set(sc.x,sc.y,sc.z);
     globalMesh[name].children.push(mline);
     
-    callback(name);
+    if(callback !== undefined) callback(name);
     
   }
 }
