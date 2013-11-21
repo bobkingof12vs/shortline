@@ -245,7 +245,7 @@ function generateDrawTrack() {
 	obj['switches'].children = [];
 	while (j>0){
 		j--;
-		obj['switches'].children[j] = globalMesh['switchArrow'];
+		obj['switches'].children[j] = globalMesh['switchArrow'].clone();
 		obj['switches'].children[j].position.set(switches[j].o.x,switches[j].o.y,switches[j].o.z);
 		obj['switches'].children[j].lookAt(switches[j].p)
 		obj['switches'].children[j].rotation.y += (-60 + (switches[j].s * (120/(switches[j].d.length-1))));
