@@ -10,6 +10,10 @@ trackPoints = [
 	 p2: new THREE.Vector3(-50,  0,  0),
 	 p3: new THREE.Vector3(-50,  0, 50)
 	},
+	{p1: new THREE.Vector3(50,  0,-50),
+	 p2: new THREE.Vector3(50,  0,-150),
+	 p3: new THREE.Vector3(50,  0,-250)
+	},
 	{p1: new THREE.Vector3(-50,  0, 50),
 	 p2: new THREE.Vector3(  0,  0, 50),
 	 p3: new THREE.Vector3( 50,  0, 50)
@@ -25,6 +29,18 @@ trackPoints = [
 	{p1: new THREE.Vector3(-150,  0,-50),
 	 p2: new THREE.Vector3(-200,  0,-50),
 	 p3: new THREE.Vector3(-250,  0,-50)
+	},
+	{p1: new THREE.Vector3(-250,  0,-50),
+	 p2: new THREE.Vector3(-300,  0,-50),
+	 p3: new THREE.Vector3(-350,  0,-50)
+	},
+	{p1: new THREE.Vector3(-150,  0,-50),
+	 p2: new THREE.Vector3(-150,  0,-100),
+	 p3: new THREE.Vector3(-150,  0,-150)
+	},
+	{p1: new THREE.Vector3(-150,  0,-150),
+	 p2: new THREE.Vector3(-150,  0,-200),
+	 p3: new THREE.Vector3(-150,  0,-250)
 	}
 ];
 
@@ -32,27 +48,37 @@ trackPoints = [
 obj['trkPreLine'].curSeg = 0;
 addPreLineToScene(
 	new THREE.Vector3(-150,0,-50),
-	new THREE.Vector3(-250,0,-50)
+	new THREE.Vector3(-150,0,-150)
 );
 obj['trkPreLine'].curSeg = 1;
+addPreLineToScene(
+	new THREE.Vector3(-150,0,-50),
+	new THREE.Vector3(-250,0,-50)
+);
+obj['trkPreLine'].curSeg = 2;
 addPreLineToScene(
 	new THREE.Vector3( -50,0,-50),
 	new THREE.Vector3(-150,0,-50)
 );
-obj['trkPreLine'].curSeg = 2;
+obj['trkPreLine'].curSeg = 3;
 addPreLineToScene(
 	new THREE.Vector3( 50,0,-50),
 	new THREE.Vector3( 50,0, 50)
 );
-obj['trkPreLine'].curSeg = 3;
+obj['trkPreLine'].curSeg = 4;
 addPreLineToScene(
 	new THREE.Vector3(-50,0, 50),
 	new THREE.Vector3( 50,0, 50)
 );
-obj['trkPreLine'].curSeg = 4;
+obj['trkPreLine'].curSeg = 5;
 addPreLineToScene(
 	new THREE.Vector3(-50,0,-50),
 	new THREE.Vector3(-50,0, 50)
+);
+obj['trkPreLine'].curSeg = 6;
+addPreLineToScene(
+	new THREE.Vector3(-150,0,-150),
+	new THREE.Vector3(-150,0,-250)
 );
 
 var firstClick = 1;
@@ -165,41 +191,71 @@ function layTrack(i){
 
 drawTrack = [];
 switches = [];
+endPoints = [];
 function generateDrawTrack() {
 	drawTrack = [];
+	endPoints = [];
 	var i = trackPoints.length;
 	while(i>0){
 		i--;
 		j = trackPoints.length;
+		var found1 = found3 = 0;
 		while(j>0){
 			j--;
-			if (equalXZ(trackPoints[i].p1,trackPoints[j].p1) == 1) {
-				if (angleBetweenFlattenedVectors(trackPoints[i].p3,trackPoints[j].p3,trackPoints[i].p1) >= 90) {
-					drawTrack.push({
-						p1: trackPoints[i].p2,
-						p2: trackPoints[i].p1,
-						p3: trackPoints[j].p2
-					});
+			if (i != j) {
+				if (equalXZ(trackPoints[i].p1,trackPoints[j].p1) == 1) {
+					if (angleBetweenFlattenedVectors(trackPoints[i].p3,trackPoints[j].p3,trackPoints[i].p1) >= 90) {
+						drawTrack.push({
+							p1: trackPoints[i].p2,
+							p2: trackPoints[i].p1,
+							p3: trackPoints[j].p2
+						});
+					}
+				}
+				else if (equalXZ(trackPoints[i].p1,trackPoints[j].p3) == 1) {
+					if (angleBetweenFlattenedVectors(trackPoints[i].p3,trackPoints[j].p1,trackPoints[i].p1) >= 90) {
+						drawTrack.push({
+							p1: trackPoints[i].p2,
+							p2: trackPoints[i].p1,
+							p3: trackPoints[j].p2
+						});
+					}
+				}
+				else if (equalXZ(trackPoints[i].p3,trackPoints[j].p3) == 1) {
+					if (angleBetweenFlattenedVectors(trackPoints[i].p1,trackPoints[j].p1,trackPoints[i].p3) >= 90) {
+						drawTrack.push({
+							p1: trackPoints[i].p2,
+							p2: trackPoints[i].p3,
+							p3: trackPoints[j].p2
+						});
+					}
+				}
+					
+				if ((equalXZ(trackPoints[i].p1,trackPoints[j].p1) == 1)
+					 |(equalXZ(trackPoints[i].p1,trackPoints[j].p3) == 1)){
+					found1 = 1;
+				}
+				if ((equalXZ(trackPoints[i].p3,trackPoints[j].p1) == 1)
+					 |(equalXZ(trackPoints[i].p3,trackPoints[j].p3) == 1)){
+					found3 = 1;
 				}
 			}
-			else if (equalXZ(trackPoints[i].p1,trackPoints[j].p3) == 1) {
-				if (angleBetweenFlattenedVectors(trackPoints[i].p3,trackPoints[j].p1,trackPoints[i].p1) >= 90) {
-					drawTrack.push({
-						p1: trackPoints[i].p2,
-						p2: trackPoints[i].p1,
-						p3: trackPoints[j].p2
-					});
-				}
-			}
-			else if (equalXZ(trackPoints[i].p3,trackPoints[j].p3) == 1) {
-				if (angleBetweenFlattenedVectors(trackPoints[i].p1,trackPoints[j].p1,trackPoints[i].p3) >= 90) {
-					drawTrack.push({
-						p1: trackPoints[i].p2,
-						p2: trackPoints[i].p3,
-						p3: trackPoints[j].p2
-					});
-				}
-			}
+		}
+		if (found1 == 0) {
+			drawTrack.push({
+				p1: trackPoints[i].p1,
+				p2: midpoint(trackPoints[i].p1,trackPoints[i].p2),
+				p3: trackPoints[i].p2
+			});
+			endPoints.push({end: trackPoints[i].p1, track: i, dir: 1});
+		}
+		if (found3 == 0) {
+			drawTrack.push({
+				p1: trackPoints[i].p3,
+				p2: midpoint(trackPoints[i].p3,trackPoints[i].p2),
+				p3: trackPoints[i].p2
+			});
+			endPoints.push({end: trackPoints[i].p3, track: i, dir: 1});
 		}
 	}
 	
@@ -271,7 +327,6 @@ function generateDrawTrack() {
 				}
 			}
 		}
-		
 	}
 	
 	switches = switches.filter(function(elem) {
@@ -419,7 +474,78 @@ function lengthOfTrack(trackNum,opts) {
 	return d;
 }
 
+function nextTrackFromSwitch(i,change){
+	if (change != undefined) {
+		switches[i].s = change
+	}
+	j = drawTrack.length;
+	while (j > 0) {
+		j--;
+		if ((equalXZ(switches[i].o, drawTrack[j].p1) == 1)
+			 &(equalXZ(switches[i].d[switches[i].s], drawTrack[j].p3) == 1)) {
+			return {type: 'switch', num: j, startT: 0, endT: 1, s: i}
+		}
+		else 
+		if ((equalXZ(switches[i].o, drawTrack[j].p3) == 1)
+			 &(equalXZ(switches[i].d[switches[i].s], drawTrack[j].p1) == 1)) {
+			return {type: 'switch', num: j, startT: 1, endT: 0, s: i}
+		}
+	}
+	console.log('error: switch with no found D. switch: ' + i +'. change: '+change);
+	return false;
+}
 
-generateDrawTrack();
-renderTrack();
-endTrack();
+function nextTrack(i,p1,opts){
+	opts = (opts != undefined ? opts : {});
+	change = opts.change != undefined ? opts.change : -1;
+	
+	j = switches.length;
+	while (j > 0){
+		j--;
+		if ((equalXZ(switches[j].o,p1) == 1)
+			 &(equalXZ(drawTrack[i].p2, switches[j].p) == 0)) {
+			return nextTrackFromSwitch(j,change);
+		}
+	}
+	j = drawTrack.length;
+	while (j > 0){
+		j--;
+		if (equalXZ(drawTrack[j].p1, p1) == 1) {
+			k = endPoints.length;
+			while (k > 0){
+				k--;
+				if (equalXZ(endPoints[k].end, p1) == 1) {
+					return {type: 'stop', num: j, startT: 0, endT: 1, stop: k}
+				}
+			}
+			return {type: 'track', num: j, startT: 1, endT: 0}
+		}
+		else if (equalXZ(drawTrack[j].p3, p1) == 1) {
+			k = endPoints.length;
+			while (k > 0){
+				k--;
+				if (equalXZ(endPoints[k].end, p1) == 1) {
+					return {type: 'stop', num: j, startT: 1, endT: 0, stop: k}
+				}
+			}
+			return {type: 'track', num: j, startT: 1, endT: 0}
+		}
+	}
+	return false;
+}
+
+var b = 0;
+function initTrack(){
+	console.log('here');
+	if(globalMesh['switchArrow'] !== undefined){
+		generateDrawTrack();
+		renderTrack();
+		endTrack();
+		b = 1;
+	}
+	if (b == 0) {
+		setTimeout(initTrack,10);
+	}
+}
+initTrack();
+		

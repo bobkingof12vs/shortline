@@ -1,8 +1,4 @@
 
-function startup(){
-  loader.load("js/trains/shunter.js", modelToScene('shunter'));
-  loader.load("js/trains/switchArrow.js", jsObjToGlobalMesh('switchArrow',{line: false, scale: new THREE.Vector3(10,10,10)}));
-}
 
 //---Init---//
 
