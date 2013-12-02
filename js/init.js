@@ -21,8 +21,6 @@ console.log("'camera'",camera);
 var toonMaterial = new THREE.MeshLambertMaterial
 //load trains
 var loader = new THREE.JSONLoader();
-loader.load("js/trains/shunter.js", modelToScene('shunter'));
-loader.load("js/trains/switchArrow.js", jsObjToGlobalMesh('switchArrow',{line: false, scale: new THREE.Vector3(10,10,10)}));
 
 //load train function
 function modelToScene (name){

@@ -534,9 +534,11 @@ function nextTrack(i,p1,opts){
 	return false;
 }
 
+
+loader.load("js/trains/switchArrow.js", jsObjToGlobalMesh('switchArrow',{line: false, scale: new THREE.Vector3(10,10,10)}));
+
 var b = 0;
 function initTrack(){
-	console.log('here');
 	if(globalMesh['switchArrow'] !== undefined){
 		generateDrawTrack();
 		renderTrack();
