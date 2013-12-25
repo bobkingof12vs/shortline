@@ -40,6 +40,7 @@ function jsObjToGlobalMesh(name,opts,callback){
     
     globalMesh[name] = {};
     globalMesh[name] = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial(materials));
+    opts = (opts !== undefined) ? opts : {};
     sc = (opts.scale !== undefined) ? opts.scale : new THREE.Vector3(10,10,10);
     globalMesh[name].scale.set(sc.x,sc.y,sc.z);
     globalMesh[name].castShadow = (opts.castShadow !== undefined) ? opts.castShadow : false;

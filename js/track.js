@@ -108,8 +108,6 @@ function layTrack(i){
 		return point;
 	}
 	
-	console.log(obj['trkPreLine'].part)
-	
 	point = closePoint(i[0].point);
 	
 	if (obj['trkPreLine'].part == 'init') {
@@ -206,6 +204,7 @@ function generateDrawTrack() {
 				if (equalXZ(trackPoints[i].p1,trackPoints[j].p1) == 1) {
 					if (angleBetweenFlattenedVectors(trackPoints[i].p3,trackPoints[j].p3,trackPoints[i].p1) >= 90) {
 						drawTrack.push({
+							//len calculated below
 							p1: trackPoints[i].p2,
 							p2: trackPoints[i].p1,
 							p3: trackPoints[j].p2
@@ -215,6 +214,7 @@ function generateDrawTrack() {
 				else if (equalXZ(trackPoints[i].p1,trackPoints[j].p3) == 1) {
 					if (angleBetweenFlattenedVectors(trackPoints[i].p3,trackPoints[j].p1,trackPoints[i].p1) >= 90) {
 						drawTrack.push({
+							//len calculated below
 							p1: trackPoints[i].p2,
 							p2: trackPoints[i].p1,
 							p3: trackPoints[j].p2
@@ -224,6 +224,7 @@ function generateDrawTrack() {
 				else if (equalXZ(trackPoints[i].p3,trackPoints[j].p3) == 1) {
 					if (angleBetweenFlattenedVectors(trackPoints[i].p1,trackPoints[j].p1,trackPoints[i].p3) >= 90) {
 						drawTrack.push({
+							//len calculated below
 							p1: trackPoints[i].p2,
 							p2: trackPoints[i].p3,
 							p3: trackPoints[j].p2
@@ -243,6 +244,7 @@ function generateDrawTrack() {
 		}
 		if (found1 == 0) {
 			drawTrack.push({
+				//len calculated below
 				p1: trackPoints[i].p1,
 				p2: midpoint(trackPoints[i].p1,trackPoints[i].p2),
 				p3: trackPoints[i].p2
@@ -251,6 +253,7 @@ function generateDrawTrack() {
 		}
 		if (found3 == 0) {
 			drawTrack.push({
+				//len calculated below
 				p1: trackPoints[i].p3,
 				p2: midpoint(trackPoints[i].p3,trackPoints[i].p2),
 				p3: trackPoints[i].p2
@@ -295,6 +298,10 @@ function generateDrawTrack() {
 	var i = drawTrack.length;
 	while(i>0){
 		i--;
+		
+		//len calculated here
+		drawTrack[i].len = lengthOfTrack(i)
+		
 		j = drawTrack.length;
 		while(j>0){
 			j--;
@@ -449,25 +456,20 @@ function lengthOfTrack(trackNum,opts) {
 	var startT = opts.startT !== undefined ? opts.startT : 0;
 	var endT = opts.endT !== undefined ? opts.endT : 1;
 	
-	console.log(startT,endT);
 	if (startT == endT) {return 0;}
 	
 	var st = startT < endT ? endT : startT;
 	var et = startT < endT ? startT : endT;
 	var step = (st-et)/numBreaks;
-	console.log(st,et,step);
 	tr = drawTrack[trackNum];
 	
 	var d = 0;
 	
 	p1 = lerp(tr.p1,tr.p2,tr.p2,tr.p3,st);
 	while(st>et+.000001){
-		console.log(p1.x,p1.z)
 		st -= step;
-		console.log(st,et,d)
 		p2 = lerp(tr.p1,tr.p2,tr.p2,tr.p3,st);
 		d += p1.distanceTo(p2);
-		console.log(p1.distanceTo(p2))
 		p1 = p2;
 	}
 	
@@ -483,52 +485,74 @@ function nextTrackFromSwitch(i,change){
 		j--;
 		if ((equalXZ(switches[i].o, drawTrack[j].p1) == 1)
 			 &(equalXZ(switches[i].d[switches[i].s], drawTrack[j].p3) == 1)) {
-			return {type: 'switch', num: j, startT: 0, endT: 1, s: i}
+			return {type: 'switch', num: j, startT: 0, endT: 1, s: i, len: drawTrack[j].len}
 		}
 		else 
 		if ((equalXZ(switches[i].o, drawTrack[j].p3) == 1)
 			 &(equalXZ(switches[i].d[switches[i].s], drawTrack[j].p1) == 1)) {
-			return {type: 'switch', num: j, startT: 1, endT: 0, s: i}
+			return {type: 'switch', num: j, startT: 1, endT: 0, s: i, len: drawTrack[j].len}
 		}
 	}
 	console.log('error: switch with no found D. switch: ' + i +'. change: '+change);
 	return false;
 }
 
-function nextTrack(i,p1,opts){
+function nextTrack(i,t1,opts){
+	console.log(i,endPoints);
+	if (t1 === 1) {
+		p1 = drawTrack[i].p1
+		p3 = drawTrack[i].p3
+	}
+	else if (t1 === 0) {
+		p1 = drawTrack[i].p3
+		p3 = drawTrack[i].p1
+	}
+	
 	opts = (opts != undefined ? opts : {});
+	//calculating change of switch should be here
+	//just send the code/func as the opt and it will calc here.
 	change = opts.change != undefined ? opts.change : -1;
 	
 	j = switches.length;
 	while (j > 0){
 		j--;
-		if ((equalXZ(switches[j].o,p1) == 1)
-			 &(equalXZ(drawTrack[i].p2, switches[j].p) == 0)) {
-			return nextTrackFromSwitch(j,change);
+		if (j != i) {
+			if ((equalXZ(switches[j].o,p1) == 1)
+				 &(equalXZ(drawTrack[i].p2, switches[j].p) == 1)) { //bug?
+				console.log('switch');
+				return nextTrackFromSwitch(j,change);
+			}
 		}
 	}
 	j = drawTrack.length;
 	while (j > 0){
 		j--;
-		if (equalXZ(drawTrack[j].p1, p1) == 1) {
-			k = endPoints.length;
-			while (k > 0){
-				k--;
-				if (equalXZ(endPoints[k].end, p1) == 1) {
-					return {type: 'stop', num: j, startT: 0, endT: 1, stop: k}
+		if (j != i) {
+			if (equalXZ(drawTrack[j].p1, p1) == 1) {
+				console.log('next track 1');
+				k = endPoints.length;
+				while (k > 0){
+					k--;
+					console.log(endPoints[k].end, p3, p1);
+					//if (equalXZ(endPoints[k].end, p3) == 1) {
+					if (endPoints[k].track == i) {
+						return {type: 'stop', num: j, startT: 0, endT: 1, stop: k, len: drawTrack[j].len}
+					}
 				}
+				return {type: 'track', num: j, startT: 1, endT: 0, len: drawTrack[j].len}
 			}
-			return {type: 'track', num: j, startT: 1, endT: 0}
-		}
-		else if (equalXZ(drawTrack[j].p3, p1) == 1) {
-			k = endPoints.length;
-			while (k > 0){
-				k--;
-				if (equalXZ(endPoints[k].end, p1) == 1) {
-					return {type: 'stop', num: j, startT: 1, endT: 0, stop: k}
+			else if (equalXZ(drawTrack[j].p3, p1) == 1) {
+				console.log('next track 2');
+				k = endPoints.length;
+				while (k > 0){
+					k--;
+					console.log(endPoints[k].end, p3, p1);
+					if (endPoints[k].track == i) {
+						return {type: 'stop', num: j, startT: 1, endT: 0, stop: k, len: drawTrack[j].len}
+					}
 				}
+				return {type: 'track', num: j, startT: 1, endT: 0, len: drawTrack[j].len}
 			}
-			return {type: 'track', num: j, startT: 1, endT: 0}
 		}
 	}
 	return false;
@@ -543,6 +567,12 @@ function initTrack(){
 		generateDrawTrack();
 		renderTrack();
 		endTrack();
+		if (initEngines != undefined) {
+			initEngines();
+			train.addTrain();
+			train.rebuildPath();
+			console.log('engines tr',engines);
+		}
 		b = 1;
 	}
 	if (b == 0) {
@@ -550,4 +580,3 @@ function initTrack(){
 	}
 }
 initTrack();
-		

@@ -135,4 +135,5 @@ function gridPointsOnLine(gridSize, p1, p2) {
   newPoints.sort(function(a,b){return a.x-b.x});  
   
   return newPoints;
+
 }

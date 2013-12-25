@@ -176,7 +176,7 @@ m['main'] = makeMenu('Tool Kit', 'main', 'main',0);
 
 m['m_ter'] = makeMenu('Terraform Tools', 'm_ter', 'main',1);
 m['m_tra'] = makeMenu('Track Tools', 'm_tra', 'main',2);
-m['m_tur'] = makeMenu('Rotate Train', 'm_tur', 'main',3);
+m['m_tad'] = makeMenu('Add Train', 'm_tad', 'main',3);
 
 m['m_ter_raise'] = makeMenu('Raise Ground', 'm_ter_raise', 'm_ter',1);
 m['m_ter_lower'] = makeMenu('Lower Ground', 'm_ter_lower', 'm_ter',2);
@@ -186,4 +186,3 @@ m['m_tra_remove'] = makeMenu('Remove Track', 'm_tra_remove', 'm_tra',2);
 
 setAllMenu();
 m['main'].e.click();
-m['m_tur'].e.click();

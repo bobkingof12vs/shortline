@@ -26,6 +26,7 @@
     <script src="js/menu.js"></script>
     <script src="js/track.js"></script>
     <script src="js/events.js"></script>
+    <?php include('js/train.php'); ?>
     
     <script>
       //console.log(THREE.UniformsUtils)
