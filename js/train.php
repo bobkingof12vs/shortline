@@ -27,6 +27,9 @@
 					this.train[i].path.push(nextT);
 					//console.log(this.train[i].path);
 				}
+				this.train[i].engine.curTrack = this.train[i].path[0].num;
+				this.train[i].engine.curT = 0;
+				this.train[i].engine.curPath = 0;
 				console.log('path',this.train[i].path,k);
 			}
 		}
@@ -37,7 +40,6 @@
 				railcars: [],
 				jobs: {},
 				findNextPath: 1,
-				speed: 0
 			});
 			this.rebuildPath(this.train.length - 1);
 			m['m_tad'].e.click();
@@ -69,11 +71,40 @@
 					}
 				*/
 				dTime /= 1000;
-				this.train[i].speed += this.train[i].engine.acc*dTime;
+				this.train[i].engine.speed += this.train[i].engine.acc*dTime;
 				travDist = this.train[i].speed*dTime;
 				brakeDist = ((this.train[i].speed*this.train[i].engine.dec)/60)+travDist;
-				//follow path
-				//unset done path's
+				
+				//-- follow path --//
+				//-- find dist left --//
+				dDist = lengthOfTrack(this.train[i].engine.curTrack,
+					{startT: this.train[i].engine.curT
+				});
+				//-- compare to travel --//
+				remDist = travDist + dDist;
+				if (remDist <= this.train[i].path[this.train[i].engine.curPath].len	) {
+					this.train[i].engine.curT = (remDist/this.train[i].path[this.train[i].engine.curPath].len);
+				}
+				else{
+					//-- if remainder, compare to next track length --//
+					//-- subtract distance from other tracks (if not the same track) --//
+					travDist -= dDist;
+					j = this.train[i].engine.curPath - 1;
+					while (j < this.train[i].path.length){
+						j++;
+						if (travDist <= this.train[i].path[j].len	) {
+							this.train[i].engine.curT = (travDist/this.train[i].path[j].len);
+						}
+						else{
+							travDist -= this.train[i].path[j].len;
+							this.train[i].engine.curPath++;
+						}
+					}
+				}
+				console.log(this.train[i].engine.curTrack,this.train[i].engine.curT,this.train[i].engine.curPath);
+					//-- move remaining distance --//
+					//-- find dist + .001 for rotation --//
+					//-- update train --//
 			}
 		}
 	};
@@ -94,6 +125,8 @@
 			engines[mesh].curP = endPoints[engines[mesh].startEndPoint].end;
 			engines[mesh].curDir = endPoints[engines[mesh].startEndPoint].dir;
 			engines[mesh].curTrack = endPoints[engines[mesh].startEndPoint].track;
+			engines[mesh].curT = 0;
+			engines[mesh].curPath = 0;
 			
 			console.log(engines[mesh]);
 			loader.load("js/trains/"+mesh+".js", jsObjToGlobalMesh(mesh));

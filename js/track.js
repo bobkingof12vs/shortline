@@ -498,7 +498,6 @@ function nextTrackFromSwitch(i,change){
 }
 
 function nextTrack(i,t1,opts){
-	console.log(i,endPoints);
 	if (t1 === 1) {
 		p1 = drawTrack[i].p1
 		p3 = drawTrack[i].p3
@@ -533,7 +532,7 @@ function nextTrack(i,t1,opts){
 				k = endPoints.length;
 				while (k > 0){
 					k--;
-					console.log(endPoints[k].end, p3, p1);
+					//console.log(endPoints[k].end, p3, p1);
 					//if (equalXZ(endPoints[k].end, p3) == 1) {
 					if (endPoints[k].track == i) {
 						return {type: 'stop', num: j, startT: 0, endT: 1, stop: k, len: drawTrack[j].len}
