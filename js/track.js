@@ -485,12 +485,12 @@ function nextTrackFromSwitch(i,change){
 		j--;
 		if ((equalXZ(switches[i].o, drawTrack[j].p1) == 1)
 			 &(equalXZ(switches[i].d[switches[i].s], drawTrack[j].p3) == 1)) {
-			return {type: 'switch', num: j, startT: 0, endT: 1, s: i, len: drawTrack[j].len}
+			return {type: 'switch', num: j, startT: 1, endT: 0, s: i, len: drawTrack[j].len}
 		}
 		else 
 		if ((equalXZ(switches[i].o, drawTrack[j].p3) == 1)
 			 &(equalXZ(switches[i].d[switches[i].s], drawTrack[j].p1) == 1)) {
-			return {type: 'switch', num: j, startT: 1, endT: 0, s: i, len: drawTrack[j].len}
+			return {type: 'switch', num: j, startT: 0, endT: 1, s: i, len: drawTrack[j].len}
 		}
 	}
 	console.log('error: switch with no found D. switch: ' + i +'. change: '+change);
@@ -535,10 +535,10 @@ function nextTrack(i,t1,opts){
 					//console.log(endPoints[k].end, p3, p1);
 					//if (equalXZ(endPoints[k].end, p3) == 1) {
 					if (endPoints[k].track == i) {
-						return {type: 'stop', num: j, startT: 0, endT: 1, stop: k, len: drawTrack[j].len}
+						return {type: 'stop', num: j, startT: 1, endT: 0, stop: k, len: drawTrack[j].len}
 					}
 				}
-				return {type: 'track', num: j, startT: 1, endT: 0, len: drawTrack[j].len}
+				return {type: 'track', num: j, startT: 0, endT: 1, len: drawTrack[j].len}
 			}
 			else if (equalXZ(drawTrack[j].p3, p1) == 1) {
 				console.log('next track 2');
@@ -547,7 +547,7 @@ function nextTrack(i,t1,opts){
 					k--;
 					console.log(endPoints[k].end, p3, p1);
 					if (endPoints[k].track == i) {
-						return {type: 'stop', num: j, startT: 1, endT: 0, stop: k, len: drawTrack[j].len}
+						return {type: 'stop', num: j, startT: 0, endT: 1, stop: k, len: drawTrack[j].len}
 					}
 				}
 				return {type: 'track', num: j, startT: 1, endT: 0, len: drawTrack[j].len}
