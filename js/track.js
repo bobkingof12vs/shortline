@@ -250,6 +250,7 @@ function generateDrawTrack() {
 				p3: trackPoints[i].p2
 			});
 			endPoints.push({end: trackPoints[i].p1, track: i, dir: 1});
+			testCube(trackPoints[i].p1, 0xff0000);
 		}
 		if (found3 == 0) {
 			drawTrack.push({
@@ -259,6 +260,23 @@ function generateDrawTrack() {
 				p3: trackPoints[i].p2
 			});
 			endPoints.push({end: trackPoints[i].p3, track: i, dir: 1});
+			testCube(trackPoints[i].p3, 0x00ff00);
+		}
+	}
+	
+	i = drawTrack.length;
+	var removals = [];
+	while (i > 0){
+		i--;
+		j = drawTrack.length
+		while (j > 0){
+			j--;
+			if (i < j & drawTrack[i] != undefined) {
+				if ((equalXZ(drawTrack[i].p1,drawTrack[j].p3) == 1 & equalXZ(drawTrack[i].p2,drawTrack[j].p2) == 1 & equalXZ(drawTrack[i].p3,drawTrack[j].p1) == 1 )
+				  | (equalXZ(drawTrack[i].p1,drawTrack[j].p1) == 1 & equalXZ(drawTrack[i].p2,drawTrack[j].p2) == 1 & equalXZ(drawTrack[i].p3,drawTrack[j].p3) == 1 )) {
+					drawTrack.splice(j,1);
+				}
+			}
 		}
 	}
 	
@@ -301,6 +319,7 @@ function generateDrawTrack() {
 		
 		//len calculated here
 		drawTrack[i].len = lengthOfTrack(i)
+		testText(i,recalcY(lerp(drawTrack[i].p1,drawTrack[i].p2,drawTrack[i].p2,drawTrack[i].p3,.8),10),-1)
 		
 		j = drawTrack.length;
 		while(j>0){
@@ -350,11 +369,19 @@ function generateDrawTrack() {
 	obj['switches'].children = [];
 	while (j>0){
 		j--;
-		obj['switches'].children[j] = globalMesh['switchArrow'].clone();
-		obj['switches'].children[j].position.set(switches[j].o.x,switches[j].o.y,switches[j].o.z);
-		obj['switches'].children[j].lookAt(switches[j].p)
-		obj['switches'].children[j].rotation.y += (-60 + (switches[j].s * (120/(switches[j].d.length-1))));
-		scene.add(obj['switches'].children[j]);
+		switchMeshWait = function(){
+			if (globalMesh['switchArrow'] != undefined) {
+				obj['switches'].children[j] = globalMesh['switchArrow'].clone();
+				obj['switches'].children[j].position.set(switches[j].o.x,switches[j].o.y,switches[j].o.z);
+				obj['switches'].children[j].lookAt(switches[j].p)
+				obj['switches'].children[j].rotation.y += (-60 + (switches[j].s * (120/(switches[j].d.length-1))));
+				scene.add(obj['switches'].children[j]);
+			}
+			else{
+				setTimeout(switchMeshWait,20);
+			}
+		}
+		switchMeshWait();
 	}
 }
 
@@ -498,11 +525,11 @@ function nextTrackFromSwitch(i,change){
 }
 
 function nextTrack(i,t1,opts){
-	if (t1 === 1) {
+	if (t1 === 0) {
 		p1 = drawTrack[i].p1
 		p3 = drawTrack[i].p3
 	}
-	else if (t1 === 0) {
+	else if (t1 === 1) {
 		p1 = drawTrack[i].p3
 		p3 = drawTrack[i].p1
 	}
@@ -527,29 +554,31 @@ function nextTrack(i,t1,opts){
 	while (j > 0){
 		j--;
 		if (j != i) {
-			if (equalXZ(drawTrack[j].p1, p1) == 1) {
-				console.log('next track 1');
+			if (equalXZ(drawTrack[j].p1, p3) == 1) {
 				k = endPoints.length;
 				while (k > 0){
 					k--;
-					//console.log(endPoints[k].end, p3, p1);
+					//console.log(endPoints[k].end, p3, p3);
 					//if (equalXZ(endPoints[k].end, p3) == 1) {
-					if (endPoints[k].track == i) {
+					if (endPoints[k].track == j) {
+						console.log('20',i,j,endPoints[k]);
 						return {type: 'stop', num: j, startT: 1, endT: 0, stop: k, len: drawTrack[j].len}
 					}
 				}
+						console.log('23',i,j);
 				return {type: 'track', num: j, startT: 0, endT: 1, len: drawTrack[j].len}
 			}
-			else if (equalXZ(drawTrack[j].p3, p1) == 1) {
-				console.log('next track 2');
+			else if (equalXZ(drawTrack[j].p3, p3) == 1) {
 				k = endPoints.length;
 				while (k > 0){
 					k--;
-					console.log(endPoints[k].end, p3, p1);
-					if (endPoints[k].track == i) {
-						return {type: 'stop', num: j, startT: 0, endT: 1, stop: k, len: drawTrack[j].len}
+					console.log(endPoints[k].end, p3, p3);
+					if (endPoints[k].track == j) {
+						console.log('21',i,j);
+						return {type: 'stop', num: j, startT: 1, endT: 0, stop: k, len: drawTrack[j].len}
 					}
 				}
+						console.log('22',i,j);
 				return {type: 'track', num: j, startT: 1, endT: 0, len: drawTrack[j].len}
 			}
 		}
@@ -579,3 +608,5 @@ function initTrack(){
 	}
 }
 initTrack();
+
+generateDrawTrack();

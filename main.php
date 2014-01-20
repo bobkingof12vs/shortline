@@ -20,6 +20,7 @@
     
     <script src="js/three.js"></script>
     <script src="js/OrbitControls.js"></script>
+    <script src="js/helvetiker_regular.typeface.js"></script>
     <script src="js/general.js"></script>
     <script src="js/init.js"></script>
     <script src="js/terraform.js"></script>

@@ -21,6 +21,9 @@ console.log("'camera'",camera);
 var toonMaterial = new THREE.MeshLambertMaterial
 //load trains
 var loader = new THREE.JSONLoader();
+//loader.callbackSync = callbackSync;
+//loader.callbackProgress = callbackProgress;
+//loader.load( "scenes/test_scene.js", callbackFinished );
 
 //load train function
 function modelToScene (name){
@@ -212,3 +215,67 @@ function getMouseIntersect( mouse, objects, callback) {
     callback(intersects);
   }
 }
+
+function testCube(p1,col,scale) {
+  scale = scale != undefined ? scale : 1;
+  var cubeMaterial = new THREE.MeshLambertMaterial( {color: col} ); 
+  var cubeGeometry = new THREE.CubeGeometry( 10*scale, 10*scale, 10*scale, 1, 1, 1 );
+  cube = new THREE.Mesh( cubeGeometry, cubeMaterial );
+	cube.position.set(p1.x, p1.y, p1.z);
+	scene.add(cube);
+  return cube;
+}
+
+function testText(text,p1,rot,scale){
+  scale = scale != undefined ? scale : 1;
+	// add 3D text
+	var materialFront = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+	var materialSide = new THREE.MeshBasicMaterial( { color: 0x000088 } );
+	var materialArray = [ materialFront, materialSide ];
+	var textGeom = new THREE.TextGeometry( text, 
+	{
+		size: 10, height: 4, curveSegments: 3,
+		font: "helvetiker", weight: "normal", style: "normal",
+		bevelThickness: 1, bevelSize: 2, bevelEnabled: true,
+		material: 0, extrudeMaterial: 1
+	});
+	// font: helvetiker, gentilis, droid sans, droid serif, optimer
+	// weight: normal, bold
+	
+	var textMaterial = new THREE.MeshFaceMaterial(materialArray);
+	var textMesh = new THREE.Mesh(textGeom, textMaterial );
+	
+	textGeom.computeBoundingBox();
+	var posx = (-0.5 * (textGeom.boundingBox.max.x - textGeom.boundingBox.min.x)) + p1.x;
+	var posy = (-0.5 * (textGeom.boundingBox.max.y - textGeom.boundingBox.min.y)) + p1.y;
+	var posz = (-0.5 * (textGeom.boundingBox.max.z - textGeom.boundingBox.min.z)) + p1.z;
+
+	textMesh.position.set(posx,posy,posz);
+  
+  if (rot != -1) {
+    textMesh.rotation.x = (rot == undefined ? 0 : rot.x);
+    textMesh.rotation.y = (rot == undefined ? 0 : rot.y);
+    textMesh.rotation.z = (rot == undefined ? 0 : rot.z);
+  }
+  else{
+    textMesh.lookAt(camera.position);
+    controls.addEventListener( 'change', function(){
+      
+      textMesh.lookAt(camera.position);
+      textGeom.computeBoundingBox();
+      posx = (-0.5 * (textGeom.boundingBox.max.x - textGeom.boundingBox.min.x)) + p1.x;
+      posy = (-0.5 * (textGeom.boundingBox.max.y - textGeom.boundingBox.min.y)) + p1.y;
+      posz = (-0.5 * (textGeom.boundingBox.max.z - textGeom.boundingBox.min.z)) + p1.z;
+      textMesh.position.set(posx,posy,posz);
+      textMesh.lookAt(camera.position);
+    });
+  };
+					
+  
+	scene.add(textMesh);
+  
+  return textMesh;
+}
+
+//testText('this is test',new THREE.Vector3(10,10,10),new THREE.Vector3(3.1415/-2,0,0))
+//testText('this is test',new THREE.Vector3(10,10,10),-1)
