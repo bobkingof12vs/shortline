@@ -19,14 +19,15 @@
 				
 				console.log(this.train[i])
 				this.train[i].path.push({type: 'track', num: this.train[i].engine.curTrack, startT: sT, endT: eT, len: lengthOfTrack(this.train[i].engine.curTrack)})
-				this.train[i].path.push(nextTrack(this.train[i].engine.curTrack,sT));
+				this.train[i].path.push(nextTrack(this.train[i].engine.curTrack,sT,this.train[i].path[this.train[i].path.length - 1 ].s));
 				nextT = true;
 				l = 0
 				while (nextT !== false & l < 20) {
 					
 					l++;
 					//console.log('19',this.train[i].path.length-1,this.train[i].path[this.train[i].path.length-1].num);
-					nextT = nextTrack(this.train[i].path[this.train[i].path.length-1].num,this.train[i].path[this.train[i].path.length-1].startT)
+					
+					nextT = nextTrack(this.train[i].path[this.train[i].path.length-1].num,this.train[i].path[this.train[i].path.length-1].startT,this.train[i].path[this.train[i].path.length - 1 ].s)
 					this.train[i].path.push(nextT);
 					console.log('1',this.train[i].path[this.train[i].path.length-1]);
 				}
@@ -74,11 +75,12 @@
 				//-- follow path --//
 				//-- find dist left --//
 				curTrackRemDist = lengthOfTrack(this.train[i].engine.curTrack,
-					{startT: this.train[i].engine.curT
+					{startT: this.train[i].engine.curT,
+					endT: this.train[i].path[this.train[i].engine.curPath].endT
 				});
 				//-- compare to travel --//
 				remDist = travDist - curTrackRemDist;
-				console.log(this.train[i].engine.curT , this.train[i].path[this.train[i].engine.curPath].endT , curTrackRemDist)
+				console.log(this.train[i].engine.curT , this.train[i].path[this.train[i].engine.curPath].endT , curTrackRemDist, travDist - curTrackRemDist, travDist)
 				curTrackLen = this.train[i].path[this.train[i].engine.curPath].len;
 				if ( remDist < 0) {
 					//remDist is a negative number, so we ADD it! not subtract!
@@ -90,7 +92,8 @@
 					});
 					console.log(lenTPlus)
 					//.01/lenTPlus = x/-remDist
-					this.train[i].engine.curT += ((travDist*.01)/lenTPlus);
+					//console.log(lenTPlus);
+					this.train[i].engine.curT += (this.train[i].path[this.train[i].engine.curPath].endT == 1 ? (travDist*.01)/lenTPlus : -(travDist*.01)/lenTPlus)
 				}
 				else{
 					//-- if remainder, compare to \next track length --//
@@ -99,31 +102,32 @@
 					this.train[i].engine.curPath++;
 					while (j < this.train[i].path.length - 2){
 						j++;
-						if (travDist <= this.train[i].path[j].len	) {
-							this.train[i].engine.curT = (travDist/this.train[i].path[j].len);
+						if (remDist <= this.train[i].path[j].len	) {
+							this.train[i].engine.curT = (this.train[i].path[this.train[i].engine.curPath].endT == 1 ? (travDist/this.train[i].path[j].len) : 1 - (travDist/this.train[i].path[j].len));
 							break;
 						}
 						else{
-							travDist -= this.train[i].path[j].len;
+							remDist -= this.train[i].path[j].len;
 							this.train[i].engine.curPath++;
 						}
 					}
 				}
 				//console.log(this.train[i].engine.curT,this.train[i].engine.curTrack,this.train[i].engine.curPath,this.train[i].engine.curSpeed,dTime,travDist,brakeDist);
 				//-- move remaining distance --//
+				//console.log(this.train[i].path[this.train[i].engine.curPath].endT, 1 - this.train[i].engine.curT, this.train[i].engine.curT)
 				this.train[i].engine.curP = lerp(
 					drawTrack[this.train[i].path[this.train[i].engine.curPath].num].p1,
 					drawTrack[this.train[i].path[this.train[i].engine.curPath].num].p2,
 					drawTrack[this.train[i].path[this.train[i].engine.curPath].num].p2,
 					drawTrack[this.train[i].path[this.train[i].engine.curPath].num].p3,
-					(this.train[i].path[this.train[i].engine.curPath].endT == 1 ? 1 - this.train[i].engine.curT : this.train[i].engine.curT));
+					(this.train[i].engine.curT));
 				//-- find dist + .001 for rotation --//
 				pointAt = lerp(
 					drawTrack[this.train[i].path[this.train[i].engine.curPath].num].p1,
 					drawTrack[this.train[i].path[this.train[i].engine.curPath].num].p2,
 					drawTrack[this.train[i].path[this.train[i].engine.curPath].num].p2,
 					drawTrack[this.train[i].path[this.train[i].engine.curPath].num].p3,
-					(this.train[i].path[this.train[i].engine.curPath].endT == 1 ? 1 - this.train[i].engine.curT - .01 : this.train[i].engine.curT) + .01);
+					(this.train[i].path[this.train[i].engine.curPath].endT == 1 ? (this.train[i].engine.curT) + .001 : (this.train[i].engine.curT) - .001));
 				//console.log(this.train[i].engine.curPath,this.train[i].path[this.train[i].engine.curPath].num,drawTrack[this.train[i].path[this.train[i].engine.curPath].num].p1);
 				
 				
