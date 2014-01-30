@@ -9,31 +9,44 @@
 			console.log('here',i,j,this.train)
 			while(i > j) {
 				i--;
-				
-				//onclick of switch arrow mark that trains need to be checked for changes
-				//only if the change switch is checked though
-				this.train[i].path = [];
-				
-				sT = this.train[i].engine.curDir == 1 ? 1 : 0;
-				eT = this.train[i].engine.curDir == 1 ? 0 : 1;
-				
-				console.log(this.train[i])
-				this.train[i].path.push({type: 'track', num: this.train[i].engine.curTrack, startT: sT, endT: eT, len: lengthOfTrack(this.train[i].engine.curTrack)})
-				this.train[i].path.push(nextTrack(this.train[i].engine.curTrack,sT,this.train[i].path[this.train[i].path.length - 1 ].s));
-				nextT = true;
-				l = 0
-				while (nextT !== false & l < 20) {
+				if (this.train[i].pathType == 'routed') {
+						
+					//onclick of switch arrow mark that trains need to be checked for changes
+					//only if the change switch is checked though
+					this.train[i].path = [];
 					
-					l++;
-					//console.log('19',this.train[i].path.length-1,this.train[i].path[this.train[i].path.length-1].num);
+					sT = this.train[i].engine.curDir == 1 ? 1 : 0;
+					eT = this.train[i].engine.curDir == 1 ? 0 : 1;
 					
-					nextT = nextTrack(this.train[i].path[this.train[i].path.length-1].num,this.train[i].path[this.train[i].path.length-1].startT,this.train[i].path[this.train[i].path.length - 1 ].s)
-					this.train[i].path.push(nextT);
-					console.log('1',this.train[i].path[this.train[i].path.length-1]);
+					console.log(this.train[i])
+					this.train[i].path.push({type: 'track', num: this.train[i].engine.curTrack, startT: sT, endT: eT, len: lengthOfTrack(this.train[i].engine.curTrack)})
+					this.train[i].path.push(nextTrack(this.train[i].engine.curTrack,sT,this.train[i].path[this.train[i].path.length - 1 ].s));
+					nextT = true;
+					l = 0
+					while (nextT !== false & l < 0) {
+						
+						l++;
+						//console.log('19',this.train[i].path.length-1,this.train[i].path[this.train[i].path.length-1].num);
+						
+						nextT = nextTrack(this.train[i].path[this.train[i].path.length-1].num,this.train[i].path[this.train[i].path.length-1].startT,this.train[i].path[this.train[i].path.length - 1 ].s)
+						this.train[i].path.push(nextT);
+						console.log('1',this.train[i].path[this.train[i].path.length-1]);
+						if (l > 0) {
+							this.train[i].path.push(false)
+						}
+					}
+					this.train[i].engine.curTrack = this.train[i].path[0].num;
+					this.train[i].engine.curT = 0;
+					this.train[i].engine.curPath = 0;
+					this.train[i].engine.curDir = this.train[i].path[0].dir
 				}
-				this.train[i].engine.curTrack = this.train[i].path[0].num;
-				this.train[i].engine.curT = 0;
-				this.train[i].engine.curPath = 0;
+				else if(this.train[i].pathType == 'wayward'){
+					this.train[i].path.push(nextTrack(this.train[i].engine.curTrack,sT,this.train[i].path[this.train[i].path.length - 1 ].s));
+					this.train[i].engine.curT = 0;
+					this.train[i].engine.curPath = this.train[i].path.length - 1;
+					this.train[i].engine.curTrack = this.train[i].path[this.train[i].path.length - 1].num;
+					this.train[i].engine.curDir = this.train[i].path[this.train[i].path.length - 1].dir;
+				}
 				console.log('path',this.train[i].path,k);
 			}
 		}
@@ -43,7 +56,7 @@
 				engine: engines['shunter'],
 				railcars: [],
 				jobs: {},
-				findNextPath: 1,
+				pathType: 'wayward' //routed wayward
 			});
 			this.rebuildPath(this.train.length - 1);
 			addTrainMeshFunction = function(){
@@ -68,6 +81,11 @@
 			var i = -1;
 			while(i < this.train.length - 1) {
 				i++;
+				
+				if (this.train[i].path[this.train[i].engine.curPath] == false) {
+					this.rebuildTrack(i);
+				}
+				
 				this.train[i].engine.curSpeed += this.train[i].engine.acc*dTime;
 				travDist = this.train[i].engine.curSpeed*dTime;
 				brakeDist = ((this.train[i].engine.curSpeed*this.train[i].engine.dec)/60)+travDist;
@@ -80,7 +98,7 @@
 				});
 				//-- compare to travel --//
 				remDist = travDist - curTrackRemDist;
-				console.log(this.train[i].engine.curT , this.train[i].path[this.train[i].engine.curPath].endT , curTrackRemDist, travDist - curTrackRemDist, travDist)
+				//console.log(this.train[i].engine.curT , this.train[i].path[this.train[i].engine.curPath].endT , curTrackRemDist, travDist - curTrackRemDist, travDist)
 				curTrackLen = this.train[i].path[this.train[i].engine.curPath].len;
 				if ( remDist < 0) {
 					//remDist is a negative number, so we ADD it! not subtract!
@@ -90,7 +108,7 @@
 						 endT: this.train[i].engine.curT + .01,
 						 numBreaks: 3
 					});
-					console.log(lenTPlus)
+					//console.log(lenTPlus)
 					//.01/lenTPlus = x/-remDist
 					//console.log(lenTPlus);
 					this.train[i].engine.curT += (this.train[i].path[this.train[i].engine.curPath].endT == 1 ? (travDist*.01)/lenTPlus : -(travDist*.01)/lenTPlus)
@@ -100,8 +118,13 @@
 					//-- subtract distance from other tracks (if not the same track) --//
 					j = this.train[i].engine.curPath;
 					this.train[i].engine.curPath++;
-					while (j < this.train[i].path.length - 2){
+					
+					while (j < this.train[i].path.length - 1){
 						j++;
+						console.log(this.train[i].path[this.train[i].engine.curPath])
+						if (this.train[i].path[this.train[i].engine.curPath] == false) {
+							this.rebuildPath(i);
+						}
 						if (remDist <= this.train[i].path[j].len	) {
 							this.train[i].engine.curT = (this.train[i].path[this.train[i].engine.curPath].endT == 1 ? (travDist/this.train[i].path[j].len) : 1 - (travDist/this.train[i].path[j].len));
 							break;
@@ -200,11 +223,9 @@
 	if (endPoints !== undefined & engines == undefined) {
 		initEngines();
 		train.addTrain();
-		train.rebuildPath();
+		//train.rebuildPath();
 		console.log('engines',engines);
 	}
 	
 
 </script>
-
-c

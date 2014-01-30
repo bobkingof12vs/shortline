@@ -312,6 +312,7 @@ function generateDrawTrack() {
 			d: [d1,d2],
 			s: 1
 		});
+		//testText(switches.length-1,randomPoint(new THREE.Vector3(5,0,5),recalcY(o,10)),-1);
 		return;
 	}
 	
@@ -321,7 +322,7 @@ function generateDrawTrack() {
 		
 		//len calculated here
 		drawTrack[i].len = lengthOfTrack(i)
-		testText(i,recalcY(lerp(drawTrack[i].p1,drawTrack[i].p2,drawTrack[i].p2,drawTrack[i].p3,.68),10),-1)
+		//testText(i,recalcY(lerp(drawTrack[i].p1,drawTrack[i].p2,drawTrack[i].p2,drawTrack[i].p3,.68),10),-1)
 		
 		found1 = found3 = 0;
 		
@@ -384,7 +385,7 @@ function generateDrawTrack() {
 		j--;
 		scene.remove(obj['switches'].children[j]);
 	}
-	
+	console.log('switches', switches);
 	var j = switches.length;
 	obj['switches'].children = [];
 	while (j>0){
@@ -523,8 +524,8 @@ function lengthOfTrack(trackNum,opts) {
 	return d;
 }
 
-function nextTrackFromSwitch(i,change,lastSwitchNum){
-	console.log('switch',i,lastSwitchNum)
+function nextTrackFromSwitch(i,change){
+	console.log('switch',i)
 	if (change != -1) {
 		switches[i].s = change
 	}
@@ -532,27 +533,15 @@ function nextTrackFromSwitch(i,change,lastSwitchNum){
 	
 	while (k > 0) {
 		k--;
-		if (lastSwitchNum != undefined) {
-			l = switches[lastSwitchNum].d.length
-			while(l > 0){
-				l--;
-				if (((equalXZ(switches[lastSwitchNum].o, drawTrack[k].p3) == 1)
-					& (equalXZ(switches[lastSwitchNum].d[l], drawTrack[k].p1) == 1))
-				| ((equalXZ(switches[lastSwitchNum].o, drawTrack[k].p1) == 1)
-					& (equalXZ(switches[lastSwitchNum].d[l], drawTrack[k].p3) == 1))){
-					console.log( "go away from switch");
-					return false;
-				}
-			}
-		}
 		if ((equalXZ(switches[i].o, drawTrack[k].p1) == 1)
 			 &(equalXZ(switches[i].d[switches[i].s], drawTrack[k].p3) == 1)) {
+			console.log('point 1 switch');
 			return {type: 'switch', num: k, startT: 0, endT: 1, s: i, len: drawTrack[k].len}
-		}
-		else 
+		} 
 		if ((equalXZ(switches[i].o, drawTrack[k].p3) == 1)
 			 &(equalXZ(switches[i].d[switches[i].s], drawTrack[k].p1) == 1)) {
-			return {type: 'switch', num: k, startT: 0, endT: 1, s: i, len: drawTrack[k].len}
+			console.log('point 3 switch');
+			return {type: 'switch', num: k, startT: 1, endT: 0, s: i, len: drawTrack[k].len}
 		}
 	}
 	console.log('error: switch with no found D. switch: ' + i +'. change: '+change);
@@ -577,22 +566,21 @@ function nextTrack(i,t1,lastSwitchNum,opts){
 	j = switches.length;
 	while (j > 0){
 		j--;
-		if (j != i & j != lastSwitchNum) {
-			if ((equalXZ(switches[j].o,p1) == 1)
-				 &(equalXZ(drawTrack[i].p2, switches[j].p) == 1)) { //bug?
-				console.log('switch',lastSwitchNum,j);
-				ret = nextTrackFromSwitch(j,change,lastSwitchNum);
-				if (ret != false) {
-					return ret
+		if (j != lastSwitchNum) {
+			if (equalXZ(switches[j].o,p3) == 1){
+				if (lastSwitchNum == undefined) {
+					return nextTrackFromSwitch(j,change);
 				}
-				console.log('j',j)
+				else if(equalXZ(switches[j].p,switches[lastSwitchNum].p) != 1)	{
+					return nextTrackFromSwitch(j,change);
+				}
 			}
 		}
 	}
 	j = drawTrack.length;
 	while (j > 0){
 		j--;
-		if (j != i) {
+		if (j != i & drawTrack[i].p2 != drawTrack[j].p2) {
 			if (equalXZ(drawTrack[j].p1, p3) == 1) {
 				k = endPoints.length;
 				while (k > 0){
@@ -647,5 +635,3 @@ function initTrack(){
 	}
 }
 initTrack();
-
-generateDrawTrack();

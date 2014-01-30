@@ -137,3 +137,11 @@ function gridPointsOnLine(gridSize, p1, p2) {
   return newPoints;
 
 }
+
+function randomPoint(magnitude,p1){
+  p1 = p1 == undefined ? new THREE.Vector3(0,0,0) : p1;
+  p1.x += ((Math.random() * magnitude.x * 2) - magnitude.x)
+  p1.y += ((Math.random() * magnitude.y * 2) - magnitude.y)
+  p1.z += ((Math.random() * magnitude.z * 2) - magnitude.z)
+  return p1;
+}
