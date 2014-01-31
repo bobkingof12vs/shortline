@@ -267,7 +267,7 @@ function generateDrawTrack() {
 				p2: midpoint(trackPoints[i].p1,trackPoints[i].p2),
 				p3: trackPoints[i].p2
 			});
-			testCube(trackPoints[i].p1, 0xff0000);
+			//testCube(trackPoints[i].p1, 0xff0000);
 		}
 		if (found3 == 0) {
 			drawTrack.push({
@@ -276,7 +276,7 @@ function generateDrawTrack() {
 				p2: midpoint(trackPoints[i].p3,trackPoints[i].p2),
 				p3: trackPoints[i].p2
 			});
-			testCube(trackPoints[i].p3, 0x00ff00);
+			//testCube(trackPoints[i].p3, 0x00ff00);
 		}
 	}
 	
@@ -312,7 +312,7 @@ function generateDrawTrack() {
 			d: [d1,d2],
 			s: 1
 		});
-		//testText(switches.length-1,randomPoint(new THREE.Vector3(5,0,5),recalcY(o,10)),-1);
+		///testText(switches.length-1,randomPoint(new THREE.Vector3(5,0,5),recalcY(o,10)),-1);
 		return;
 	}
 	
@@ -535,12 +535,10 @@ function nextTrackFromSwitch(i,change){
 		k--;
 		if ((equalXZ(switches[i].o, drawTrack[k].p1) == 1)
 			 &(equalXZ(switches[i].d[switches[i].s], drawTrack[k].p3) == 1)) {
-			console.log('point 1 switch');
 			return {type: 'switch', num: k, startT: 0, endT: 1, s: i, len: drawTrack[k].len}
 		} 
 		if ((equalXZ(switches[i].o, drawTrack[k].p3) == 1)
 			 &(equalXZ(switches[i].d[switches[i].s], drawTrack[k].p1) == 1)) {
-			console.log('point 3 switch');
 			return {type: 'switch', num: k, startT: 1, endT: 0, s: i, len: drawTrack[k].len}
 		}
 	}
@@ -548,15 +546,8 @@ function nextTrackFromSwitch(i,change){
 	return false;
 }
 
-function nextTrack(i,t1,lastSwitchNum,opts){
-	if (t1 === 0) {
-		p1 = drawTrack[i].p1
-		p3 = drawTrack[i].p3
-	}
-	else if (t1 === 1) {
-		p1 = drawTrack[i].p3
-		p3 = drawTrack[i].p1
-	}
+function nextTrack(i,lastEndT,lastSwitchNum,opts){
+	p3 = lastEndT === 1 ? drawTrack[i].p3 : drawTrack[i].p1;
 	
 	opts = (opts != undefined ? opts : {});
 	//calculating change of switch should be here
@@ -567,11 +558,14 @@ function nextTrack(i,t1,lastSwitchNum,opts){
 	while (j > 0){
 		j--;
 		if (j != lastSwitchNum) {
-			if (equalXZ(switches[j].o,p3) == 1){
+			if ((equalXZ(switches[j].o,p3) == 1)
+				 &(equalXZ(drawTrack[i].p2,switches[j].p) != 1)){
+				console.log(drawTrack[i].p2,switches[j].p)
 				if (lastSwitchNum == undefined) {
 					return nextTrackFromSwitch(j,change);
 				}
 				else if(equalXZ(switches[j].p,switches[lastSwitchNum].p) != 1)	{
+					console.log('pew pew',switches[j].p,switches[lastSwitchNum].p)
 					return nextTrackFromSwitch(j,change);
 				}
 			}
@@ -585,8 +579,6 @@ function nextTrack(i,t1,lastSwitchNum,opts){
 				k = endPoints.length;
 				while (k > 0){
 					k--;
-					//console.log(endPoints[k].end, p3, p3);
-					//if (equalXZ(endPoints[k].end, p3) == 1) {
 					if (endPoints[k].track == j) {
 						console.log('20',i,j,endPoints[k]);
 						return {type: 'stop', num: j, startT: 1, endT: 0, stop: k, len: drawTrack[j].len}
@@ -599,7 +591,6 @@ function nextTrack(i,t1,lastSwitchNum,opts){
 				k = endPoints.length;
 				while (k > 0){
 					k--;
-					console.log(endPoints[k].end, p3, p3);
 					if (endPoints[k].track == j) {
 						console.log('21',i,j);
 						return {type: 'stop', num: j, startT: 1, endT: 0, stop: k, len: drawTrack[j].len}

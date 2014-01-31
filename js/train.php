@@ -9,45 +9,30 @@
 			console.log('here',i,j,this.train)
 			while(i > j) {
 				i--;
-				if (this.train[i].pathType == 'routed') {
-						
-					//onclick of switch arrow mark that trains need to be checked for changes
-					//only if the change switch is checked though
-					this.train[i].path = [];
-					
-					sT = this.train[i].engine.curDir == 1 ? 1 : 0;
-					eT = this.train[i].engine.curDir == 1 ? 0 : 1;
-					
-					console.log(this.train[i])
-					this.train[i].path.push({type: 'track', num: this.train[i].engine.curTrack, startT: sT, endT: eT, len: lengthOfTrack(this.train[i].engine.curTrack)})
-					this.train[i].path.push(nextTrack(this.train[i].engine.curTrack,sT,this.train[i].path[this.train[i].path.length - 1 ].s));
-					nextT = true;
-					l = 0
-					while (nextT !== false & l < 0) {
-						
-						l++;
-						//console.log('19',this.train[i].path.length-1,this.train[i].path[this.train[i].path.length-1].num);
-						
-						nextT = nextTrack(this.train[i].path[this.train[i].path.length-1].num,this.train[i].path[this.train[i].path.length-1].startT,this.train[i].path[this.train[i].path.length - 1 ].s)
-						this.train[i].path.push(nextT);
-						console.log('1',this.train[i].path[this.train[i].path.length-1]);
-						if (l > 0) {
-							this.train[i].path.push(false)
-						}
-					}
-					this.train[i].engine.curTrack = this.train[i].path[0].num;
-					this.train[i].engine.curT = 0;
-					this.train[i].engine.curPath = 0;
-					this.train[i].engine.curDir = this.train[i].path[0].dir
+				
+				//onclick of switch arrow mark that trains need to be checked for changes
+				//only if the change switch is checked though
+			console.log()
+				var nextT = nextTrack(this.train[i].engine.curTrack,this.train[i].path[this.train[i].path.length - 2 ].endT,this.train[i].path[this.train[i].path.length - 2 ].s);
+				this.train[i].path = [];
+				this.train[i].path.push(nextT);
+				l = 1;
+				while (nextT !== false & l < this.train[i].pathMaxLength) {
+					l++;
+					nextT = nextTrack(this.train[i].path[this.train[i].path.length-1].num,this.train[i].path[this.train[i].path.length-1].endT,this.train[i].path[this.train[i].path.length - 1 ].s)
+					this.train[i].path.push(nextT);
 				}
-				else if(this.train[i].pathType == 'wayward'){
-					this.train[i].path.push(nextTrack(this.train[i].engine.curTrack,sT,this.train[i].path[this.train[i].path.length - 1 ].s));
-					this.train[i].engine.curT = 0;
-					this.train[i].engine.curPath = this.train[i].path.length - 1;
-					this.train[i].engine.curTrack = this.train[i].path[this.train[i].path.length - 1].num;
-					this.train[i].engine.curDir = this.train[i].path[this.train[i].path.length - 1].dir;
+				
+				if (this.train[i].pathMaxLength == l) {
+					this.train[i].path.push(false);
 				}
+				
+				this.train[i].engine.curTrack = this.train[i].path[0].num;
+				this.train[i].engine.curT = 0;
+				this.train[i].engine.curPath = 0;
+				this.train[i].engine.curDir = this.train[i].path[0].dir
 				console.log('path',this.train[i].path,k);
+				
 			}
 		}
 		
@@ -56,9 +41,10 @@
 				engine: engines['shunter'],
 				railcars: [],
 				jobs: {},
-				pathType: 'wayward' //routed wayward
+				pathMaxLength: 20,
+				path: [{type: 'track', num: engines['shunter'].curTrack, startT: 0, endT: 1, len: lengthOfTrack(engines['shunter'].curTrack)},false]
 			});
-			this.rebuildPath(this.train.length - 1);
+			//this.rebuildPath(this.train.length - 1);
 			addTrainMeshFunction = function(){
 				if (train.train[train.train.length - 1].engine.mesh != undefined) {
 					scene.add(train.train[train.train.length - 1].engine.mesh);
@@ -124,6 +110,7 @@
 						console.log(this.train[i].path[this.train[i].engine.curPath])
 						if (this.train[i].path[this.train[i].engine.curPath] == false) {
 							this.rebuildPath(i);
+							j = 0;
 						}
 						if (remDist <= this.train[i].path[j].len	) {
 							this.train[i].engine.curT = (this.train[i].path[this.train[i].engine.curPath].endT == 1 ? (travDist/this.train[i].path[j].len) : 1 - (travDist/this.train[i].path[j].len));
