@@ -1,3 +1,5 @@
-'acc' => 30,
-'top' => 100,
-'dec' => 100
+'acc' => 10,
+'top' => 20,
+'dec' => 100,
+'axleOffset' => 20,
+'sizeLength' => 30

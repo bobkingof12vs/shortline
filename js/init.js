@@ -218,6 +218,7 @@ function getMouseIntersect( mouse, objects, callback) {
 
 function testCube(p1,col,scale) {
   scale = scale != undefined ? scale : 1;
+  col = col != undefined ? col : 0x00ff00;
   var cubeMaterial = new THREE.MeshLambertMaterial( {color: col} ); 
   var cubeGeometry = new THREE.CubeGeometry( 10*scale, 10*scale, 10*scale, 1, 1, 1 );
   cube = new THREE.Mesh( cubeGeometry, cubeMaterial );

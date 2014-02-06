@@ -616,7 +616,6 @@ function initTrack(){
 		if (initEngines != undefined) {
 			initEngines();
 			train.addTrain();
-			train.rebuildPath();
 			console.log('engines tr',engines);
 		}
 		b = 1;
