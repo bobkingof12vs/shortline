@@ -73,6 +73,32 @@
 			addTrainMeshFunction();
 		}
 		
+		this.carDistBehindEngineCurP = function(i,j){
+			var dist = ((this.train[i].engine.sizeLength - this.train[i].engine.axleOffset)/2) + this.train[i].engine.axleOffset;
+			for(k = 0; k < j; k++){
+				dist += this.train[i].railcars[k].sizeLength + 5;
+			}
+			return (dist + ((this.train[i].railcars[j].sizeLength - this.train[i].railcars[j].axleOffset)/2))
+		}
+		
+		this.addRailcar = function(i){
+			this.train[i].railcars.push(railcars['flatcar']);
+			this.train[i].railcars[this.train[i].railcars.length - 1].distanceBehind = this.carDistBehindEngineCurP(i,this.train[i].railcars.length - 1);
+			
+			console.log('railcar',this.train[i].railcars)
+			
+			addRailcarMeshFunction = function(){
+				if (train.train[train.train.length - 1].railcars[train.train[train.train.length - 1].railcars.length - 1].mesh != undefined) {
+					console.log('railcar mesh added');
+					scene.add(train.train[train.train.length - 1].railcars[train.train[train.train.length - 1].railcars.length - 1].mesh);
+				}
+				else{
+					setTimeout(addRailcarMeshFunction,20)
+				}
+			};
+			addRailcarMeshFunction();
+		}
+		
 		this.followBehind = function(i,distanceBehind){
 			
 			curPath = this.train[i].pathHistory.length - (this.train[i].path.length - this.train[i].engine.curPath - 2) - 1;
@@ -93,7 +119,8 @@
 					 numBreaks: 3
 				});
 				//.01/lenTPlus = x/-remDist
-				toCalcT = this.train[i].engine.curT + (this.train[i].pathHistory[curPath].endT == 0 ? (distanceBehind*.01)/lenTPlus : -(distanceBehind*.01)/lenTPlus)
+				
+				toCalcT = this.train[i].engine.curT + (this.train[i].pathHistory[curPath].endT == 0 ? -(remDist*.01)/lenTPlus : (remDist*.01)/lenTPlus)
 			}
 			else{
 				//-- if remainder, compare to \next track length --//
@@ -124,6 +151,7 @@
 			//check for new trains
 			if (m['m_tad'].clicked == 1) {
 				this.addTrain();
+				this.addRailcar(this.train.length-1);
 				m['m_tad'].e.click();
 			}
 			
@@ -209,36 +237,40 @@
 					this.train[i].engine.mesh.lookAt(this.train[i].engine.back)
 					this.train[i].engine.mesh.rotationNeedsUpdate = true;
 				}
-				/*
+				
 				//then loop through railcars
 				j = this.train[i].railcars.length
 				while(j > 0){
 					j--;
 					//-- find front and back based on distance behind curP --//
-					front = this.followBehind(i,this.train[i].railcar[j].distanceBehind);
-					back = this.followBehind(i,this.train[i].railcar[j].distanceBehind + this.train[i].railcar[j].axleOffset);
+					front = this.followBehind(i,this.train[i].railcars[j].distanceBehind);
+					back = this.followBehind(i,this.train[i].railcars[j].distanceBehind + this.train[i].railcars[j].axleOffset);
 					
 					if (front != false & back != false) {
+						console.log('true true');
 						back.y = findY(back.x,back.z);
 						front.y = findY(front.x,front.z);
-						this.train[i].railcar[j].front = front;
-						this.train[i].railcar[j].back = back;
+						this.train[i].railcars[j].front = front;
+						this.train[i].railcars[j].back = back;
 					}
 					else if (front != false & back == false) {
+						console.log('true flase');
 						front.y = findY(front.x,front.z);
-						this.train[i].railcar[j].front = front;
-						this.train[i].railcar[j].back = this.train[i].engine.back;
+						this.train[i].railcars[j].front = front;
+						this.train[i].railcars[j].back = this.train[i].engine.back;
 						
 					}
 					else{
-						this.train[i].railcar[j].front = this.train[i].engine.front;
-						this.train[i].railcar[j].back = this.train[i].engine.back;
+						console.log('false flase');
+						this.train[i].railcars[j].front = this.train[i].engine.front;
+						this.train[i].railcars[j].back = this.train[i].engine.back;
 					}
-					
-					this.train[i].railcar[j].mesh.position = this.train[i].railcar[j].front;
-					this.train[i].railcar[j].mesh.lookAt(this.train[i].railcar[j].back);
-					this.train[i].railcar[j].mesh.rotationNeedsUpdate = true;
-				}*/
+					if (this.train[i].railcars[j].mesh!= undefined) {	
+						this.train[i].railcars[j].mesh.position = this.train[i].railcars[j].front;
+						this.train[i].railcars[j].mesh.lookAt(this.train[i].railcars[j].back);
+						this.train[i].railcars[j].mesh.rotationNeedsUpdate = true;
+					}
+				}
 			}
 		}
 	};
@@ -247,37 +279,59 @@
 	var railcars = [];
 	
 	function engine(mesh,opts){
-			engines[mesh] = {};
-			engines[mesh].acc = opts.acc;
-			engines[mesh].top = opts.top;
-			engines[mesh].dec = opts.dec;
-			
-			engines[mesh].axleOffset = opts.axleOffset;
-			engines[mesh].sizeLength = opts.sizeLength;
-			
-			engines[mesh].startEndPoint = 0; //opts.startEndPoint;
-			
-			engines[mesh].curSpeed = 0;
-			engines[mesh].curP = endPoints[engines[mesh].startEndPoint].end;
-			engines[mesh].curDir = endPoints[engines[mesh].startEndPoint].dir;
-			engines[mesh].curTrack = endPoints[engines[mesh].startEndPoint].track;
-			
-			engines[mesh].curT = 0;
-			engines[mesh].curPath = 0;
-			
-			console.log(engines[mesh]);
-			loader.load("js/trains/"+mesh+".js", jsObjToGlobalMesh(mesh));
-			
-			var f = function(){
-				if (globalMesh[mesh] != undefined) {
-					engines[mesh].mesh = globalMesh[mesh];
-					console.log('engine '+mesh, engines[mesh]);
-				}
-				else{
-					setTimeout(f,10);
-				}
+		engines[mesh] = {};
+		engines[mesh].acc = opts.acc;
+		engines[mesh].top = opts.top;
+		engines[mesh].dec = opts.dec;
+		
+		engines[mesh].axleOffset = opts.axleOffset;
+		engines[mesh].sizeLength = opts.sizeLength;
+		
+		engines[mesh].startEndPoint = 0; //opts.startEndPoint;
+		
+		engines[mesh].curSpeed = 0;
+		engines[mesh].curP = endPoints[engines[mesh].startEndPoint].end;
+		engines[mesh].curDir = endPoints[engines[mesh].startEndPoint].dir;
+		engines[mesh].curTrack = endPoints[engines[mesh].startEndPoint].track;
+		
+		engines[mesh].curT = 0;
+		engines[mesh].curPath = 0;
+		
+		console.log(engines[mesh]);
+		loader.load("js/trains/"+mesh+".js", jsObjToGlobalMesh(mesh));
+		
+		var f = function(){
+			if (globalMesh[mesh] != undefined) {
+				engines[mesh].mesh = globalMesh[mesh];
+				console.log('engine '+mesh, engines[mesh]);
 			}
-			f();
+			else{
+				setTimeout(f,10);
+			}
+		}
+		f();
+	}
+	
+	function railcar(mesh,opts){
+		railcars[mesh] = {};
+		
+		railcars[mesh].axleOffset = opts.axleOffset;
+		railcars[mesh].sizeLength = opts.sizeLength;
+		railcars[mesh].distancebehind = 0;
+		
+		console.log(railcars[mesh]);
+		loader.load("js/trains/"+mesh+".js", jsObjToGlobalMesh(mesh));
+		
+		var f = function(){
+			if (globalMesh[mesh] != undefined) {
+				railcars[mesh].mesh = globalMesh[mesh];
+				console.log('railcar '+mesh, railcars[mesh]);
+			}
+			else{
+				setTimeout(f,10);
+			}
+		}
+		f();
 	}
 	
 	function initEngines(){
@@ -300,11 +354,28 @@
 					);";
 				}
 			}
+			
+			foreach(glob('/Google Drive/webroot/train/railcars/*') as $railcars){
+				
+				$ex = explode('/',$railcars);
+				$name = end($ex);
+				if(strpos($name,'.') === false){
+					eval('$in = array('.file_get_contents($railcars).');');
+					echo "
+					railcar(
+						'$name',{ 
+							axleOffset: {$in['axleOffset']},
+							sizeLength: {$in['sizeLength']},
+						}
+					);";
+				}
+			}
 		?>
 	}
 	if (endPoints !== undefined & engines == undefined) {
 		initEngines();
 		train.addTrain();
+		train.addRailcar(train.train.length-1);
 		//train.rebuildPath();
 		console.log('engines',engines);
 	}
