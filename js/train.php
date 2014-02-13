@@ -105,22 +105,20 @@
 			//-- follow path --//
 			//-- find dist left --//
 			curTrackRemDist = lengthOfTrack(this.train[i].engine.curTrack,
-				{startT: this.train[i].engine.curT,
-				endT: (this.train[i].pathHistory[curPath].endT == 1 ? 0 : 1)
+				{startT: (this.train[i].pathHistory[curPath].endT == 1 ? 0 : 1),
+				endT: this.train[i].engine.curT
 			});
-			
 			//-- compare to travel --//
 			remDist = distanceBehind - curTrackRemDist;
 			curTrackLen = this.train[i].pathHistory[curPath].len;
 			if ( remDist < 0) {
-				lenTPlus = lengthOfTrack(this.train[i].engine.curTrack,
-					{startT: this.train[i].engine.curT,
-					 endT: this.train[i].engine.curT + .01,
-					 numBreaks: 3
+				RT = this.train[i].engine.curT - ((this.train[i].engine.curT*(curTrackLen+remDist))/(curTrackLen-curTrackRemDist))
+				var newRemDist = lengthOfTrack(this.train[i].engine.curTrack,
+					{startT: this.train[i].pathHistory[curPath].endT,
+					endT: RT
 				});
-				//.01/lenTPlus = x/-remDist
-				
-				toCalcT = this.train[i].engine.curT + (this.train[i].pathHistory[curPath].endT == 0 ? -(remDist*.01)/lenTPlus : (remDist*.01)/lenTPlus)
+				toCalcT = ((RT * (curTrackLen+remDist))/newRemDist);
+					toCalcT = 0;
 			}
 			else{
 				//-- if remainder, compare to \next track length --//
@@ -131,7 +129,13 @@
 					curPath--;
 				}
 				if (curPath >= 0) {
-					toCalcT = (this.train[i].pathHistory[curPath].endT == 0 ? (remDist/this.train[i].pathHistory[curPath].len) : 1-(remDist/this.train[i].pathHistory[curPath].len));
+					RT = (this.train[i].pathHistory[curPath].endT == 0 ? (remDist/this.train[i].pathHistory[curPath].len) : 1-(remDist/this.train[i].pathHistory[curPath].len));
+						newRemDist = lengthOfTrack(curPath,
+						{startT: RT,
+						endT: (this.train[i].pathHistory[curPath].endT == 1 ? 0 : 1)
+					});
+					console.log('here',remDist,newRemDist);
+					toCalcT = ((RT * (remDist))/newRemDist);
 				}
 				else{
 					return false;
@@ -193,7 +197,6 @@
 					
 					while (this.train[i].engine.curPath < this.train[i].path.length - 1){
 						this.train[i].engine.curPath++;
-						console.log(this.train[i].path[this.train[i].engine.curPath])
 						if (this.train[i].path[this.train[i].engine.curPath] == false) {
 							this.rebuildPath(i);
 							this.train[i].engine.curPath = 0;
@@ -247,21 +250,18 @@
 					back = this.followBehind(i,this.train[i].railcars[j].distanceBehind + this.train[i].railcars[j].axleOffset);
 					
 					if (front != false & back != false) {
-						console.log('true true');
 						back.y = findY(back.x,back.z);
 						front.y = findY(front.x,front.z);
 						this.train[i].railcars[j].front = front;
 						this.train[i].railcars[j].back = back;
 					}
 					else if (front != false & back == false) {
-						console.log('true flase');
 						front.y = findY(front.x,front.z);
 						this.train[i].railcars[j].front = front;
 						this.train[i].railcars[j].back = this.train[i].engine.back;
 						
 					}
 					else{
-						console.log('false flase');
 						this.train[i].railcars[j].front = this.train[i].engine.front;
 						this.train[i].railcars[j].back = this.train[i].engine.back;
 					}
