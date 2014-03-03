@@ -1,0 +1,15 @@
+{
+				'path': 'js/trains/shunter.js',
+				'type': 'engine',
+				'acc': 10,
+				'top': 20,
+				'dec': 100,
+				'axleOffset': 30,
+				'sizeLength': 70,
+				'dispOpts': {
+								'scale': new THREE.Vector3(10, 10, 10),
+								'castShadow': true,
+								'receiveShadow': true,
+								'line': true
+				}
+}

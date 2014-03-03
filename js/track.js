@@ -603,26 +603,3 @@ function nextTrack(i,lastEndT,lastSwitchNum,opts){
 	}
 	return false;
 }
-
-
-loader.load("js/trains/switchArrow.js", jsObjToGlobalMesh('switchArrow',{line: false, scale: new THREE.Vector3(10,10,10)}));
-
-var b = 0;
-function initTrack(){
-	if(globalMesh['switchArrow'] !== undefined){
-		generateDrawTrack();
-		renderTrack();
-		endTrack();
-		if (initEngines != undefined) {
-			initEngines();
-			train.addTrain();
-			train.addRailcar(train.train.length-1);
-			console.log('engines tr',engines);
-		}
-		b = 1;
-	}
-	if (b == 0) {
-		setTimeout(initTrack,10);
-	}
-}
-initTrack();

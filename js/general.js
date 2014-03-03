@@ -145,3 +145,64 @@ function randomPoint(magnitude,p1){
   p1.z += ((Math.random() * magnitude.z * 2) - magnitude.z)
   return p1;
 }
+
+function cloneObjSimple(oldObject){
+  console.log('a', oldObject, 'b', JSON.parse(JSON.stringify(oldObject)))
+  return JSON.parse(JSON.stringify(oldObject));
+}
+
+function outlineGeometry(geometry){
+  var start = geometry.faces.length - 1;
+  var i = start;
+  var lineVecs = [];
+  while(i >= 0){
+    var j = start;
+    while(j >= 0){
+      var set1 = -1;
+      var set2 = -1;
+      if (geometry.faces[i].a == geometry.faces[j].a 
+      | geometry.faces[i].a == geometry.faces[j].b
+      | geometry.faces[i].a == geometry.faces[j].c
+      ){set1 = geometry.faces[i].a}
+      if (geometry.faces[i].b == geometry.faces[j].a 
+      | geometry.faces[i].b == geometry.faces[j].b
+      | geometry.faces[i].b == geometry.faces[j].c
+      ){
+        if(set1 != -1){set2 = geometry.faces[i].b}
+        else{set1 = geometry.faces[i].b}
+      }
+      if (geometry.faces[i].c == geometry.faces[j].a 
+      | geometry.faces[i].c == geometry.faces[j].b
+      | geometry.faces[i].c == geometry.faces[j].c
+      ){if(set2 != -1){set2 = -1}
+        else if(set1 != -1){set2 = geometry.faces[i].c}}
+      
+      if (set2 >= 0) {
+        var caught = 0;
+        for(k = lineVecs.length-1; k = 0; k--){
+          if((set1 == lineVecs[k][0] & set2 == lineVecs[k][1])
+          |  (set1 == lineVecs[k][1] & set2 == lineVecs[k][0])
+          ) {caught = 1;}
+        }
+        
+        if(caught <= 0 
+        & (angleBetweenVectors(geometry.faces[i].normal,geometry.faces[j].normal) > 15
+          |angleBetweenVectors(geometry.faces[i].normal,geometry.faces[j].normal) < -10)
+        ){lineVecs.push([set1,set2]);}
+      }
+      j--;
+    }
+    i--;
+  }
+  var outlineGeometry = new THREE.Geometry();
+  for (i = 0; i < lineVecs.length; i++) { 
+    outlineGeometry.vertices.push(geometry.vertices[lineVecs[i][0]]);
+    outlineGeometry.vertices.push(geometry.vertices[lineVecs[i][1]]);
+  }
+  
+  return outlineGeometry;
+  //var lineMaterial = new THREE.LineBasicMaterial( { color: 0x222222, linewidth: 3 } );
+  //var mline = new THREE.Line( outlineGeometry, lineMaterial, THREE.LinePieces);
+  //mline.scale.set(sc.x,sc.y,sc.z);
+  //globalMesh[name].children.push(mline);
+}
