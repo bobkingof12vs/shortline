@@ -99,47 +99,35 @@ var trainFunc = function(){
 		
 		if (distanceBehind + curLen < this.train[i].pathHistory[curPath].len) {
 			color = 0xff0000;
-			curT = this.train[i].engine.curT;
-			tempNewT = this.train[i].pathHistory[curPath].endT == 1
-				? 1 - ((distanceBehind + curLen) / this.train[i].pathHistory[curPath].len)
-				: ((distanceBehind + curLen) / this.train[i].pathHistory[curPath].len);
+			toCalcT = getTFromDist(
+				this.train[i].pathHistory[curPath].num,
+				this.train[i].pathHistory[curPath].endT,
+				curLen + distanceBehind
+			);
 		}
 		else{
 			color = 0x0000ff;
-			curT = 0;
 			//-- if remainder, compare to \next track length --//
 			//-- subtract distance from other tracks (if not the same track) --//
 			distanceBehind -= (this.train[i].pathHistory[curPath].len - curLen);
 			curPath--;
-			while (curPath > 0 & distanceBehind < this.train[i].pathHistory[curPath].len){
+			while (curPath > 0 & distanceBehind > this.train[i].pathHistory[curPath].len){
 				distanceBehind -= this.train[i].pathHistory[curPath].len;
 				curPath--;
-				if (curPath <= 0) {return false;}
+				if (curPath < 0) {return false;}
 			}
 			if (curPath >= 0 & distanceBehind >= 0) {
-				tempNewT = (this.train[i].pathHistory[curPath].endT == 1
-					? (distanceBehind/this.train[i].pathHistory[curPath].len)
-					: (distanceBehind/this.train[i].pathHistory[curPath].len));
+				toCalcT = getTFromDist(
+					this.train[i].pathHistory[curPath].num,
+					this.train[i].pathHistory[curPath].endT,
+					distanceBehind
+				);
 			}
 			else{
 				console.log('returned false in distanceBehind')
 				return false;
 			}	
 		}
-		var LerpNewDist = lengthOfTrack(this.train[i].pathHistory[curPath].num,
-			{startT: curT,
-			endT: tempNewT
-		});
-		offByDist = distanceBehind - LerpNewDist;
-		
-		var LerpNewDist = lengthOfTrack(this.train[i].pathHistory[curPath].num,
-			{startT: tempNewT,
-			endT: tempNewT + .01
-		});
-			//.01/lenTPlus = x/-remDist
-		adjustT = (offByDist*.01)/LerpNewDist;
-		console.log('curLen',curLen,'distbehind',distanceBehind,'tnt',tempNewT,'lnd',LerpNewDist,'off',offByDist,'adjT',adjustT)
-		toCalcT = tempNewT + adjustT;
 		
 		ret = lerp(
 			drawTrack[this.train[i].pathHistory[curPath].num].p1,
@@ -149,7 +137,7 @@ var trainFunc = function(){
 			toCalcT
 		);
 		
-		testCube(ret,color);
+		//testCube(ret,color);
 		return ret;
 	}
 	

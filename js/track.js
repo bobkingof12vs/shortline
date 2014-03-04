@@ -603,3 +603,25 @@ function nextTrack(i,lastEndT,lastSwitchNum,opts){
 	}
 	return false;
 }
+
+function getTFromDist(trackNum,dir,dist){
+
+	trackLen = drawTrack[trackNum].len;
+
+	tempNewT = (dir == 1 ? 1 - (dist / drawTrack[trackNum].len) : (dist / drawTrack[trackNum].len));
+	
+	var LerpNewDist = lengthOfTrack(trackNum,
+		{startT: dir,
+		endT: tempNewT
+	});
+	offByDist = dist - LerpNewDist;
+	
+	var LerpAdjust = lengthOfTrack(trackNum,
+		{startT: tempNewT,
+		endT: tempNewT + .01
+	});
+		//.01/lenTPlus = x/-remDist
+	adjustT = (offByDist*.01)/LerpAdjust;
+
+	return tempNewT + adjustT;
+}

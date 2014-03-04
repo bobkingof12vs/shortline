@@ -108,8 +108,8 @@
 			console.log('railcars',railcars);
 			//-- things to do once we have all of our objects loaded --//
 			train.addTrain()
-			//train.addRailcar(train.train.length-1);
-			//train.addRailcar(train.train.length-1);
+			train.addRailcar(train.train.length-1);
+			train.addRailcar(train.train.length-1);
 			render();
 		}
 		else{
