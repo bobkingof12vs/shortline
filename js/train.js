@@ -51,18 +51,22 @@ var trainFunc = function(){
 		}
 	}
 	
-	this.addTrain = function(){
+	this.addTrain = function(name){
+		console.log(engines[name].newEngine(0));
 		this.train.push({
-			engine: engines['shunter'],
+			engine: engines[name].newEngine(0),
 			railcars: [],
 			jobs: {},
-			pathMaxLength: 2,
-			pathHistory: [{type: 'track', num: engines['shunter'].curTrack, startT: 0, endT: 1, len: lengthOfTrack(engines['shunter'].curTrack)}],
-			path: [{type: 'track', num: engines['shunter'].curTrack, startT: 0, endT: 1, len: lengthOfTrack(engines['shunter'].curTrack)},false]
+			pathMaxLength: 2
 		});
-		this.train[this.train.length-1].engine.mesh = engines['shunter'].newMesh();
-		console.log('train added','id: ' + this.train.length,this.train[this.train.length-1])
-		scene.add(this.train[this.train.length-1].engine.mesh);
+		var trainNum = this.train.length-1
+		this.train[trainNum].pathHistory = [{type: 'track', num: this.train[trainNum].engine.curTrack, startT: 0, endT: 1, len: lengthOfTrack(this.train[trainNum].engine.curTrack)}],
+		this.train[trainNum].path = [{type: 'track', num: this.train[trainNum].engine.curTrack, startT: 0, endT: 1, len: lengthOfTrack(this.train[trainNum].engine.curTrack)},false]
+		this.train[trainNum].engine.mesh = engines[name].newMesh();
+		this.train[trainNum].engine.userSpeed = this.train[trainNum].engine.opts.top;
+		this.train[trainNum].engine.opts.acc = this.train[trainNum].engine.opts.maxAcc;
+		console.log('train added','id: ' + this.train.length,this.train[trainNum])
+		scene.add(this.train[trainNum].engine.mesh);
 	}
 	
 	this.carDistBehindEngineCurP = function(i,j){
@@ -73,10 +77,12 @@ var trainFunc = function(){
 		return (dist + ((this.train[i].railcars[j].opts.sizeLength - this.train[i].railcars[j].opts.axleOffset)/2))
 	}
 	
-	this.addRailcar = function(i){
-		this.train[i].railcars.push(railcars['flatcar']);
-		this.train[i].railcars[this.train[i].railcars.length - 1].mesh = this.train[i].railcars[this.train[i].railcars.length - 1].newMesh();
-		this.train[i].railcars[this.train[i].railcars.length - 1].distanceBehind = this.carDistBehindEngineCurP(i,this.train[i].railcars.length - 1);
+	this.addRailcar = function(name,i){
+		this.train[i].railcars.push({
+			opts: railcars[name].newOpts(),
+			mesh: railcars[name].newMesh()
+		});
+		this.train[i].railcars[this.train[i].railcars.length - 1].distanceBehind = this.carDistBehindEngineCurP(i,this.train[i].railcars.length - 1)
 		scene.add(this.train[i].railcars[this.train[i].railcars.length - 1].mesh);
 		
 		console.log('railcar',this.train[i].railcars)
@@ -142,13 +148,6 @@ var trainFunc = function(){
 	}
 	
 	this.workJobs = function(dTime){
-		//check for new trains
-		if (m['m_tad'].clicked == 1) {
-			this.addTrain();
-			this.addRailcar(this.train.length-1);
-			m['m_tad'].e.click();
-		}
-		
 		dTime /= 1000;
 		var i = -1;
 		while(i < this.train.length - 1) {
@@ -159,12 +158,74 @@ var trainFunc = function(){
 				this.rebuildPath(i);
 			}
 			
-			if((this.train[i].engine.curSpeed + this.train[i].engine.opts.acc*dTime) < this.train[i].engine.opts.top){
-				this.train[i].engine.curSpeed += this.train[i].engine.opts.acc*dTime;
+			console.log(this.train[i].engine.opts.acc, this.train[i].engine.userSpeed)
+			if (this.train[i].engine.opts.acc > 0 & this.train[i].engine.userSpeed > 0){
+				if ((this.train[i].engine.curSpeed + this.train[i].engine.opts.acc*dTime) < 0) {
+					this.train[i].engine.curSpeed += this.train[i].engine.opts.dec*dTime;
+				}
+				else if ((this.train[i].engine.curSpeed + this.train[i].engine.opts.acc*dTime) < this.train[i].engine.userSpeed) {
+					this.train[i].engine.curSpeed += this.train[i].engine.opts.acc*dTime;
+				}
+				else{
+					this.train[i].engine.curSpeed = this.train[i].engine.userSpeed;
+				}
 			}
-			else if(this.train[i].engine.curSpeed != this.train[i].engine.opts.top){
-				this.train[i].engine.curSpeed = this.train[i].engine.opts.top
+			else if (this.train[i].engine.opts.acc < 0 & this.train[i].engine.userSpeed > 0){
+				if ((this.train[i].engine.curSpeed - this.train[i].engine.opts.dec*dTime) > -1 * this.train[i].engine.opts.acc) {
+					this.train[i].engine.curSpeed -= this.train[i].engine.opts.dec*dTime;
+				}
+				else{
+					if (this.train[i].engine.curSpeed > this.train[i].engine.opts.dec) {
+						this.train[i].engine.curSpeed -= this.train[i].engine.opts.dec*dTime;
+					}
+					else if (this.train[i].engine.curSpeed < -this.train[i].engine.opts.dec) {
+						this.train[i].engine.curSpeed += this.train[i].engine.opts.dec*dTime;
+					}
+					else{
+						this.train[i].engine.curSpeed = 0;
+					}
+				}
 			}
+			else if (this.train[i].engine.opts.acc < 0 & this.train[i].engine.userSpeed < 0){
+				if ((this.train[i].engine.curSpeed + this.train[i].engine.opts.acc*dTime) > 0) {
+					this.train[i].engine.curSpeed -= this.train[i].engine.opts.dec*dTime;
+				}
+				else if ((this.train[i].engine.curSpeed + this.train[i].engine.opts.acc*dTime) > this.train[i].engine.userSpeed) {
+					this.train[i].engine.curSpeed += this.train[i].engine.opts.acc*dTime;
+				}
+				else{
+					this.train[i].engine.curSpeed = this.train[i].engine.userSpeed;
+				}
+			}
+			else if (this.train[i].engine.opts.acc > 0 & this.train[i].engine.userSpeed < 0){
+				if ((this.train[i].engine.curSpeed + this.train[i].engine.opts.dec*dTime) < -1 * this.train[i].engine.opts.acc) {
+					this.train[i].engine.curSpeed += this.train[i].engine.opts.dec*dTime;
+				}
+				else{
+					if (this.train[i].engine.curSpeed < -this.train[i].engine.opts.dec) {
+						this.train[i].engine.curSpeed += this.train[i].engine.opts.dec*dTime;
+					}
+					else if (this.train[i].engine.curSpeed > this.train[i].engine.opts.dec) {
+						this.train[i].engine.curSpeed -= this.train[i].engine.opts.dec*dTime;
+					}
+					else{
+						this.train[i].engine.curSpeed = 0;
+					}
+				}
+			}
+			else if(this.train[i].engine.userSpeed == 0){
+				if (this.train[i].engine.curSpeed > this.train[i].engine.opts.dec) {
+					this.train[i].engine.curSpeed -= this.train[i].engine.opts.dec*dTime;
+				}
+				else if (this.train[i].engine.curSpeed < -this.train[i].engine.opts.dec) {
+					this.train[i].engine.curSpeed += this.train[i].engine.opts.dec*dTime;
+				}
+				else{
+					this.train[i].engine.curSpeed = 0;
+				}
+				this.train[i].engine.curSpeed = 0;
+			}
+			
 			travDist = this.train[i].engine.curSpeed*dTime;
 			brakeDist = ((this.train[i].engine.curSpeed*this.train[i].engine.opts.dec)/60)+travDist;
 						

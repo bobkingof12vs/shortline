@@ -1,7 +1,7 @@
 <script>
 	
 	//--do this first--//
-	generateDrawTrack();
+	generateDrawTrack(1);
 	renderTrack();
 	endTrack();
 
@@ -20,19 +20,19 @@
 			
 			if (objData.type == 'engine') {
 				engines[name] = {};
-				engines[name].opts = objData;
-				
-				engines[name].startEndPoint = 0; //opts.startEndPoint;
-				
-				curEndData = endPoints[engines[name].startEndPoint];
-				engines[name].curSpeed = 0;
-				engines[name].curP = curEndData.end;
-				engines[name].curDir = curEndData.dir;
-				engines[name].curTrack = curEndData.track;
-				
-				engines[name].curT = 0;
-				engines[name].curPath = 0;
-				
+				engines[name].newEngine = function(endPoint){
+					curEndData = endPoints[endPoint];
+					return {
+						curSpeed: 0,
+						curP: curEndData.end,
+						curDir: curEndData.dir,
+						curTrack: curEndData.track,
+						curT: 0,
+						curPath: 0,
+						userSpeed: objData.top,
+						opts: objData
+					}
+				}
 				engines[name].newMesh = function(){
 					var retMesh = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial(materials));
 					retMesh.scale.set(sc.x,sc.y,sc.z);
@@ -40,13 +40,13 @@
 					retMesh.receiveShadow = (opts.receiveShadow !== undefined) ? opts.receiveShadow : false;
 					return retMesh;
 				}
-				
-				console.log('qwerasdc', engines[name].curDir, curEndData.dir)
 				console.log(engines[name]);
 			}
 			else if(objData.type == 'railcar'){
 				railcars[name] = {};
-				railcars[name].opts = objData;
+				railcars[name].newOpts = function(){
+					return objData;
+				}
 				railcars[name].newMesh = function(){
 					var retMesh = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial(materials));
 					retMesh.scale.set(sc.x,sc.y,sc.z);
@@ -54,7 +54,6 @@
 					retMesh.receiveShadow = (opts.receiveShadow !== undefined) ? opts.receiveShadow : false;
 					return retMesh;
 				}
-				railcars[name].distancebehind = 0;
 			}
 			else{
 				obj[name] = {};
@@ -107,9 +106,17 @@
 			console.log('engines',engines);
 			console.log('railcars',railcars);
 			//-- things to do once we have all of our objects loaded --//
-			train.addTrain()
-			train.addRailcar(train.train.length-1);
-			train.addRailcar(train.train.length-1);
+			train.addTrain('shunter')
+			train.addRailcar('flatcar',train.train.length-1);
+			train.addRailcar('flatcar',train.train.length-1);
+			train.addRailcar('flatcar',train.train.length-1);
+			train.addRailcar('flatcar',train.train.length-1);
+			/*setTimeout(function(){
+				train.addTrain('shunter');
+				train.addRailcar(train.train.length-1);
+				train.addRailcar(train.train.length-1);
+				train.addRailcar(train.train.length-1);
+			},10000);*/
 			render();
 		}
 		else{

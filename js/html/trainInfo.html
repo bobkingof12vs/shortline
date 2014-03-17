@@ -1,0 +1,90 @@
+<span id='trainInfo' style='display: block;'>
+	<style scoped>
+		.mono{
+			font-family: monospace;
+			line-height: 20px;
+			text-align: left;
+			padding: 5px;
+		}
+		.backwords{
+			position: relative;
+			margin-left: -177px;
+			left: 17px;
+			bottom: 5px;
+			text-align: center;
+			color: #bbb;
+			padding: 1px;
+			z-index: 50;
+		}
+		.lowerMenu{
+			position: fixed;
+			bottom: 0px;
+			left: 0px;
+			padding: 8px;
+			border: solid 2px #473119;
+			border-radius: 0px 15px 0px 0px;
+			background-color: #c37547  
+		}
+		.max{
+			bottom: 80px;
+			left: 140px;
+		}
+		.speed{
+			width: 150px;
+			margin: 7px;
+			border: solid 1px #222222;
+			border-radius: 5px;
+			background-color: #aaaaaa  
+		}
+		input[type='range'] {
+			-webkit-appearance: none;
+			outline: none;
+			height: 20px;
+			width: 160px;
+			margin: 8px;
+			border: solid 1px #000000;
+			border-radius: 5px;
+			background-color: #222222;
+			z-index: 111; 
+		}
+		input[type='range']::-webkit-slider-thumb {
+			-webkit-appearance: none;
+			position: relative;
+			height: 32px;
+			width: 20px;
+			border: solid 1px #222222;
+			border-radius: 5px;
+			background-color: #777777;
+			z-index: 100; 
+		}
+	
+	</style>
+	<script>
+		trainMenuTrain = 0;
+		setInterval(function(){
+			document.getElementById('curspeed').innerHTML = (Math.round(train.train[trainMenuTrain].engine.curSpeed*100)/100);
+		},1000)
+		function topUserSpeed(){
+			var newX = (document.getElementById('userSpeed').value-50)/50;
+			train.train[trainMenuTrain].engine.userSpeed = (train.train[trainMenuTrain].engine.opts.top * newX);
+			document.getElementById('topspeed').innerHTML = train.train[trainMenuTrain].engine.userSpeed;
+		}
+		function userAcc(){
+			var newX = (document.getElementById('userAcc').value-50)/50;
+			train.train[trainMenuTrain].engine.opts.acc = train.train[trainMenuTrain].engine.opts.maxAcc * newX;
+			document.getElementById('accell').innerHTML = train.train[trainMenuTrain].engine.opts.acc
+		}
+	</script>
+	<div class='lowerMenu'>
+		<div class='speed mono'>
+			current&nbsp; <span id='curspeed'>0</span><br>
+			accell&nbsp;&nbsp; <span id='accell'>1</span>
+			throttle <span id='topspeed'>1</span>
+		</div>
+		<input id='userAcc' type='range' value=100  step=2.5 onchange='userAcc()'></input>
+		<span class='mono backwords'>Acceleration</span>
+		<input id='userSpeed' type='range' value=100  step=2.5 onchange='topUserSpeed()'></input>
+		<span class='backwords mono'>Top Speed</span>
+		<script>document.onload(function(){userAcc(); topUserSpeed();})</script>
+	</div>
+</span>

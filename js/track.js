@@ -180,10 +180,10 @@ function layTrack(i){
 		
 		obj['trkPreLine'].curSeg++;
 		obj['trkPreLine'].origin = point;
+		generateDrawTrack();
 		
 	}
 	
-	generateDrawTrack();
 		renderTrack();
 }
 
@@ -205,11 +205,17 @@ function existsInDrawTrack(p1,p2,p3,i,j){
 drawTrack = [];
 switches = [];
 endPoints = [];
-function generateDrawTrack() {
-	drawTrack = [];
-	endPoints = [];
+function generateDrawTrack(rebuild) {
+	if (rebuild == undefined) {
+		var endVal = trackPoints.length - 1;
+	}
+	else{
+		drawTrack = [];
+		endPoints = [];
+		var endVal = 0;
+	}
 	var i = trackPoints.length;
-	while(i>0){
+	while(i > endVal){
 		i--;
 		j = trackPoints.length;
 		var found1 = found3 = 0;
@@ -265,7 +271,8 @@ function generateDrawTrack() {
 				//len calculated below
 				p1: trackPoints[i].p1,
 				p2: midpoint(trackPoints[i].p1,trackPoints[i].p2),
-				p3: trackPoints[i].p2
+				p3: trackPoints[i].p2,
+				end: true
 			});
 			//testCube(trackPoints[i].p1, 0xff0000);
 		}
@@ -274,13 +281,26 @@ function generateDrawTrack() {
 				//len calculated below
 				p1: trackPoints[i].p3,
 				p2: midpoint(trackPoints[i].p3,trackPoints[i].p2),
-				p3: trackPoints[i].p2
+				p3: trackPoints[i].p2,
+				end: true
 			});
 			//testCube(trackPoints[i].p3, 0x00ff00);
 		}
 	}
 	
-	
+	if (rebuild == undefined) {
+		i = drawTrack.length
+		while(i > 0){
+			i--;
+			if (drawTrack[i].end != undefined) {
+				if ((equalXZ(drawTrack[i].p1, trackPoints[trackPoints.length-1].p3) == 1)
+					 |(equalXZ(drawTrack[i].p1, trackPoints[trackPoints.length-1].p1) == 1)){
+						console.log(i);
+						drawTrack.splice(i,1);
+				}
+			}
+		}
+	}
 	
 	switches = [];
 	
@@ -404,6 +424,7 @@ function generateDrawTrack() {
 		}
 		switchMeshWait();
 	}
+	
 }
 
 function checkSwitches(i){

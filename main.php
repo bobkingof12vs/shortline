@@ -47,10 +47,19 @@
         train.workJobs(now-then);
         then = now;
         endTrack();
+        checkMenus();
         controls.update();
         renderer.render(scene, camera);
       }
       
     </script>
   </div>
+  
+  <?php
+    $loadHTMLFiles = glob('/Google Drive/webroot/train/js/html/*');
+    foreach($loadHTMLFiles as $load){
+      echo "\n".file_get_contents($load);
+    }
+  ?>
+  
 </body>

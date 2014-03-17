@@ -39,6 +39,7 @@ function makeBackground(id){
   return {type: "background", c: menuCanvas, ctx: mc, t: 0, countElements: 1, x: 0, y: 0,
     draw: draw, clicked: 0, parent: id, id: id}
 }
+
 function makeMenu( str, id, parent, order){
   var posx = 1000, posy = 1000;
   var menuCanvas = document.createElement('canvas');
@@ -186,3 +187,15 @@ m['m_tra_remove'] = makeMenu('Remove Track', 'm_tra_remove', 'm_tra',2);
 
 setAllMenu();
 m['main'].e.click();
+
+//--
+
+function checkMenus(){
+  if (m['m_tad'].clicked == 1) {
+    
+  }
+}
+
+function lowerLeftMenu(){
+  
+}
