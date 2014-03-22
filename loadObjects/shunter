@@ -1,9 +1,9 @@
 {
 				'path': 'js/trains/shunter.js',
 				'type': 'engine',
-				'maxAcc': 10,
+				'maxAcc': 20,
 				'top': 200,
-				'dec': 1,
+				'dec': 10,
 				'axleOffset': 30,
 				'sizeLength': 70,
 				'dispOpts': {

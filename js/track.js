@@ -205,6 +205,8 @@ function existsInDrawTrack(p1,p2,p3,i,j){
 drawTrack = [];
 switches = [];
 endPoints = [];
+drawTrackWorker = new Worker('js/drawTrack.js');
+
 function generateDrawTrack(rebuild) {
 	if (rebuild == undefined) {
 		var endVal = trackPoints.length - 1;
