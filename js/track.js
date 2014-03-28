@@ -184,7 +184,7 @@ function layTrack(i){
 		
 	}
 	
-		renderTrack();
+	renderTrack();
 }
 
 function existsInDrawTrack(p1,p2,p3,i,j){
