@@ -206,3 +206,16 @@ function outlineGeometry(geometry){
   //mline.scale.set(sc.x,sc.y,sc.z);
   //globalMesh[name].children.push(mline);
 }
+
+function arrayVectorMatch(arr,p1){
+  var j = arr.length - 1;
+  var i = -1;
+  var matches = [];
+  while (i < j) {
+    i++;
+    if (equalXZ(arr[i],p1)) {
+      matches.push(i);
+    }
+  }
+  return matches;
+}

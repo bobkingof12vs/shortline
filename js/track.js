@@ -205,7 +205,7 @@ function existsInDrawTrack(p1,p2,p3,i,j){
 drawTrack = [];
 switches = [];
 endPoints = [];
-drawTrackWorker = new Worker('js/drawTrack.js');
+//drawTrackWorker = new Worker('js/drawTrack.js');
 
 function generateDrawTrack(rebuild) {
 	if (rebuild == undefined) {
@@ -648,3 +648,109 @@ function getTFromDist(trackNum,dir,dist){
 
 	return tempNewT + adjustT;
 }
+
+	/*
+	
+	
+	function findMatchIn(arr, p1){
+		var j = arr.length;
+		var count = 0;
+		while (j > 0){
+			j--;
+			if (equalXZ(p1, arr[j]) == 1) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	function findSegmentInSection(num){
+		var k = trackSections.length;
+		while (k > 0) {
+			k--;
+			if(trackSections[k].trackPointIds.indexOf(num) >= 0){
+				return k;
+			}
+		}
+		return false;
+	}
+	
+	function buildASectionFromSegment(seg, dir){
+		var retSeg = [];
+		if (dir == 1) {
+			retSeg[0] = trackPoints[seg].p1;
+			retSeg[1] = trackPoints[seg].p2;
+			retSeg[2] = trackPoints[seg].p3;
+		}
+		else{
+			retSeg[0] = trackPoints[seg].p3;
+			retSeg[1] = trackPoints[seg].p2;
+			retSeg[2] = trackPoints[seg].p1;
+		}
+		retSegIds = [seg];
+		while(findMatchIn(switches, retSeg[retSeg.length - 1]) && findMatchIn(ends, retSeg[retSeg.length - 1])){
+			var k = trackPoints.length;
+			while(k > 0){
+				k--;
+				if (equalXZ(trackPoints[k].p1, retSeg[retSeg.length - 1]) == 1 && k != retSegIds[retSegIds.length - 1]) {
+					retSeg.push(trackPoints[k].p2,trackPoints[k].p3);
+					retSegIds.push(k);
+					break;
+				}
+				else if (equalXZ(trackPoints[k].p3, retSeg[retSeg.length - 1]) == 1 && k != retSegIds[retSegIds.length - 1]) {
+					retSeg.push(trackPoints[k].p2,trackPoints[k].p1);
+					retSegIds.push(k);
+					break;
+				}
+			}
+		}
+		console.log({points: retSeg, trackPointIds: retSegIds});
+		return {points: retSeg, trackPointIds: retSegIds};
+	}
+	
+	var i = trackPoints.length;
+	
+	while (i > 0){
+		i--;
+		if(findMatchInTrackPoints(trackPoints[i].p1) > 2 && findMatchIn(switches, trackPoints[i].p1)){
+			switches.push(trackPoints[i].p1);
+		}
+		else if(findMatchInTrackPoints(trackPoints[i].p1) == 1 && findMatchIn(ends, trackPoints[i].p1)){
+			ends.push(trackPoints[i].p1);
+		}
+		
+		if(findMatchInTrackPoints(trackPoints[i].p3) > 2 && findMatchIn(switches, trackPoints[i].p3)){
+			switches.push(trackPoints[i].p3);
+		}
+		else if(findMatchInTrackPoints(trackPoints[i].p3) == 1 && findMatchIn(ends, trackPoints[i].p3)){
+			ends.push(trackPoints[i].p3);
+		}
+	}
+	
+	console.log('switches',switches);
+	console.log('ends',ends);
+
+	i = switches.length;
+	while(i > 0){
+		i--;
+		tempSections = [];
+		tempSectionsTPIds = [];
+		tempSections.push(switches[i]);
+		j = trackPoints.length;
+		while(j > 0 && tempSections.length < 15){
+			j--;
+			if (equalXZ(switches[i], trackPoints[j].p1) == 1) {
+				if(findSegmentInSection(j)){
+					trackSections.shift(findSegmentInSection(j),1);
+				}
+				trackSections.push(buildASectionFromSegment(j, 1));
+			}
+			else if (equalXZ(switches[i], trackPoints[j].p3) == 1) {
+				if(findSegmentInSection(j)){
+					trackSections.shift(findSegmentInSection(j),1);
+				}
+				trackSections.push(buildASectionFromSegment(j, 0));
+			}
+		}
+	}
+	console.log('sections - predata',trackSections)*/

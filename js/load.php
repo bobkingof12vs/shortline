@@ -77,7 +77,7 @@
 			endPoints.length > 0
 		) {
 			<?php
-				$loadObjFiles = glob('/Google Drive/webroot/train/loadObjects/*');
+				$loadObjFiles = glob('loadObjects/*');
 				echo "\nnumOfLoaderObjects = ".count($loadObjFiles).';';
 				foreach($loadObjFiles as $Loadobjs){
 					$ex = explode('/',$Loadobjs);
@@ -109,8 +109,8 @@
 			train.addTrain('shunter')
 			train.addRailcar('flatcar',train.train.length-1);
 			train.addRailcar('flatcar',train.train.length-1);
-			train.addRailcar('flatcar',train.train.length-1);
-			train.addRailcar('flatcar',train.train.length-1);
+			//train.addRailcar('flatcar',train.train.length-1);
+			//train.addRailcar('flatcar',train.train.length-1);
 			/*setTimeout(function(){
 				train.addTrain('shunter');
 				train.addRailcar(train.train.length-1);
