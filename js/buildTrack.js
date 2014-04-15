@@ -141,6 +141,68 @@ trackFunc = function(){
 		return false;
 	}
 	
+	this.getNextSec = function(secId,endId){
+		end = this.sections[secId].ends[endId].type;
+		if (end.type == 'switch') {
+			id = end.secIds.indexOf(secId);
+			return ends.connectsTo[id][ends.target[id]];
+		}
+		else if (end.type == 'end') {
+			return end;
+		}
+		return false;
+	}
+	
+	this.lengthOfSeg = function(segId,opts) {
+		opts = opts !== undefined ? opts : {};
+		var numBreaks = opts.numBreaks !== undefined ? opts.numBreaks : 10;
+		var startT = opts.startT !== undefined ? opts.startT : 0;
+		var endT = opts.endT !== undefined ? opts.endT : 1;
+		
+		if (startT == endT) {return 0;}
+		
+		var st = startT < endT ? endT : startT;
+		var et = startT < endT ? startT : endT;
+		var step = (st-et)/numBreaks;
+		seg = this.segments[segId];
+			
+		var d = 0;
+		
+		p1 = lerp(seg.p1,seg.p2,seg.p2,seg.p3,st);
+		while(st>et+.000001){
+			st -= step;
+			p2 = lerp(seg.p1,seg.p2,seg.p2,seg.p3,st);
+			d += p1.distanceTo(p2);
+			p1 = p2;
+		}
+		
+		return d;
+	}
+	
+	this.sectionDistanceRemaining = function(secId,secStartDirPoint,curSeg,curT){
+		var startT = equalXZ(secStartDirPoint,this.section[secId].ends[0].point) == 1 ? 0 : 1;
+		var endT = start == 1 ? 0 : 1;
+		var dist = this.lengthOfSeg(curSeg,{startT: curT, endT: endT});
+		var i = this.sections[secId].segmentIds.indexOf(curSeg);
+		var j = endT == 0 ? 0 : this.section[secId].segmentIds.length;
+		var inc = (startT == 0 ? 1 : -1);
+		while(i != j){
+			i += inc;
+			dist += this.segments[this.sections[secId].segmentIds[i]].len;
+		}
+		return dist;
+	}
+	
+	this.sectionDistance = function(secId){
+		var i = this.sections[secId].segmentIds.length
+		dist = 0;
+		while(i > 0){
+			i--;
+			dist += this.segments[this.sections[secId].segmentIds[i]].len;
+		}
+		return dist;
+	}
+	
 	this.addToSection = function(p1,p2,p3){
 		
 		this.newSec = function(p1,p2,p3,segId){
@@ -150,15 +212,6 @@ trackFunc = function(){
 				points:[p1,p2,p3],
 				ends: [false,false],
 				segmentIds: [segId]
-				/*pointIndex: function(p1){
-					var i = this.segments.length;
-					while(i > 0){
-						if (equalXZ(p1,this.segments[i]) == 1) {
-							return i;
-						}
-					}
-					return false;
-				}*/
 			});
 			return this.sections.length - 1;
 		}
@@ -251,6 +304,7 @@ trackFunc = function(){
 		this.newEnd = function(newPoint, secId){
 			var endId = this.ends.length;
 			this.ends.push({
+				type: 'end',
 				point: newPoint,
 				id: endId,
 				secId: secId 
@@ -290,6 +344,7 @@ trackFunc = function(){
 				switchId = checkSwitch;
 			}
 			this.switches[switchId] = {
+				type: 'switch',
 				origin: p1,
 				id: switchId,
 				secIds: [secId1, secId2, secId3],
@@ -602,7 +657,9 @@ trackFunc = function(){
 			console.log('no match -1',this.segments.length);
 		}
 		
+		var segIdNext = this.segments.length;
 		this.segments.push({p1: p1,p2: p2,p3: p3});
+		this.segments[segIdNext].len = this.lengthOfSeg(segIdNext);
 		//uploader.queueData('points',{segId:this.segments.length - 1, p1: p1, p2: p2, p3: p3});
 		//uploader.queueData('sections',this.sections[0]);
 		
