@@ -25,10 +25,11 @@
     <script src="js/init.js"></script>
     <script src="js/terraform.js"></script>
     <script src="js/menu.js"></script>
-    <script src="js/track.js"></script>
+    <!---<script src="js/track.js"></script>--->
+    <script src="js/buildTrack.js"></script>
     <script src="js/events.js"></script>
-    <script src="js/train.js"></script>
-    <?php include('js/load.php') ?>
+    <!---<script src="js/train.js"></script>--->
+    <!---<?php include('js/load.php') ?>--->
     
     <script>
       //console.log(THREE.UniformsUtils)
@@ -44,21 +45,21 @@
         //requestAnimationFrame(render);
         setTimeout(render,1000/20);
         now = Date.now();
-        train.workJobs(now-then);
+        //train.workJobs(now-then);
         then = now;
-        endTrack();
+        //endTrack();
         checkMenus();
         controls.update();
         renderer.render(scene, camera);
       }
-      
+      render();
     </script>
   </div>
   
   <?php
     $loadHTMLFiles = glob('/Google Drive/webroot/train/js/html/*');
     foreach($loadHTMLFiles as $load){
-      echo "\n".file_get_contents($load);
+      //echo "\n".file_get_contents($load);
     }
   ?>
   

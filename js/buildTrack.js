@@ -117,6 +117,8 @@ console.log(uploader);
 trackFunc = function(){
 	this.ends = [];
 	this.segments = [];
+	this.segments['material'] = new THREE.MeshBasicMaterial({ color: 0x222222, vertexColors: THREE.FaceColors })
+	this.segments['lineMaterial'] = new THREE.LineBasicMaterial({ color: 0x2222ff, linewidth: 5 })
 	this.sections = [];
 	this.switches = [];
 	this.findMatchInTrackPoints = function(p1){
@@ -153,7 +155,7 @@ trackFunc = function(){
 		return false;
 	}
 	
-	this.lengthOfSeg = function(segId,opts) {
+	this.lerpDistance = function(seg,opts) {
 		opts = opts !== undefined ? opts : {};
 		var numBreaks = opts.numBreaks !== undefined ? opts.numBreaks : 10;
 		var startT = opts.startT !== undefined ? opts.startT : 0;
@@ -164,7 +166,6 @@ trackFunc = function(){
 		var st = startT < endT ? endT : startT;
 		var et = startT < endT ? startT : endT;
 		var step = (st-et)/numBreaks;
-		seg = this.segments[segId];
 			
 		var d = 0;
 		
@@ -182,7 +183,7 @@ trackFunc = function(){
 	this.sectionDistanceRemaining = function(secId,secStartDirPoint,curSeg,curT){
 		var startT = equalXZ(secStartDirPoint,this.section[secId].ends[0].point) == 1 ? 0 : 1;
 		var endT = start == 1 ? 0 : 1;
-		var dist = this.lengthOfSeg(curSeg,{startT: curT, endT: endT});
+		var dist = this.lerpDistance(this.segments[curSeg],{startT: curT, endT: endT});
 		var i = this.sections[secId].segmentIds.indexOf(curSeg);
 		var j = endT == 0 ? 0 : this.section[secId].segmentIds.length;
 		var inc = (startT == 0 ? 1 : -1);
@@ -659,19 +660,109 @@ trackFunc = function(){
 		
 		var segIdNext = this.segments.length;
 		this.segments.push({p1: p1,p2: p2,p3: p3});
-		this.segments[segIdNext].len = this.lengthOfSeg(segIdNext);
+		this.segments[segIdNext].len = this.lerpDistance(this.segments[segIdNext]);
+		this.calcSegmentVertices([segIdNext].concat(pointsP1).concat(pointsP3));
 		//uploader.queueData('points',{segId:this.segments.length - 1, p1: p1, p2: p2, p3: p3});
 		//uploader.queueData('sections',this.sections[0]);
 		
 	}
-	this.addGroupToSection = function(thatGroup){
-		
+	
+	this.findP2OfConnectingSegs = function(p1,segId){
+		var ret = [];
+		var i = this.segments.length;
+		while(i > 0){
+			i--;
+			if (i != segId && (equalXZ(this.segments[i].p1,p1) == 1 || equalXZ(this.segments[i].p3,p1) == 1)) {
+				ret.push({segId: i, p2: this.segments[i].p2});
+			}
+		}
+		return ret.length == 0 ? false : ret;
 	}
+	
+	this.buildPoints = function(origin,originOffset){
+		return [
+			addVectorToPoint(origin,extendVector(10,perpendicularVectorXZ({x: -1, z:  1},originOffset,origin))),
+			addVectorToPoint(origin,extendVector(10,perpendicularVectorXZ({x:  1, z: -1},originOffset,origin)))
+		];
+	}
+	
+	this.calcHalfFromP2toP2 = function(startP2,p1,endP2){
+		
+		var geom = [];
+		
+		var dist = this.lerpDistance({p1:startP2,p2:p1,p3:endP2})
+		
+		this.trackWidth = 10;
+		this.trackSpacing = 10;
+		
+		var spacing = 1/(dist/(Math.floor(dist/this.trackSpacing)));
+		
+		var i = .5;
+		
+		geom = geom.concat(this.buildPoints(lerp(startP2,p1,p1,endP2,i),lerp(startP2,p1,p1,endP2,i+.01)));
+		while (i >= spacing){
+			i -= spacing;
+				geom = geom.concat(this.buildPoints(lerp(startP2,p1,p1,endP2,i),lerp(startP2,p1,p1,endP2,i+.01)));
+				geom = geom.concat(this.buildPoints(lerp(startP2,p1,p1,endP2,i),lerp(startP2,p1,p1,endP2,i+.01)));
+		}
+		geom = geom.concat(this.buildPoints(lerp(startP2,p1,p1,endP2,i),lerp(startP2,p1,p1,endP2,i+.01)));
+		
+		console.log(geom)
+		return geom;
+	}
+	
+	this.calcSegmentVertices = function(segIds){
+		var j = segIds.length;
+		while(j > 0){
+			j--;
+			console.log('next seg',j)
+			var geom = new THREE.Geometry()
+			var p1 = this.segments[segIds[j]].p1;
+			var p2 = this.segments[segIds[j]].p2;
+			var p3 = this.segments[segIds[j]].p3;
+			var pointsFromP1 = this.findP2OfConnectingSegs(p1,segIds[j]);
+			if (pointsFromP1 != false) {
+				var i = pointsFromP1.length;
+				while( i > 0){
+					i--;
+					console.log('next1')
+					geom.vertices = geom.vertices.concat(this.calcHalfFromP2toP2(p2,p1,pointsFromP1[i].p2))
+					console.log(i,geom.vertices.length)
+				}
+			}
+			else{
+				console.log('else 1');
+				geom.vertices = geom.vertices.concat([p1,p2]);
+			}
+			var pointsFromP3 = this.findP2OfConnectingSegs(p3,segIds[j]);
+			if (pointsFromP3 != false) {
+				var i = pointsFromP3.length;
+				while( i > 0){
+					i--;
+					console.log('next3')
+					geom.vertices = geom.vertices.concat(this.calcHalfFromP2toP2(p2,p3,pointsFromP3[i].p2));
+					console.log(geom.vertices.length)
+				}
+			}
+			else{
+				console.log('else 3');
+				geom.vertices = geom.vertices.concat([p3,p2]);
+			}
+			if (this.segments[segIds[j]].geometry != undefined){
+				scene.remove(this.segments[segIds[j]].mesh)
+			}
+			this.segments[segIds[j]].geometry = geom;
+			this.segments[segIds[j]].mesh = new THREE.Line( this.segments[segIds[j]].geometry, this.segments['lineMaterial'], THREE.LinePieces );// new THREE.Mesh(this.segments[segIds[j]].geometry, this.segments.material);
+			scene.add(this.segments[segIds[j]].mesh)
+		}
+	}
+	
 	this.downloadData = function(){
 		//ajax
 		//if newData
 		//add via group
-	},
+	}
+	
 	this.bulkAddTrack = function(bulkPoints){
 		var i = bulkPoints.length
 		while(i > 0){
@@ -679,8 +770,11 @@ trackFunc = function(){
 			this.addToSection(bulkPoints[i].p1,bulkPoints[i].p2,bulkPoints[i].p3);
 		}
 	}
+	
 }
+
 
 track = new trackFunc
 track.bulkAddTrack(trackPoints);
 console.log('track',track);
+

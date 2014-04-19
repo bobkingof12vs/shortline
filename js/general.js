@@ -219,3 +219,42 @@ function arrayVectorMatch(arr,p1){
   }
   return matches;
 }
+
+function perpendicularVectorXZ(matrix,v1,origin){
+  if (origin != undefined) {
+    var z = matrix.x*(v1.x - origin.x)
+    var x = matrix.z*(v1.z - origin.z)
+  }
+  else{
+    var z = matrix.x*v1.x
+    var x = matrix.z*v1.z
+  }
+  return new THREE.Vector3(x,0,z);
+}
+
+function extendVector(newLength,v1,origin){
+  if (origin != undefined) {
+    v1.z = (v1.z - origin.z)
+    v1.y = (v1.y - origin.y)
+    v1.x = (v1.x - origin.x)
+  }
+  else{
+    origin = new THREE.Vector3(0,0,0);
+  }
+  
+  var extendFactor = newLength / v1.distanceTo(origin);
+  
+  return new THREE.Vector3(
+    (v1.x * extendFactor) + origin.x,
+    (v1.y * extendFactor) + origin.y,
+    (v1.z * extendFactor) + origin.z
+  );
+}
+
+function addVectorToPoint(origin,v1){
+  return new THREE.Vector3(
+    origin.x + v1.x,
+    origin.y + v1.y,
+    origin.z + v1.z
+  );
+}
