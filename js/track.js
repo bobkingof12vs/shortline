@@ -5,81 +5,6 @@ obj['trkPreLine'].curSeg = -1;
 obj['trkPreLine'].origin = new THREE.Vector3();
 obj['trkPreLine'].blinemat = new THREE.LineBasicMaterial( { color: 0xff0000, linewidth: 5 } );
 obj['trkLine'].blinemat = new THREE.LineBasicMaterial( { color: 0x0000ff, linewidth: 5 } );
-trackPoints = [
-	{p1: new THREE.Vector3(-50,  0,-50),
-	 p2: new THREE.Vector3(-50,  0,  0),
-	 p3: new THREE.Vector3(-50,  0, 50)
-	},
-	{p1: new THREE.Vector3(50,  0,-50),
-	 p2: new THREE.Vector3(50,  0,-150),
-	 p3: new THREE.Vector3(50,  0,-250)
-	},
-	{p1: new THREE.Vector3(-50,  0, 50),
-	 p2: new THREE.Vector3(  0,  0, 50),
-	 p3: new THREE.Vector3( 50,  0, 50)
-	},
-	{p1: new THREE.Vector3( 50,  0, 50),
-	 p2: new THREE.Vector3( 50,  0,  0),
-	 p3: new THREE.Vector3( 50,  0,-50)
-	},
-	{p1: new THREE.Vector3( -50,  0,-50),
-	 p2: new THREE.Vector3(-100,  0,-50),
-	 p3: new THREE.Vector3(-150,  0,-50)
-	},
-	{p1: new THREE.Vector3(-150,  0,-50),
-	 p2: new THREE.Vector3(-200,  0,-50),
-	 p3: new THREE.Vector3(-250,  0,-50)
-	},
-	{p1: new THREE.Vector3(-250,  0,-50),
-	 p2: new THREE.Vector3(-300,  0,-50),
-	 p3: new THREE.Vector3(-350,  0,-50)
-	},
-	{p1: new THREE.Vector3(-150,  0,-50),
-	 p2: new THREE.Vector3(-150,  0,-100),
-	 p3: new THREE.Vector3(-150,  0,-150)
-	},
-	{p1: new THREE.Vector3(-150,  0,-150),
-	 p2: new THREE.Vector3(-150,  0,-200),
-	 p3: new THREE.Vector3(-150,  0,-250)
-	}
-];
-
-
-obj['trkPreLine'].curSeg = 0;
-addPreLineToScene(
-	new THREE.Vector3(-150,0,-50),
-	new THREE.Vector3(-150,0,-150)
-);
-obj['trkPreLine'].curSeg = 1;
-addPreLineToScene(
-	new THREE.Vector3(-150,0,-50),
-	new THREE.Vector3(-250,0,-50)
-);
-obj['trkPreLine'].curSeg = 2;
-addPreLineToScene(
-	new THREE.Vector3( -50,0,-50),
-	new THREE.Vector3(-150,0,-50)
-);
-obj['trkPreLine'].curSeg = 3;
-addPreLineToScene(
-	new THREE.Vector3( 50,0,-50),
-	new THREE.Vector3( 50,0, 50)
-);
-obj['trkPreLine'].curSeg = 4;
-addPreLineToScene(
-	new THREE.Vector3(-50,0, 50),
-	new THREE.Vector3( 50,0, 50)
-);
-obj['trkPreLine'].curSeg = 5;
-addPreLineToScene(
-	new THREE.Vector3(-50,0,-50),
-	new THREE.Vector3(-50,0, 50)
-);
-obj['trkPreLine'].curSeg = 6;
-addPreLineToScene(
-	new THREE.Vector3(-150,0,-150),
-	new THREE.Vector3(-150,0,-250)
-);
 
 var firstClick = 1;
 
@@ -177,6 +102,7 @@ function layTrack(i){
 			p2: w,
 			p3: point
 		});
+		track.addToSection(obj['trkPreLine'].origin,w,point);
 		
 		obj['trkPreLine'].curSeg++;
 		obj['trkPreLine'].origin = point;
@@ -184,9 +110,76 @@ function layTrack(i){
 		
 	}
 	
-	renderTrack();
 }
 
+checkTrack = 1;
+function endTrack(){
+	if (checkTrack == 1 & m['m_tra_lay'].clicked != 1) {
+		checkTrack = 0;
+		
+		obj['trkPreLine'].part = 'init';
+		
+		var j = obj['trkPreLine'].children.length;
+		while (j>0){
+			j--;
+			scene.remove(obj['trkPreLine'].children[j]);
+		}
+	}
+	if (checkTrack == 0 & m['m_tra_lay'].clicked == 1) {
+		checkTrack = 1;
+		
+		obj['trkPreLine'].children.pop();
+		
+		var j = obj['trkPreLine'].children.length;
+		while (j>0){
+			j--;
+			scene.add(obj['trkPreLine'].children[j]);
+		}
+	}
+}
+
+function addPreLineToScene(o,p) {
+	var geom = new THREE.Geometry();
+	geom.vertices = gridPointsOnLine(100,o,p);
+	
+	obj['trkPreLine'].children[obj['trkPreLine'].curSeg] = new THREE.Line( geom, obj['trkPreLine'].blinemat)
+	scene.add(obj['trkPreLine'].children[obj['trkPreLine'].curSeg]);
+}
+/*Finds the length of a track segment(drawTack[numTrack])
+ *trackNum is the drawTrack id
+ *available opts:
+ *  numBreaks - the Number of pieces to cur the curve into
+ *  startT - marks the where to start measurement. must be between 0 and 1
+ *  endT - marks the end of measurement. must be between 0 and 1
+ */
+function lengthOfTrack(trackNum,opts) {
+	opts = opts !== undefined ? opts : {};
+	var numBreaks = opts.numBreaks !== undefined ? opts.numBreaks : 10;
+	var startT = opts.startT !== undefined ? opts.startT : 0;
+	var endT = opts.endT !== undefined ? opts.endT : 1;
+	
+	if (startT == endT) {return 0;}
+	
+	var st = startT < endT ? endT : startT;
+	var et = startT < endT ? startT : endT;
+	var step = (st-et)/numBreaks;
+	tr = drawTrack[trackNum];
+		
+	var d = 0;
+	
+	p1 = lerp(tr.p1,tr.p2,tr.p2,tr.p3,st);
+	while(st>et+.000001){
+		st -= step;
+		p2 = lerp(tr.p1,tr.p2,tr.p2,tr.p3,st);
+		d += p1.distanceTo(p2);
+		p1 = p2;
+	}
+	
+	return d;
+}
+
+
+/*
 function existsInDrawTrack(p1,p2,p3,i,j){
 	i = drawTrack.length;
 	while (i > 0){
@@ -481,72 +474,6 @@ function renderTrack(){
 	scene.add(obj['trkLine'].obj);
 }
 
-checkTrack = 1;
-function endTrack(){
-	if (checkTrack == 1 & m['m_tra_lay'].clicked != 1) {
-		checkTrack = 0;
-		
-		obj['trkPreLine'].part = 'init';
-		
-		var j = obj['trkPreLine'].children.length;
-		while (j>0){
-			j--;
-			scene.remove(obj['trkPreLine'].children[j]);
-		}
-	}
-	if (checkTrack == 0 & m['m_tra_lay'].clicked == 1) {
-		checkTrack = 1;
-		
-		obj['trkPreLine'].children.pop();
-		
-		var j = obj['trkPreLine'].children.length;
-		while (j>0){
-			j--;
-			scene.add(obj['trkPreLine'].children[j]);
-		}
-	}
-}
-
-function addPreLineToScene(o,p) {
-	var geom = new THREE.Geometry();
-	geom.vertices = gridPointsOnLine(100,o,p);
-	
-	obj['trkPreLine'].children[obj['trkPreLine'].curSeg] = new THREE.Line( geom, obj['trkPreLine'].blinemat)
-	scene.add(obj['trkPreLine'].children[obj['trkPreLine'].curSeg]);
-}
-/*Finds the length of a track segment(drawTack[numTrack])
- *trackNum is the drawTrack id
- *available opts:
- *  numBreaks - the Number of pieces to cur the curve into
- *  startT - marks the where to start measurement. must be between 0 and 1
- *  endT - marks the end of measurement. must be between 0 and 1
- */
-function lengthOfTrack(trackNum,opts) {
-	opts = opts !== undefined ? opts : {};
-	var numBreaks = opts.numBreaks !== undefined ? opts.numBreaks : 10;
-	var startT = opts.startT !== undefined ? opts.startT : 0;
-	var endT = opts.endT !== undefined ? opts.endT : 1;
-	
-	if (startT == endT) {return 0;}
-	
-	var st = startT < endT ? endT : startT;
-	var et = startT < endT ? startT : endT;
-	var step = (st-et)/numBreaks;
-	tr = drawTrack[trackNum];
-		
-	var d = 0;
-	
-	p1 = lerp(tr.p1,tr.p2,tr.p2,tr.p3,st);
-	while(st>et+.000001){
-		st -= step;
-		p2 = lerp(tr.p1,tr.p2,tr.p2,tr.p3,st);
-		d += p1.distanceTo(p2);
-		p1 = p2;
-	}
-	
-	return d;
-}
-
 function nextTrackFromSwitch(i,change){
 	console.log('switch',i)
 	if (change != -1) {
@@ -648,9 +575,6 @@ function getTFromDist(trackNum,dir,dist){
 
 	return tempNewT + adjustT;
 }
-
-	/*
-	
 	
 	function findMatchIn(arr, p1){
 		var j = arr.length;

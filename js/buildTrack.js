@@ -18,7 +18,7 @@ var trackPoints = [
 	{p1: new THREE.Vector3(200, 0, 100),
 	 p2: new THREE.Vector3(150, 0, 100),
 	 p3: new THREE.Vector3(100, 0, 100)
-	},
+	}/*,
 	{p1: new THREE.Vector3(300, 0, 100),
 	 p2: new THREE.Vector3(250, 0, 100),
 	 p3: new THREE.Vector3(200, 0, 100)
@@ -26,7 +26,7 @@ var trackPoints = [
 	{p1: new THREE.Vector3(200, 0, 0),
 	 p2: new THREE.Vector3(200, 0, 50),
 	 p3: new THREE.Vector3(200, 0, 100)
-	},
+	}*/,
 	{p1: new THREE.Vector3(100, 0, 100),
 	 p2: new THREE.Vector3(100, 0, 150),
 	 p3: new THREE.Vector3(100, 0, 200)
@@ -38,7 +38,7 @@ var trackPoints = [
 	{p1: new THREE.Vector3(100, 0, 300),
 	 p2: new THREE.Vector3(150, 0, 300),
 	 p3: new THREE.Vector3(200, 0, 300)
-	},
+	}/*,
 	{p1: new THREE.Vector3(200, 0, 200),
 	 p2: new THREE.Vector3(200, 0, 250),
 	 p3: new THREE.Vector3(200, 0, 300)
@@ -46,7 +46,7 @@ var trackPoints = [
 	{p1: new THREE.Vector3(200, 0, 200),
 	 p2: new THREE.Vector3(150, 0, 200),
 	 p3: new THREE.Vector3(100, 0, 200)
-	},
+	}*/,
 	{p1: new THREE.Vector3(300, 0, 200),
 	 p2: new THREE.Vector3(250, 0, 200),
 	 p3: new THREE.Vector3(200, 0, 200)
@@ -82,6 +82,42 @@ var trackPoints = [
 	{p1: new THREE.Vector3(400,   0, 100),
 	 p2: new THREE.Vector3(350,   0, 100),
 	 p3: new THREE.Vector3(300,   0, 100)
+	},
+	{p1: new THREE.Vector3(-50,  0,-50),
+	 p2: new THREE.Vector3(-50,  0,  0),
+	 p3: new THREE.Vector3(-50,  0, 50)
+	},
+	{p1: new THREE.Vector3(50,  0,-50),
+	 p2: new THREE.Vector3(50,  0,-150),
+	 p3: new THREE.Vector3(50,  0,-250)
+	},
+	{p1: new THREE.Vector3(-50,  0, 50),
+	 p2: new THREE.Vector3(  0,  0, 50),
+	 p3: new THREE.Vector3( 50,  0, 50)
+	},
+	{p1: new THREE.Vector3( 50,  0, 50),
+	 p2: new THREE.Vector3( 50,  0,  0),
+	 p3: new THREE.Vector3( 50,  0,-50)
+	},
+	{p1: new THREE.Vector3( -50,  0,-50),
+	 p2: new THREE.Vector3(-100,  0,-50),
+	 p3: new THREE.Vector3(-150,  0,-50)
+	},
+	{p1: new THREE.Vector3(-150,  0,-50),
+	 p2: new THREE.Vector3(-200,  0,-50),
+	 p3: new THREE.Vector3(-250,  0,-50)
+	},
+	{p1: new THREE.Vector3(-250,  0,-50),
+	 p2: new THREE.Vector3(-300,  0,-50),
+	 p3: new THREE.Vector3(-350,  0,-50)
+	},
+	{p1: new THREE.Vector3(-150,  0,-50),
+	 p2: new THREE.Vector3(-150,  0,-100),
+	 p3: new THREE.Vector3(-150,  0,-150)
+	},
+	{p1: new THREE.Vector3(-150,  0,-150),
+	 p2: new THREE.Vector3(-150,  0,-200),
+	 p3: new THREE.Vector3(-150,  0,-250)
 	}
 ];
 console.log('track points',trackPoints)
@@ -111,16 +147,35 @@ uploadFunc = function(){
 		xmlhttp.send();
 	}
 }
+
 var uploader = new uploadFunc();
 console.log(uploader);
 
 trackFunc = function(){
-	this.ends = [];
+	
 	this.segments = [];
-	this.segments['material'] = new THREE.MeshBasicMaterial({ color: 0x222222, vertexColors: THREE.FaceColors })
-	this.segments['lineMaterial'] = new THREE.LineBasicMaterial({ color: 0x2222ff, linewidth: 5 })
-	this.sections = [];
+	this.segments['material'] = new THREE.MeshBasicMaterial({ color: 0x49311c })
+	this.segments['lineMaterial'] = new THREE.MeshBasicMaterial({ color: 0x222222 })
+	this.segments['trackShape'] = new THREE.Shape([
+		new THREE.Vector3(-1, -.5, 0),
+		new THREE.Vector3(-1,  .5, 0),
+		new THREE.Vector3( 1,  .5, 0),
+		new THREE.Vector3( 1, -.5, 0)
+	]);
+	this.segments['baseMaterial'] = new THREE.MeshBasicMaterial({ color: 0x8E6B23 })
+	this.segments['baseShape'] = new THREE.Shape([
+		new THREE.Vector3(-9, -9, 0),
+		new THREE.Vector3(-9,  9, 0),
+		new THREE.Vector3( 9,  9, 0),
+		new THREE.Vector3( 9, -9, 0)
+	]);
+
 	this.switches = [];
+	this.switches['material'] = new THREE.MeshBasicMaterial({ color: 0xaa2222 })
+	this.throws = [];
+	
+	this.ends = [];
+	this.sections = [];
 	this.findMatchInTrackPoints = function(p1){
 		var j = this.segments.length;
 		var count = [];
@@ -351,7 +406,8 @@ trackFunc = function(){
 				secIds: [secId1, secId2, secId3],
 				segIds: [segId1, segId2, newSegId3],
 				target: [0, 0, 0],
-				connectsTo: [[],[],[]]
+				connectsTo: [[],[],[]],
+				throwObjs: [null,null,null]
 			};
 			
 			this.sections[secId1].ends[(equalXZ(this.sections[secId1].points[0],p1) == 1 ? 0 : 1)] = this.switches[switchId];
@@ -375,8 +431,8 @@ trackFunc = function(){
 					this.switches[i].segIds.push(addSegId);
 					this.switches[i].target.push(0);
 					this.switches[i].connectsTo.push([])
+					this.switches[i].throwObjs.push(null)
 					this.rebuildSwitch(i,{p2:p2});
-					console.log('---',i,this.switches[i],p1)
 					return i;
 				}
 			}
@@ -421,6 +477,25 @@ trackFunc = function(){
 							segId: this.switches[switchId].segIds[j]
 						});
 					}
+				}
+				if (this.switches[switchId].throwObjs[i] != null) {
+					scene.remove(this.switches[switchId].throwObjs[i]);
+					delete this.throws[this.switches[switchId].throwObjs[i].id];
+					this.switches[switchId].throwObjs[i] = null;
+				}
+				if(this.switches[switchId].connectsTo[i].length >= 2){
+					this.switches[switchId].throwObjs[i] = new THREE.Mesh(
+						this.buildGeomPoints(addVectorToPoint(newSegArray[i].p2,extendVector(12,perpendicularVectorXZ({x:-1,z:1},this.switches[switchId].origin,newSegArray[i].p2))),newSegArray[i].p2,5,5,5),
+						this.switches['material']
+					);
+					this.switches[switchId].throwObjs[i].clickCall = Function(
+						'track.switches['+switchId+'].target['+i+']++;'+
+						'if(track.switches['+switchId+'].target['+i+'] == track.switches['+switchId+'].connectsTo['+i+'].length){'+
+							'track.switches['+switchId+'].target['+i+'] = 0;'+
+						'}'
+					)
+					this.throws[this.switches[switchId].throwObjs[i].id] = this.switches[switchId].throwObjs[i];
+					scene.add(this.switches[switchId].throwObjs[i])
 				}
 			}
 		}
@@ -512,8 +587,7 @@ trackFunc = function(){
 		
 		pointsP1 = this.findMatchInTrackPoints(p1);
 		pointsP3 = this.findMatchInTrackPoints(p3);
-		console.log('p1p3',pointsP1,pointsP3);
-		console.log('cur seg',this.segments.length)
+		//console.log('p1p3',pointsP1,pointsP3);
 		if (pointsP1.length == 0) {
 			//point connects to nothing thus a new section
 			if (pointsP3.length == 0) {
@@ -541,7 +615,6 @@ trackFunc = function(){
 				console.log('point connects to existing switch and is a new end');
 				var secId = this.newSec(p1,p2,p3,this.segments.length);
 				this.newEnd(p1,secId);
-				console.log(p1,p3);
 				this.addToSwitch(p3,p2,this.segments.length);
 			}
 			else{
@@ -557,7 +630,6 @@ trackFunc = function(){
 			}
 			else if (pointsP3.length == 1) {
 				console.log('point connects to two existing ends');
-				console.log(this.sections);
 				if (this.findSegInSec(pointsP1[0]) == this.findSegInSec(pointsP3[0])) {
 					console.log('self enclosed loop found');
 					secId = this.findSegInSec(pointsP1[0]);
@@ -565,7 +637,6 @@ trackFunc = function(){
 					this.newSwitch(p3,p2,pointsP3[0],this.segments.length,-1);
 				}
 				else{
-					console.log(p1,p2,p3,pointsP1[0],pointsP3[0],false);
 					secId = this.combineSecs(p1,p2,p3,pointsP1[0],pointsP3[0],false);
 					this.removeEnd(p1);
 					this.removeEnd(p3);
@@ -576,7 +647,6 @@ trackFunc = function(){
 				this.splitSec(pointsP3[1],p3);
 				this.connectTo(p1,p2,p3,pointsP1[0],this.segments.length);
 				this.removeEnd(p1);
-				console.log(this.sections);
 				this.newSwitch(p3,p2,pointsP3[0],pointsP3[1],this.segments.length);
 			}
 			else if (pointsP3.length >= 3) {
@@ -679,81 +749,195 @@ trackFunc = function(){
 		return ret.length == 0 ? false : ret;
 	}
 	
-	this.buildPoints = function(origin,originOffset){
-		return [
-			addVectorToPoint(origin,extendVector(10,perpendicularVectorXZ({x: -1, z:  1},originOffset,origin))),
-			addVectorToPoint(origin,extendVector(10,perpendicularVectorXZ({x:  1, z: -1},originOffset,origin)))
-		];
+	this.buildGeomPoints = function(origin,originOffset,x,y,z){
+		var tie = new THREE.CubeGeometry(x,y,z);
+		tie.applyMatrix( new THREE.Matrix4().makeTranslation(origin.x,origin.y+2,origin.z).lookAt( origin,originOffset,new THREE.Vector3(0,1,0)));
+		tie.verticesNeedUpdate = true;
+		tie.origin = origin;
+		return tie;
 	}
 	
-	this.calcHalfFromP2toP2 = function(startP2,p1,endP2){
+	this.buildLinePointsLeft = function(origin,originOffset){
+		return addVectorToPoint(origin,extendVector(5,perpendicularVectorXZ({x: -1, z:  1},originOffset,origin)));
+	}
+	
+	this.buildLinePointsRight = function(origin,originOffset){
+		return addVectorToPoint(origin,extendVector(5,perpendicularVectorXZ({x: 1,  z: -1},originOffset,origin)));
+	}
+	
+	this.calcFromP2toP2 = function(startP2,p1,endP2,half){
 		
-		var geom = [];
+		var leftExtrudeSettings = {bevelEnabled: false}
+		var rightExtrudeSettings = {bevelEnabled: false}
+		var baseExtrudeSettings = {bevelEnabled: false}
 		
+		var  path = lleft = lright = [];
+		var geom = new THREE.Geometry();
 		var dist = this.lerpDistance({p1:startP2,p2:p1,p3:endP2})
 		
-		this.trackWidth = 10;
-		this.trackSpacing = 10;
+		this.trackWidth = 1;
+		this.trackSpacing = 7;
 		
-		var spacing = 1/(dist/(Math.floor(dist/this.trackSpacing)));
+		var spacing = 1/Math.floor(dist/this.trackSpacing);
 		
-		var i = .5;
+		var i = half ? .5 - (spacing/2) : 1;
 		
-		geom = geom.concat(this.buildPoints(lerp(startP2,p1,p1,endP2,i),lerp(startP2,p1,p1,endP2,i+.01)));
-		while (i >= spacing){
+		var l = recalcY(lerp(startP2,p1,p1,endP2,half ? .51 : 1.01));
+		var lPlus = recalcY(lerp(startP2,p1,p1,endP2,half ? .52 : 1.02));
+		
+		path   = path.concat(l);
+		lleft  = lleft.concat(this.buildLinePointsLeft(l,lPlus));
+		lright = lright.concat(this.buildLinePointsRight(l,lPlus));
+		
+		//meat
+		var lim = (spacing/2)
+		var steps = 0;
+		while (i >= lim){
+			steps++;
+			
+			var l = recalcY(lerp(startP2,p1,p1,endP2,i));
+			var lPlus = recalcY(lerp(startP2,p1,p1,endP2,i+.01));
+			
+			path   = path.concat(l);
+			lleft  = lleft.concat(this.buildLinePointsLeft(l,lPlus));
+			lright = lright.concat(this.buildLinePointsRight(l,lPlus));
+			THREE.GeometryUtils.merge(geom, this.buildGeomPoints(l,lPlus,14,2,2));
+			
 			i -= spacing;
-				geom = geom.concat(this.buildPoints(lerp(startP2,p1,p1,endP2,i),lerp(startP2,p1,p1,endP2,i+.01)));
-				geom = geom.concat(this.buildPoints(lerp(startP2,p1,p1,endP2,i),lerp(startP2,p1,p1,endP2,i+.01)));
 		}
-		geom = geom.concat(this.buildPoints(lerp(startP2,p1,p1,endP2,i),lerp(startP2,p1,p1,endP2,i+.01)));
 		
-		console.log(geom)
-		return geom;
+		//post
+		var l = recalcY(lerp(startP2,p1,p1,endP2,-.01));
+		var lPlus = recalcY(lerp(startP2,p1,p1,endP2,0));
+		
+		path   = path.concat(l);
+		lleft  = lleft.concat(this.buildLinePointsLeft(l,lPlus));
+		lright = lright.concat(this.buildLinePointsRight(l,lPlus));
+		
+		THREE.GeometryUtils.merge(geom, this.buildGeomPoints(lerp(startP2,p1,p1,endP2, lim),lerp(startP2,p1,p1,endP2,lim+.01),14,2,2));
+		
+		baseExtrudeSettings.extrudePath = new THREE.SplineCurve3(path)
+		leftExtrudeSettings.extrudePath = new THREE.SplineCurve3(lleft)
+		rightExtrudeSettings.extrudePath = new THREE.SplineCurve3(lright)
+		leftExtrudeSettings.steps = rightExtrudeSettings.steps = baseExtrudeSettings.steps = steps * 2
+		
+		return {geom: geom, base: baseExtrudeSettings, lleft: leftExtrudeSettings, lright: rightExtrudeSettings};
 	}
 	
 	this.calcSegmentVertices = function(segIds){
 		var j = segIds.length;
 		while(j > 0){
 			j--;
-			console.log('next seg',j)
-			var geom = new THREE.Geometry()
-			var p1 = this.segments[segIds[j]].p1;
-			var p2 = this.segments[segIds[j]].p2;
-			var p3 = this.segments[segIds[j]].p3;
+			var geom = new THREE.Geometry();
+			var trackLines = new THREE.Geometry();
+			var base = new THREE.Geometry();
+			
+			//trackLines.vertices = [];
+			var p1 = recalcY(this.segments[segIds[j]].p1);
+			var p2 = recalcY(this.segments[segIds[j]].p2);
+			var p3 =recalcY( this.segments[segIds[j]].p3);
 			var pointsFromP1 = this.findP2OfConnectingSegs(p1,segIds[j]);
 			if (pointsFromP1 != false) {
 				var i = pointsFromP1.length;
 				while( i > 0){
 					i--;
-					console.log('next1')
-					geom.vertices = geom.vertices.concat(this.calcHalfFromP2toP2(p2,p1,pointsFromP1[i].p2))
-					console.log(i,geom.vertices.length)
+					var builtPoints = this.calcFromP2toP2(p2,p1,pointsFromP1[i].p2,true);
+					THREE.GeometryUtils.merge(geom, builtPoints.geom);
+					THREE.GeometryUtils.merge(trackLines, this.segments['trackShape'].extrude(builtPoints.lleft));
+					THREE.GeometryUtils.merge(trackLines, this.segments['trackShape'].extrude(builtPoints.lright));
+					THREE.GeometryUtils.merge(base, this.segments['baseShape'].extrude(builtPoints.base));
 				}
 			}
 			else{
-				console.log('else 1');
-				geom.vertices = geom.vertices.concat([p1,p2]);
+				var builtPoints = this.calcFromP2toP2(p2,midpoint(p2,p1),p1,false);
+				THREE.GeometryUtils.merge(geom, builtPoints.geom);
+				THREE.GeometryUtils.merge(trackLines, this.segments['trackShape'].extrude(builtPoints.lleft));
+				THREE.GeometryUtils.merge(trackLines, this.segments['trackShape'].extrude(builtPoints.lright));
+				THREE.GeometryUtils.merge(base, this.segments['baseShape'].extrude(builtPoints.base));
+				var tempGeom = this.buildGeomPoints(p1,p2,15,9,5)
+				tempGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0,-4,0));
+				THREE.GeometryUtils.merge(trackLines, tempGeom);
 			}
 			var pointsFromP3 = this.findP2OfConnectingSegs(p3,segIds[j]);
 			if (pointsFromP3 != false) {
 				var i = pointsFromP3.length;
 				while( i > 0){
 					i--;
-					console.log('next3')
-					geom.vertices = geom.vertices.concat(this.calcHalfFromP2toP2(p2,p3,pointsFromP3[i].p2));
-					console.log(geom.vertices.length)
+					var builtPoints = this.calcFromP2toP2(p2,p3,pointsFromP3[i].p2,true);
+					THREE.GeometryUtils.merge(geom, builtPoints.geom);
+					THREE.GeometryUtils.merge(trackLines, this.segments['trackShape'].extrude(builtPoints.lleft));
+					THREE.GeometryUtils.merge(trackLines, this.segments['trackShape'].extrude(builtPoints.lright));
+					THREE.GeometryUtils.merge(base, this.segments['baseShape'].extrude(builtPoints.base));
 				}
 			}
 			else{
-				console.log('else 3');
-				geom.vertices = geom.vertices.concat([p3,p2]);
+				var builtPoints = this.calcFromP2toP2(p2,midpoint(p2,p3),p3,false);
+				THREE.GeometryUtils.merge(geom, builtPoints.geom);
+				THREE.GeometryUtils.merge(trackLines, this.segments['trackShape'].extrude(builtPoints.lleft));
+				THREE.GeometryUtils.merge(trackLines, this.segments['trackShape'].extrude(builtPoints.lright));
+				THREE.GeometryUtils.merge(base, this.segments['baseShape'].extrude(builtPoints.base));
+				var tempGeom = this.buildGeomPoints(p3,p2,15,9,5)
+				tempGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0,-4,0));
+				THREE.GeometryUtils.merge(trackLines, tempGeom);
 			}
-			if (this.segments[segIds[j]].geometry != undefined){
+			if (this.segments[segIds[j]].mesh != undefined){
 				scene.remove(this.segments[segIds[j]].mesh)
 			}
-			this.segments[segIds[j]].geometry = geom;
-			this.segments[segIds[j]].mesh = new THREE.Line( this.segments[segIds[j]].geometry, this.segments['lineMaterial'], THREE.LinePieces );// new THREE.Mesh(this.segments[segIds[j]].geometry, this.segments.material);
+			
+			trackLines.applyMatrix(new THREE.Matrix4().makeTranslation(0,3,0));
+			base.applyMatrix(new THREE.Matrix4().makeTranslation(0,-8,0));
+			
+			var mesh = new THREE.Object3D();
+			mesh.add(new THREE.Mesh( geom, this.segments['material']));
+			mesh.add(new THREE.Mesh( trackLines, this.segments['lineMaterial']));
+			mesh.add(new THREE.Mesh( base, this.segments['baseMaterial'])); 
+			this.segments[segIds[j]].mesh = mesh;
 			scene.add(this.segments[segIds[j]].mesh)
+		}
+	}
+	
+	this.checkTrackInArea = function(p1) {
+		var lft = p1.x - 100;
+		var rht = p1.x + 100;
+		var top = p1.z + 100;
+		var bot = p1.z - 100;
+		
+		var i = this.segments.length
+		var affectedSegs = [];
+		
+		while (i > 0) {
+			i--;
+			if (
+				(this.segments[i].p1.x >= lft && this.segments[i].p1.x <= rht && this.segments[i].p1.z >= bot && this.segments[i].p1.z <= top) | 
+				(this.segments[i].p2.x >= lft && this.segments[i].p2.x <= rht && this.segments[i].p2.z >= bot && this.segments[i].p2.z <= top) | 
+				(this.segments[i].p3.x >= lft && this.segments[i].p3.x <= rht && this.segments[i].p3.z >= bot && this.segments[i].p3.z <= top)
+			){
+				affectedSegs.push(i);
+			}
+		}
+		
+		this.calcSegmentVertices(affectedSegs);
+		
+		var i = this.switches.length
+		while(i > 0){
+			i--;
+			j = this.switches[i].throwObjs.length
+			while(j > 0){
+				j--;
+				if (this.switches[i].throwObjs[j] != null) {
+					var newY =  findY(this.switches[i].throwObjs[j].geometry.origin.x,this.switches[i].throwObjs[j].geometry.origin.z);
+					var diffY = newY - this.switches[i].throwObjs[j].geometry.origin.y;
+					if ( diffY != 0) {
+						console.log('ny',newY,diffY)
+						this.switches[i].throwObjs[j].translateY(diffY);
+						this.switches[i].throwObjs[j].geometry.origin.y = newY;
+						this.switches[i].throwObjs[j].verticesNeedUpdate = true;
+					}
+				}
+				else{
+					console.log('null found',i,j)
+				}
+			}
 		}
 	}
 	
@@ -769,12 +953,31 @@ trackFunc = function(){
 			i--;
 			this.addToSection(bulkPoints[i].p1,bulkPoints[i].p2,bulkPoints[i].p3);
 		}
-	}
-	
+	}	
 }
-
 
 track = new trackFunc
 track.bulkAddTrack(trackPoints);
 console.log('track',track);
 
+
+function getThrows( mouse ) {
+  var vector = new THREE.Vector3(
+    (( event.clientX / window.innerWidth ) * 2 - 1),
+    (- ( event.clientY / window.innerHeight ) * 2 + 1),
+    1
+	);
+	console.log(track.throws);
+	var ray = projector.pickingRay( vector, camera );
+	var intersects = ray.intersectObjects( track.throws );
+	var i = intersects.length
+	console.log('numIntersected',intersects)
+	while ( i > 0 ) {
+		i--;
+		if (intersects[i].object.clickCall != undefined) {
+			console.log(intersects[i].object.id)
+			intersects[i].object.clickCall();
+		}
+	}
+	console.log(track.switches)
+}

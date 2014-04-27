@@ -15,9 +15,12 @@ function raiseLowerTerrain(i,upDown){
       & obj['plane'].children[1].geometry.vertices[facei].z == obj['plane'].children[0].geometry.vertices[j].z) {
         obj['plane'].children[0].geometry.vertices[j].y += upDown;
         obj['plane'].children[0].geometry.verticesNeedUpdate = true;
-    } 
+    }
   }
 
   obj['plane'].children[1].geometry.vertices[facei].y += upDown;
-  obj['plane'].children[1].geometry.verticesNeedUpdate = true; 
+  obj['plane'].children[1].geometry.verticesNeedUpdate = true;
+  
+  //redraw affected track
+  track.checkTrackInArea(obj['plane'].children[1].geometry.vertices[facei]);
 }
