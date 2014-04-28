@@ -25,7 +25,6 @@
     <script src="js/init.js"></script>
     <script src="js/terraform.js"></script>
     <script src="js/menu.js"></script>
-    <script src="js/track.js"></script>
     <script src="js/buildTrack.js"></script>
     <script src="js/events.js"></script>
     <!---<script src="js/train.js"></script>--->
@@ -47,7 +46,7 @@
         now = Date.now();
         //train.workJobs(now-then);
         then = now;
-        endTrack();
+        track.endTrack();
         checkMenus();
         controls.update();
         renderer.render(scene, camera);

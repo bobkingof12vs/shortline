@@ -42,7 +42,7 @@ document.addEventListener( 'mousedown', function (e){
       console.log("'intersect'",i);
       if(m['m_ter_raise'].clicked == 1){raiseLowerTerrain(i,+10);}
       if(m['m_ter_lower'].clicked == 1){raiseLowerTerrain(i,-10);}
-      if(m['m_tra_lay'].clicked == 1 ){layTrack(i);}
+      if(m['m_tra_lay'].clicked == 1 ){track.layTrack(i);}
     });
     getThrows(mouse);
   }

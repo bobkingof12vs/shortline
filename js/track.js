@@ -4,7 +4,6 @@ obj['trkPreLine'].curTrack = -1;
 obj['trkPreLine'].curSeg = -1;
 obj['trkPreLine'].origin = new THREE.Vector3();
 obj['trkPreLine'].blinemat = new THREE.LineBasicMaterial( { color: 0xff0000, linewidth: 5 } );
-obj['trkLine'].blinemat = new THREE.LineBasicMaterial( { color: 0x0000ff, linewidth: 5 } );
 
 var firstClick = 1;
 
@@ -145,13 +144,15 @@ function addPreLineToScene(o,p) {
 	obj['trkPreLine'].children[obj['trkPreLine'].curSeg] = new THREE.Line( geom, obj['trkPreLine'].blinemat)
 	scene.add(obj['trkPreLine'].children[obj['trkPreLine'].curSeg]);
 }
+
+/*
 /*Finds the length of a track segment(drawTack[numTrack])
  *trackNum is the drawTrack id
  *available opts:
  *  numBreaks - the Number of pieces to cur the curve into
  *  startT - marks the where to start measurement. must be between 0 and 1
  *  endT - marks the end of measurement. must be between 0 and 1
- */
+ * /
 function lengthOfTrack(trackNum,opts) {
 	opts = opts !== undefined ? opts : {};
 	var numBreaks = opts.numBreaks !== undefined ? opts.numBreaks : 10;

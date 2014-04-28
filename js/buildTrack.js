@@ -259,6 +259,153 @@ trackFunc = function(){
 		return dist;
 	}
 	
+	this.trackPreLine = {};
+	this.trackPreLine.part = 'init';
+	this.trackPreLine.curTrack = -1;
+	this.trackPreLine.curSeg = -1;
+	this.trackPreLine.origin = new THREE.Vector3();
+	this.trackPreLine.blinemat = new THREE.LineBasicMaterial( { color: 0xff0000, linewidth: 5 } );
+	this.trackPreLine.children = [];
+	
+	this.firstClick = 1;
+	this.layTrack = function(i){
+		
+		this.firstClick = 1;
+		var closePoint = function(point){
+			var j = trackPoints.length;
+			var far = 50;
+			var winner = -1;
+			while (j>0) {
+				j--;{
+					if (trackPoints[j].p1.distanceTo(point) < far) {
+						far = trackPoints[j].p1.distanceTo(point);
+						winner = trackPoints[j].p1;
+					}
+					else if (trackPoints[j].p3.distanceTo(point) < far) {
+						far = trackPoints[j].p3.distanceTo(point);
+						winner = trackPoints[j].p3;
+					}
+				}
+			}
+			if (winner != -1) {
+				point = winner;
+			}
+			return point;
+		}
+		
+		point = closePoint(i[0].point);
+		
+		if (this.trackPreLine.part == 'init') {
+			this.trackPreLine.part = 'part2';
+			this.trackPreLine.curSeg++;
+			this.trackPreLine.origin = point;
+			
+			var geom = new THREE.Geometry();
+			geom.vertices.push(point);
+			geom.vertices.push(point);
+			
+		}
+			
+		if (this.trackPreLine.part == 'part2') {
+			this.trackPreLine.part = 'part3'
+			
+			listener = function(e){
+				mouse.x = e.clientX;
+				mouse.y = e.clientY;
+				
+				if(track.trackPreLine.children.length > 0)
+					scene.remove(track.trackPreLine.children[track.trackPreLine.curSeg]);
+				
+				if (m['m_tra_lay'].clicked == 1 & mouseInMenu == 0) {
+					getMouseIntersect(mouse, [obj['plane'].children[1]],function(i){
+						
+						if (i != 1) {
+							i[0].point = closePoint(i[0].point);
+							
+							if (trackPoints.length > 0) {
+								if (angleBetweenFlattenedVectors(
+									trackPoints[trackPoints.length-1].p1,
+									i[0].point,
+									trackPoints[trackPoints.length-1].p3
+								) <= 90 & track.firstClick == 0) {return}
+							}
+							
+							track.addPreLineToScene(track.trackPreLine.origin,i[0].point);
+						}
+						
+					});
+				}
+				
+				else if (m['m_tra_lay'].clicked != 1){
+					document.body.removeEventListener('mousemove',listener,false);
+				}
+				
+			}
+			document.body.addEventListener('mousemove',listener,false);
+		}
+		
+		else if (this.trackPreLine.part == 'part3') {
+			
+			if (trackPoints.length > 1) {
+				if (angleBetweenFlattenedVectors(
+					trackPoints[trackPoints.length-1].p1,
+					point,
+					this.trackPreLine.origin
+				) <= 90 & this.firstClick == 0) { return;}
+			}
+			
+			this.firstClick = 0;
+			
+			var w = midpoint(this.trackPreLine.origin,point);
+			
+			trackPoints.push({
+				p1: this.trackPreLine.origin,
+				p2: w,
+				p3: point
+			});
+			track.addToSection(this.trackPreLine.origin,w,point);
+			
+			this.trackPreLine.curSeg++;
+			this.trackPreLine.origin = point;
+			
+		}
+		
+	}
+	
+	this.checkTrack = 1;
+	this.endTrack = function(){
+		if (this.checkTrack == 1 & m['m_tra_lay'].clicked != 1) {
+			this.checkTrack = 0;
+			
+			this.trackPreLine.part = 'init';
+			
+			var j = this.trackPreLine.children.length;
+			while (j>0){
+				j--;
+				scene.remove(this.trackPreLine.children[j]);
+			}
+		}
+		if (this.checkTrack == 0 & m['m_tra_lay'].clicked == 1) {
+			this.checkTrack = 1;
+			
+			this.trackPreLine.children.pop();
+			
+			var j = this.trackPreLine.children.length;
+			while (j>0){
+				j--;
+				scene.add(this.trackPreLine.children[j]);
+			}
+		}
+	}
+	
+	this.addPreLineToScene = function(o,p) {
+		var geom = new THREE.Geometry();
+		geom.vertices = gridPointsOnLine(100,o,p);
+		
+		this.trackPreLine.children[this.trackPreLine.curSeg] = new THREE.Line( geom, this.trackPreLine.blinemat)
+		scene.add(this.trackPreLine.children[this.trackPreLine.curSeg]);
+	}
+	
 	this.addToSection = function(p1,p2,p3){
 		
 		this.newSec = function(p1,p2,p3,segId){
@@ -485,7 +632,7 @@ trackFunc = function(){
 				}
 				if(this.switches[switchId].connectsTo[i].length >= 2){
 					this.switches[switchId].throwObjs[i] = new THREE.Mesh(
-						this.buildGeomPoints(addVectorToPoint(newSegArray[i].p2,extendVector(12,perpendicularVectorXZ({x:-1,z:1},this.switches[switchId].origin,newSegArray[i].p2))),newSegArray[i].p2,5,5,5),
+						this.buildGeomPoints(recalcY(addVectorToPoint(newSegArray[i].p2,extendVector(12,perpendicularVectorXZ({x:-1,z:1},this.switches[switchId].origin,newSegArray[i].p2)))),recalcY(newSegArray[i].p2),5,5,5),
 						this.switches['material']
 					);
 					this.switches[switchId].throwObjs[i].clickCall = Function(
@@ -835,17 +982,19 @@ trackFunc = function(){
 			//trackLines.vertices = [];
 			var p1 = recalcY(this.segments[segIds[j]].p1);
 			var p2 = recalcY(this.segments[segIds[j]].p2);
-			var p3 =recalcY( this.segments[segIds[j]].p3);
+			var p3 = recalcY(this.segments[segIds[j]].p3);
 			var pointsFromP1 = this.findP2OfConnectingSegs(p1,segIds[j]);
 			if (pointsFromP1 != false) {
 				var i = pointsFromP1.length;
 				while( i > 0){
 					i--;
-					var builtPoints = this.calcFromP2toP2(p2,p1,pointsFromP1[i].p2,true);
-					THREE.GeometryUtils.merge(geom, builtPoints.geom);
-					THREE.GeometryUtils.merge(trackLines, this.segments['trackShape'].extrude(builtPoints.lleft));
-					THREE.GeometryUtils.merge(trackLines, this.segments['trackShape'].extrude(builtPoints.lright));
-					THREE.GeometryUtils.merge(base, this.segments['baseShape'].extrude(builtPoints.base));
+					if (angleBetweenFlattenedVectors(p2,pointsFromP1[i].p2,p1)) {
+						var builtPoints = this.calcFromP2toP2(p2,p1,pointsFromP1[i].p2,true);
+						THREE.GeometryUtils.merge(geom, builtPoints.geom);
+						THREE.GeometryUtils.merge(trackLines, this.segments['trackShape'].extrude(builtPoints.lleft));
+						THREE.GeometryUtils.merge(trackLines, this.segments['trackShape'].extrude(builtPoints.lright));
+						THREE.GeometryUtils.merge(base, this.segments['baseShape'].extrude(builtPoints.base));
+					}
 				}
 			}
 			else{
@@ -951,7 +1100,9 @@ trackFunc = function(){
 		var i = bulkPoints.length
 		while(i > 0){
 			i--;
+			this.trackPreLine.curSeg++;
 			this.addToSection(bulkPoints[i].p1,bulkPoints[i].p2,bulkPoints[i].p3);
+			this.addPreLineToScene(bulkPoints[i].p1,bulkPoints[i].p3);
 		}
 	}	
 }
