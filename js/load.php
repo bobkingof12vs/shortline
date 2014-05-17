@@ -1,57 +1,55 @@
 <script>
-	
+
 	//--do this first--//
-	generateDrawTrack(1);
-	renderTrack();
-	endTrack();
 
 	var loadedObjData = [];
 	var countOfLoadedLoaderObjs = 0;
 	var loader = new THREE.JSONLoader();
-	
+
 	//load train function
+	gOpts = [];
 	function jsObjToGlobalMesh(name,opts,objData,callback){
-		opts = (opts !== undefined) ? opts : {};
-		sc = (opts.scale !== undefined) ? opts.scale : new THREE.Vector3(10,10,10);
+		gOpts[name] = (opts !== undefined) ? opts : {};
+		gOpts[name].scale = (gOpts[name].scale !== undefined) ? gOpts[name].scale : new THREE.Vector3(10,10,10);
+		console.log('name: '+name,'scale: ');
 		//THREE.GeometryUtils.merge(geometry, outlineGeometry(geometry));
 		return function(geometry,materials){
 			//obj[name].newGeom = geometry;
 			//obj[name].newMat = new THREE.MeshFaceMaterial(materials);
-			
 			if (objData.type == 'engine') {
 				engines[name] = {};
+				engines[name].geom = geometry;
+				engines[name].mats = materials;
 				engines[name].newEngine = function(endPoint){
-					curEndData = endPoints[endPoint];
+					//curEndData = endPoints[endPoint];
 					return {
 						curSpeed: 0,
-						curP: curEndData.end,
-						curDir: curEndData.dir,
-						curTrack: curEndData.track,
-						curT: 0,
 						curPath: 0,
 						userSpeed: objData.top,
 						opts: objData
 					}
 				}
 				engines[name].newMesh = function(){
-					var retMesh = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial(materials));
-					retMesh.scale.set(sc.x,sc.y,sc.z);
-					retMesh.castShadow = (opts.castShadow !== undefined) ? opts.castShadow : false;
-					retMesh.receiveShadow = (opts.receiveShadow !== undefined) ? opts.receiveShadow : false;
+					var retMesh = new THREE.Mesh(engines[name].geom, new THREE.MeshFaceMaterial(engines[name].mats));
+					retMesh.scale.set(gOpts[name].scale.x,gOpts[name].scale.y,gOpts[name].scale.z);
+					retMesh.castShadow = (gOpts[name].castShadow !== undefined) ? gOpts[name].castShadow : false;
+					retMesh.receiveShadow = (gOpts[name].receiveShadow !== undefined) ? gOpts[name].receiveShadow : false;
 					return retMesh;
 				}
 				console.log(engines[name]);
 			}
 			else if(objData.type == 'railcar'){
 				railcars[name] = {};
+				railcars[name].geom = geometry;
+				railcars[name].mats = materials;
 				railcars[name].newOpts = function(){
 					return objData;
 				}
 				railcars[name].newMesh = function(){
 					var retMesh = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial(materials));
-					retMesh.scale.set(sc.x,sc.y,sc.z);
-					retMesh.castShadow = (opts.castShadow !== undefined) ? opts.castShadow : false;
-					retMesh.receiveShadow = (opts.receiveShadow !== undefined) ? opts.receiveShadow : false;
+					retMesh.scale.set(gOpts[name].scale.x,gOpts[name].scale.y,gOpts[name].scale.z);
+					retMesh.castShadow = (gOpts[name].castShadow !== undefined) ? gOpts[name].castShadow : false;
+					retMesh.receiveShadow = (gOpts[name].receiveShadow !== undefined) ? gOpts[name].receiveShadow : false;
 					return retMesh;
 				}
 			}
@@ -70,12 +68,12 @@
 			countOfLoadedLoaderObjs++;
 		}
 	}
-	
+
 	var numOfLoaderObjects = 0;
-	function waitForPreLoadObjects(){
+	/*function waitForPreLoadObjects(){
 		if (
 			endPoints.length > 0
-		) {
+		) {*/
 			<?php
 				$loadObjFiles = glob('loadObjects/*');
 				echo "\nnumOfLoaderObjects = ".count($loadObjFiles).';';
@@ -93,12 +91,12 @@
 				}
 			?>
 			waitForAllLoadedObjs();
-		}
+		/*}
 		else{
 			setTimeout(waitForPreLoadObjects,20);
 		}
-	}
-	
+	}*/
+
 	function waitForAllLoadedObjs(){
 		if (countOfLoadedLoaderObjs == numOfLoaderObjects & numOfLoaderObjects > 0) {
 			console.log('num objs loaded: ',countOfLoadedLoaderObjs);
@@ -107,8 +105,8 @@
 			console.log('railcars',railcars);
 			//-- things to do once we have all of our objects loaded --//
 			train.addTrain('shunter')
-			train.addRailcar('flatcar',train.train.length-1);
-			train.addRailcar('flatcar',train.train.length-1);
+			//train.addRailcar('flatcar',train.train.length-1);
+			//train.addRailcar('flatcar',train.train.length-1);
 			//train.addRailcar('flatcar',train.train.length-1);
 			//train.addRailcar('flatcar',train.train.length-1);
 			/*setTimeout(function(){
@@ -123,7 +121,7 @@
 			setTimeout(waitForAllLoadedObjs,20);
 		}
 	}
-	
-	waitForPreLoadObjects();
-	
+
+	//waitForPreLoadObjects();
+
 </script>

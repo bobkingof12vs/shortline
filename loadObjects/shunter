@@ -7,7 +7,7 @@
 				'axleOffset': 30,
 				'sizeLength': 70,
 				'dispOpts': {
-								'scale': new THREE.Vector3(10, 10, 10),
+								'scale': new THREE.Vector3(6, 6, 6),
 								'castShadow': true,
 								'receiveShadow': true,
 								'line': true
