@@ -55,8 +55,21 @@ var trainFunc = function(){
 			}
 
 			while(nextTotalDist <= brakeDist && this.train[i].path.nextP[this.train[i].path.nextP.length - 1] !== false){
+				console.log(this.train[i].path.nextP[this.train[i].path.nextP.length - 1].sec.id,this.train[i].path.nextP[this.train[i].path.nextP.length - 1].dir)
 				this.train[i].path.nextP.push(track.getNextSec(this.train[i].path.nextP[this.train[i].path.nextP.length - 1].sec.id,this.train[i].path.nextP[this.train[i].path.nextP.length - 1].dir))
 				nextTotalDist += track.sectionDistance(this.train[i].path.nextP[this.train[i].path.nextP.length - 1].sec.id);
+				sec2 = this.train[i].path.nextP[this.train[i].path.nextP.length - 1].sec
+				sec1 = this.train[i].path.nextP[this.train[i].path.nextP.length - 2].sec
+				if(equalXZ(sec1.points[0],sec2.points[0]) == 1
+				|| equalXZ(sec1.points[sec1.points.length - 1],sec2.points[0]) == 1
+				|| equalXZ(sec1.points[sec1.points.length - 1],sec2.points[sec2.points.length - 1]) == 1
+				|| equalXZ(sec1.points[0],sec2.points[sec2.points.length - 1]) == 1){
+					console.log('yep')
+				}
+				else{
+					console.log(sec1,sec2);
+					pud()
+				}
 			}
 			while(prevTotalDist <= trainLength + brakeDist && this.train[i].path.previousP[this.train[i].path.previousP.length - 1] !== false){
 				this.train[i].path.previousP.push(track.getNextSec(this.train[i].path.previousP[this.train[i].path.previousP.length - 1].sec.id,this.train[i].path.previousP[this.train[i].path.previousP.length - 1].dir))
@@ -115,6 +128,12 @@ var trainFunc = function(){
 	}
 
 	this.moveOnPath = function(curDist, moveDist, path, curPointId){
+
+		if(curPointId == undefined){
+			console.log('curPointId is undefined');
+			return false;
+		}
+
 		var moveDir = path.dir;
 		var inc = path.dir == 0 ? -1 : 1;
 
@@ -142,7 +161,7 @@ var trainFunc = function(){
 					var curSegDist = track.lerpDistance({
 						p1: path.sec.points[1],
 						p2: path.sec.points[0],
-						p3: path.sec.ends[0].points[track.getSwitchThrowId(path.sec.ends[0].id,path.sec.id,path.sec.segmentIds[0])]
+						p3: track.getThrowPoint(path.sec.ends[0].id,path.sec.id,path.sec.segmentIds[0])
 					});
 				}
 			}
@@ -161,7 +180,7 @@ var trainFunc = function(){
 					var curSegDist = track.lerpDistance({
 						p1: path.sec.points[path.sec.points.length - 2],
 						p2: path.sec.points[path.sec.points.length - 1],
-						p3: path.sec.ends[1].points[track.getSwitchThrowId(path.sec.ends[1].id,path.sec.id,path.sec.segmentIds[path.sec.segmentIds.length - 1])]
+						p3: track.getThrowPoint(path.sec.ends[1].id,path.sec.id,path.sec.segmentIds[path.sec.segmentIds.length - 1])
 					});
 				}
 			}
@@ -222,11 +241,12 @@ var trainFunc = function(){
 				},remDist);
 			}
 			else{
-				//console.log('switch')
+				//console.log('switch',path.sec.ends[0],path.sec.ends[0].points[track.getSwitchThrowId(path.sec.ends[0].id,path.sec.id,path.sec.segmentIds[0])]);
+				//console.log('path.sec.ends[0].id,path.sec.id,path.sec.segmentIds[0])',path.sec.ends[0].id,path.sec.id,path.sec.segmentIds[0])
 				var point = track.lerpToDist({
 					p1: path.sec.points[1],
 					p2: path.sec.points[0],
-					p3: path.sec.ends[0].points[track.getSwitchThrowId(path.sec.ends[0].id,path.sec.id,path.sec.segmentIds[0])]
+					p3: track.getThrowPoint(path.sec.ends[0].id,path.sec.id,path.sec.segmentIds[0])
 				},remDist);
 			}
 		}
@@ -245,7 +265,7 @@ var trainFunc = function(){
 				var point = track.lerpToDist({
 					p1: path.sec.points[path.sec.points.length - 2],
 					p2: path.sec.points[path.sec.points.length - 1],
-					p3: path.sec.ends[1].points[track.getSwitchThrowId(path.sec.ends[1].id,path.sec.id,path.sec.segmentIds[path.sec.segmentIds.length - 1])]
+					p3: track.getThrowPoint(path.sec.ends[1].id,path.sec.id,path.sec.segmentIds[path.sec.segmentIds.length - 1])
 				},remDist);
 			}
 		}
@@ -274,7 +294,7 @@ var trainFunc = function(){
 			},remDist);
 			//console.log(curSegDist)
 		}
-
+		//console.log('yo',remDist, curPointId)
 		return {
 			remDist: remDist,
 			pointId: curPointId,
@@ -343,13 +363,17 @@ var trainFunc = function(){
 			brakeDist = (Math.pow(this.train[i].engine.curSpeed,2)/(2*this.train[i].engine.opts.dec));
 
 			//-- Find Distance on track --//
+			//console.log(this.train[i].path)
+			//console.log(this.train[i].curDist, travDist, this.train[i].path.currentP, this.train[i].curPointId)
 			var moved = this.moveOnPath(this.train[i].curDist, travDist, this.train[i].path.currentP, this.train[i].curPointId);
+			if(!moved) return -1;
 			this.train[i].curPointId = moved.pointId;
 			this.train[i].curDist = moved.remDist;
+			//console.log(moved);
 			while(moved.pointId === false){
 				//console.log('-----',this.train[i].path.currentP)
 				this.rebuildPath(i);
-				//console.log('-----',this.train[i].path.currentP)
+
 				if(this.train[i].path.currentP.dir == 0){
 					this.train[i].curPointId = this.train[i].path.currentP.sec.points.length - 2;
 				}
@@ -361,13 +385,14 @@ var trainFunc = function(){
 
 				moved = this.moveOnPath(this.train[i].curDist, 0, this.train[i].path.currentP, this.train[i].curPointId);
 
+				this.train[i].curPointId = moved.pointId;
 				this.train[i].curDist = moved.remDist;
 			}
 			this.train[i].engine.backP = this.train[i].engine.curP
 			this.train[i].engine.mesh.position = this.train[i].engine.curP = moved.pos;
 			this.train[i].engine.mesh.lookAt(this.train[i].engine.backP);
 			this.train[i].engine.mesh.verticesNeedUpdate = true;
-
+			//console.log(this.train[i].curPointId)
 			return;
 			//-- calc rem T --//
 			//-- apply to curP --//

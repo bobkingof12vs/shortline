@@ -15,12 +15,12 @@ function makeBackground(id){
   menuCanvas.style.left = '1px'
   menuCanvas.style.zIndex='2';
   menuCanvas.style.opacity = .7;
-  
+
   var mc = menuCanvas.getContext("2d");
   mc.lw = mc.lineWidth = 2;
   menuCanvas.width = screen.width;
   menuCanvas.height = screen.height;
-  
+
   draw = function(drc,doctx,x,y,w,h,r,backcolor,outlinecolor){
     drc.width = x+w+doctx.lw*2;
     drc.height = y+h+doctx.lw*2;
@@ -31,10 +31,10 @@ function makeBackground(id){
     doctx.lineWidth = doctx.lw;
     doctx.strokeStyle = outlinecolor;
     doctx.stroke();
-    
-    menuHW = {x:x+w, y:y+h};    
+
+    menuHW = {x:x+w, y:y+h};
   }
-  
+
   document.body.appendChild(menuCanvas);
   return {type: "background", c: menuCanvas, ctx: mc, t: 0, countElements: 1, x: 0, y: 0,
     draw: draw, clicked: 0, parent: id, id: id}
@@ -47,12 +47,12 @@ function makeMenu( str, id, parent, order){
   menuCanvas.style.top = '1px'
   menuCanvas.style.left = '1px'
   menuCanvas.style.zIndex='2';
-  
+
   var fontSize = 12;
   var font = fontSize + 'px ' + 'Monospace';
   var lightBrown = "#c37547";
   var darkBrown = '#473119';
-  
+
   var mc = menuCanvas.getContext("2d");
   mc.f = mc.font = font;
   mc.lw = mc.lineWidth = 2;
@@ -63,7 +63,7 @@ function makeMenu( str, id, parent, order){
   mc.str = str;
   menuCanvas.width = mc.mw+(mc.lw*2);
   menuCanvas.height = mc.mh+mc.lw*2;
-  
+
   var menu = document.createElement("div");
   menu.style.display = 'none';
   menu.id = id;
@@ -75,10 +75,10 @@ function makeMenu( str, id, parent, order){
   menu.style.zIndex = '3';
   document.body.appendChild(menu);
   menu.appendChild(menuCanvas);
-  
+
   drawMenu(mc,lightBrown,darkBrown);
   drawMenu(mc,lightBrown,darkBrown);
-  
+
   var retMenu = {e: menu, c: menuCanvas, ctx: mc, t: 0, clicked: -1,
     x: posx, y: posy, parent: parent, id: id, order: order, type: "menu"}
   return retMenu;
@@ -95,7 +95,7 @@ function drawMenu(doctx,backcolor, outlinecolor){
   doctx.fillText(doctx.str, doctx.pad ,doctx.fs+doctx.pad-2);
   doctx.lineWidth = doctx.lw;
   doctx.strokeStyle = outlinecolor;
-  doctx.stroke();  
+  doctx.stroke();
 }
 
 function moveMenu(member,x,y){
@@ -178,6 +178,7 @@ m['main'] = makeMenu('Tool Kit', 'main', 'main',0);
 m['m_ter'] = makeMenu('Terraform Tools', 'm_ter', 'main',1);
 m['m_tra'] = makeMenu('Track Tools', 'm_tra', 'main',2);
 m['m_tad'] = makeMenu('Add Train', 'm_tad', 'main',3);
+m['m_hlt'] = makeMenu('Halt Program', 'm_hlt', 'main',4);
 
 m['m_ter_raise'] = makeMenu('Raise Ground', 'm_ter_raise', 'm_ter',1);
 m['m_ter_lower'] = makeMenu('Lower Ground', 'm_ter_lower', 'm_ter',2);
@@ -192,10 +193,10 @@ m['main'].e.click();
 
 function checkMenus(){
   if (m['m_tad'].clicked == 1) {
-    
+
   }
 }
 
 function lowerLeftMenu(){
-  
+
 }

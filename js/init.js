@@ -67,8 +67,8 @@ console.log("'line'",line);
 var pm = new THREE.MeshLambertMaterial( {vertexColors: THREE.FaceColors} );
 pm.color.setHex(0x227733);
 plane = new THREE.Mesh(planeGeometry,pm);
-plane.receiveShadow = true;
-plane.castShadow = true;
+//plane.receiveShadow = true;
+//plane.castShadow = true;
 group.add(plane);
 console.log("'plane'",plane);
 obj['plane'] = group;
@@ -95,9 +95,9 @@ console.log("'ambientLight'",ambientLight);
 //add shadows
 var directionalLight = new THREE.DirectionalLight(0xffffff, 1);
 directionalLight.position.set(-300, 400, 400);
-directionalLight.castShadow = true;
-directionalLight.shadowOnly = true;
-directionalLight.shadowDarkness = .5;
+//directionalLight.castShadow = true;
+//directionalLight.shadowOnly = true;
+//directionalLight.shadowDarkness = .5;
 scene.add(directionalLight);
 console.log("'directionalLight'",directionalLight);
 
@@ -105,8 +105,8 @@ console.log("'directionalLight'",directionalLight);
 //init renderer
 var renderer = new THREE.WebGLRenderer({canvas: document.getElementById('c'),  antialias: true});
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.shadowMapEnabled = true;
-renderer.shadowMapSoft = true;
+//renderer.shadowMapEnabled = true;
+//renderer.shadowMapSoft = true;
 console.log("'renderer'",renderer);
 
 //init controls
@@ -132,7 +132,7 @@ function getMouseIntersect( mouse, objects, callback) {
 function testCube(p1,col,scale) {
   scale = scale != undefined ? scale : 1;
   col = col != undefined ? col : 0x00ff00;
-  var cubeMaterial = new THREE.MeshBasicMaterial( {color: col} ); 
+  var cubeMaterial = new THREE.MeshBasicMaterial( {color: col} );
   var cubeGeometry = new THREE.CubeGeometry( 10*scale, 10*scale, 10*scale, 1, 1, 1 );
   cube = new THREE.Mesh( cubeGeometry, cubeMaterial );
 	cube.position.set(p1.x, p1.y, p1.z);
@@ -146,7 +146,7 @@ function testText(text,p1,rot,scale){
 	var materialFront = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
 	var materialSide = new THREE.MeshBasicMaterial( { color: 0x000088 } );
 	var materialArray = [ materialFront, materialSide ];
-	var textGeom = new THREE.TextGeometry( text, 
+	var textGeom = new THREE.TextGeometry( text,
 	{
 		size: 10, height: 4, curveSegments: 3,
 		font: "helvetiker", weight: "normal", style: "normal",
@@ -155,17 +155,17 @@ function testText(text,p1,rot,scale){
 	});
 	// font: helvetiker, gentilis, droid sans, droid serif, optimer
 	// weight: normal, bold
-	
+
 	var textMaterial = new THREE.MeshFaceMaterial(materialArray);
 	var textMesh = new THREE.Mesh(textGeom, textMaterial );
-	
+
 	textGeom.computeBoundingBox();
 	var posx = (-0.5 * (textGeom.boundingBox.max.x - textGeom.boundingBox.min.x)) + p1.x;
 	var posy = (-0.5 * (textGeom.boundingBox.max.y - textGeom.boundingBox.min.y)) + p1.y;
 	var posz = (-0.5 * (textGeom.boundingBox.max.z - textGeom.boundingBox.min.z)) + p1.z;
 
 	textMesh.position.set(posx,posy,posz);
-  
+
   if (rot != -1) {
     textMesh.rotation.x = (rot == undefined ? 0 : rot.x);
     textMesh.rotation.y = (rot == undefined ? 0 : rot.y);
@@ -174,7 +174,7 @@ function testText(text,p1,rot,scale){
   else{
     textMesh.lookAt(camera.position);
     controls.addEventListener( 'change', function(){
-      
+
       textMesh.lookAt(camera.position);
       textGeom.computeBoundingBox();
       posx = (-0.5 * (textGeom.boundingBox.max.x - textGeom.boundingBox.min.x)) + p1.x;
@@ -184,10 +184,10 @@ function testText(text,p1,rot,scale){
       textMesh.lookAt(camera.position);
     });
   };
-					
-  
+
+
 	scene.add(textMesh);
-  
+
   return textMesh;
 }
 

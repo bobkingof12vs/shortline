@@ -31,7 +31,7 @@
     <?php include('js/load.php') ?>
 
     <?php
-      $loadHTMLFiles = glob('/Google Drive/webroot/train/js/html/*');
+      $loadHTMLFiles = glob('js/html/*');
       foreach($loadHTMLFiles as $load){
         echo "\n".file_get_contents($load);
       }
@@ -47,19 +47,31 @@
       document.title = 'Shortline';
       var then = Date.now(), now=Date.now();
 
+      var work = 0;
       var render = function() {
         //requestAnimationFrame(render);
-        setTimeout(render,1000/20);
         //setTimeout(render,1000/2);
+        setTimeout(render,1000/20);
         now = Date.now();
-        train.workJobs(50)//now-then);
-        then = now;
-        track.endTrack();
-        checkMenus();
-        controls.update();
+        if(work != -1 && m['m_hlt'].clicked != 1){
+          work = train.workJobs(50);
+          then = now;
+          track.endTrack();
+          checkMenus();
+          controls.update();
+        }//now-then);
         renderer.render(scene, camera);
       }
       render();
+      setTimeout(function(){
+          var i = track.sections.length;
+          while (i > 0){
+            i--;
+            if(track.sections[i] != null){
+              var j = Math.floor(track.sections[i].points.length/2);
+              testText(i,recalcY(track.sections[i].points[j],10),THREE.Vector3(9,0,0));
+            }
+        }},1000);
     </script>
   </div>
 
