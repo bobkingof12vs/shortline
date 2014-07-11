@@ -18,19 +18,19 @@ var trackPoints = [
 	{p1: new THREE.Vector3(200, 0, 100),
 	 p2: new THREE.Vector3(150, 0, 100),
 	 p3: new THREE.Vector3(100, 0, 100)
-	}/*,
+	},
 	{p1: new THREE.Vector3(300, 0, 100),
 	 p2: new THREE.Vector3(250, 0, 100),
 	 p3: new THREE.Vector3(200, 0, 100)
-	},
+}/*,
 	{p1: new THREE.Vector3(200, 0, 0),
 	 p2: new THREE.Vector3(200, 0, 50),
 	 p3: new THREE.Vector3(200, 0, 100)
-	}*/,
+},
 	{p1: new THREE.Vector3(100, 0, 100),
 	 p2: new THREE.Vector3(100, 0, 150),
 	 p3: new THREE.Vector3(100, 0, 200)
-	},
+}*/,
 	{p1: new THREE.Vector3(100, 0, 200),
 	 p2: new THREE.Vector3(100, 0, 250),
 	 p3: new THREE.Vector3(100, 0, 300)
@@ -38,15 +38,15 @@ var trackPoints = [
 	{p1: new THREE.Vector3(100, 0, 300),
 	 p2: new THREE.Vector3(150, 0, 300),
 	 p3: new THREE.Vector3(200, 0, 300)
-	}/*,
+}/*,
 	{p1: new THREE.Vector3(200, 0, 200),
 	 p2: new THREE.Vector3(200, 0, 250),
 	 p3: new THREE.Vector3(200, 0, 300)
-	},
+}*/,
 	{p1: new THREE.Vector3(200, 0, 200),
 	 p2: new THREE.Vector3(150, 0, 200),
 	 p3: new THREE.Vector3(100, 0, 200)
-	}*/,
+	},
 	{p1: new THREE.Vector3(300, 0, 200),
 	 p2: new THREE.Vector3(250, 0, 200),
 	 p3: new THREE.Vector3(200, 0, 200)
@@ -54,11 +54,11 @@ var trackPoints = [
 	{p1: new THREE.Vector3(300, 0, 100),
 	 p2: new THREE.Vector3(300, 0, 150),
 	 p3: new THREE.Vector3(300, 0, 200)
-	},
+}/*,
 	{p1: new THREE.Vector3(200, 0, 100),
 	 p2: new THREE.Vector3(200, 0, 150),
 	 p3: new THREE.Vector3(200, 0, 200)
-	},
+}*/,
 	{p1: new THREE.Vector3(100, 0, 100),
 	 p2: new THREE.Vector3(50,  0, 100),
 	 p3: new THREE.Vector3(0,   0, 100)
@@ -82,7 +82,7 @@ var trackPoints = [
 	{p1: new THREE.Vector3(400,   0, 100),
 	 p2: new THREE.Vector3(350,   0, 100),
 	 p3: new THREE.Vector3(300,   0, 100)
-	},
+}/*,
 	{p1: new THREE.Vector3(-50,  0,-50),
 	 p2: new THREE.Vector3(-50,  0,  0),
 	 p3: new THREE.Vector3(-50,  0, 50)
@@ -118,7 +118,7 @@ var trackPoints = [
 	{p1: new THREE.Vector3(-150,  0,-150),
 	 p2: new THREE.Vector3(-150,  0,-200),
 	 p3: new THREE.Vector3(-150,  0,-250)
-	}
+}*/
 ];
 console.log('track points',trackPoints)
 
@@ -199,10 +199,10 @@ trackFunc = function(){
 
 	this.getNextSec = function(secId,endId){
 		end = this.sections[secId].ends[endId];
-		console.log(end);
+		var segId = (endId == 0 ? this.sections[secId].segmentIds[0] : this.sections[secId].segmentIds[this.sections[secId].segmentIds.length - 1]);
 		if (end.type == 'switch') {
-			console.log(end.id,secId,(endId == 0 ? this.sections[secId].segmentIds[0] : this.sections[secId].segmentIds[this.sections[secId].segmentIds.length - 1]));
-			var switchThrow = this.getSwitchThrow(end.id,secId,(endId == 0 ? this.sections[secId].segmentIds[0] : this.sections[secId].segmentIds[this.sections[secId].segmentIds.length - 1]));
+			var switchThrow = this.getSwitchThrow(end.id,secId,segId);
+			var dir = (this.sections[switchThrow.secId].segmentIds[0] === switchThrow.segId ? 1 : 0);
 			return {
 				sec: this.sections[switchThrow.secId],
 				dir: (this.sections[switchThrow.secId].segmentIds[0] === switchThrow.segId ? 1 : 0)
@@ -213,6 +213,23 @@ trackFunc = function(){
 		}
 		return false;
 	}
+
+	this.getPrevSec = function(secId,endId){
+		end = this.sections[secId].ends[endId == 0 ? 1 : 0];
+		var segId = (endId == 1 ? this.sections[secId].segmentIds[0] : this.sections[secId].segmentIds[this.sections[secId].segmentIds.length - 1]);
+		if (end.type == 'switch') {
+			var switchThrow = this.getSwitchThrow(end.id,secId,segId);
+			return {
+				sec: this.sections[switchThrow.secId],
+				dir: (this.sections[switchThrow.secId].segmentIds[0] === switchThrow.segId ? 0 : 1)
+			};
+		}
+		else if (end.type == 'end') {
+			return false;
+		}
+		return false;
+	}
+
 
 	this.lerpDistance = function(seg,opts) {
 		opts = opts !== undefined ? opts : {};
@@ -310,6 +327,12 @@ trackFunc = function(){
 			}
 			if (winner != -1) {
 				point = winner;
+			}
+			else{
+				console.log('ddd',point);
+				point.x = Math.round(point.x/50)*50;
+				point.z = Math.round(point.z/50)*50;
+				console.log(point);
 			}
 			return point;
 		}
@@ -574,8 +597,9 @@ trackFunc = function(){
 		var i = this.switches[switchId].secIds.length;
 		while(i > 0){
 			i--;
+			//console.log(this.switches[switchId].secIds[i] , secId , this.switches[switchId].segIds[i] , segId, switchId)
 			if(this.switches[switchId].secIds[i] === secId && this.switches[switchId].segIds[i] === segId){
-				this.switches[switchId].connectsTo[i][this.switches[switchId].target[i]]
+				//console.log('===',this.switches[switchId],this.switches[switchId].target[i],i)
 				return this.switches[switchId].connectsTo[i][this.switches[switchId].target[i]];
 			}
 		}
@@ -597,10 +621,10 @@ trackFunc = function(){
 		return false;
 	}
 
-	this.switchByPoint = function(p1){
+	this.switchByPoint = function(inPoint){
 
-		var points = [p1];
-		var secs = this.findPointInSec(p1);
+		var points = [inPoint];
+		var secs = this.findPointInSec(inPoint);
 		var i = secs.length
 		while(i > 0){
 			i--;
@@ -609,7 +633,7 @@ trackFunc = function(){
 		var p = points.length;
 		while(p > 0){
 			p--;
-			p1 = points[p];
+			var p1 = points[p];
 			var switchId = i = this.switches.length;
 			while(i > 0){
 				i--;
@@ -629,6 +653,10 @@ trackFunc = function(){
 						secIds.push({secId: i, pointId: this.sections[i].points.length - 2, segId: this.sections[i].segmentIds[this.sections[i].segmentIds.length - 1]});
 				}
 			}
+
+			if(secIds.length <= 1)
+				continue;
+
 
 			this.switches[switchId] = {
 				type: 'switch',
@@ -681,12 +709,12 @@ trackFunc = function(){
 				while(j > 0){
 					j--;
 					if (j != i
-						&& newSegArray[i] != -1
+						/*&& newSegArray[i] != -1
 						&& newSegArray[j] != -1
 						&& angleBetweenFlattenedVectors(
 							newSegArray[i].p2,
 							newSegArray[j].p2,
-							this.switches[switchId].origin) >= 89.999
+							this.switches[switchId].origin) >= 0*/
 					){
 						this.switches[switchId].connectsTo[i].push({
 							secId: this.findSegInSec(this.switches[switchId].segIds[j]),
@@ -695,6 +723,7 @@ trackFunc = function(){
 					}
 				}
 				if (this.switches[switchId].throwObjs[i] != null) {
+					this.switches[switchId].throwObjs[i].clickCall = '';
 					scene.remove(this.switches[switchId].throwObjs[i]);
 					delete this.throws[this.switches[switchId].throwObjs[i].id];
 					this.switches[switchId].throwObjs[i] = null;
@@ -705,8 +734,10 @@ trackFunc = function(){
 						this.switches['material']
 					);
 					this.switches[switchId].throwObjs[i].clickCall = Function(
+						'if('+this.switches[switchId].throwObjs[i].id+' != track.switches['+switchId+'].throwObjs['+i+'].id) return;'+
+						'console.log("herehere",track.switches['+switchId+'].target['+i+'],'+i+','+switchId+');'+
 						'track.switches['+switchId+'].target['+i+']++;'+
-						'console.log("herehere",track.switches['+switchId+'].target['+i+'],'+i+');'+
+						'console.log("herehere",track.switches['+switchId+'].target['+i+'],'+i+','+switchId+');'+
 						'if(track.switches['+switchId+'].target['+i+'] == track.switches['+switchId+'].connectsTo['+i+'].length){'+
 							'track.switches['+switchId+'].target['+i+'] = 0;'+
 						'}'+'console.log("herehere",track.switches['+switchId+'].target['+i+'],'+i+');'+
@@ -716,6 +747,10 @@ trackFunc = function(){
 					scene.add(this.switches[switchId].throwObjs[i])
 					//this.updateSwitchBoxes();
 				}
+			}
+
+			if(this.switches[switchId].secIds.length == 1){
+				console.error('it happened here');
 			}
 		}
 	}

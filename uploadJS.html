@@ -1,0 +1,168 @@
+<html>
+  <head>
+    <style>
+    .mono{
+      font-family: monospace;
+    }
+    #objArea{
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      right: 25%;
+      background-color: #111;
+    }
+    #editArea{
+      position: absolute;
+      right: 0;
+      top: 0;
+      left: 75%;
+      height: 100%;
+      background-color: #222;
+      overflow-y: scroll;
+    }
+    #image{
+      position: relative;
+      height: 0px;
+      padding-bottom: 80%;
+      margin: 10%;
+      width: 80%;
+      background-color: #111;
+    }
+    #formArea{
+      position: relative;
+      margin: 10%;
+      padding: 5%;
+      background-color: #333;
+    }
+    .formItem{
+      position: relative;
+      left: 0;
+      width: 96%;
+      background-color: #555;
+      padding: 2%;
+    }
+    .formInput{
+      position: relative;
+      left: 10%;
+      width: 78%;
+      margin:1%;
+    }
+
+    </style>
+    <script src="sources/threejs/build/three.min.js"></script>
+    <script src='js/3dImage.js'></script>
+    <script>
+    var obj;
+    newObj = function(e){
+      var reader = new FileReader();
+      var file = e.target.files[0];
+      reader.onload = function(r){
+
+        document.getElementById('objArea').innerHTML = '';
+        obj = new objectInit(r.target.result,'objArea',true);
+        move();
+
+        document.getElementById('image').innerHTML = '';
+      };
+      reader.readAsText(file)
+    }
+    takePic = function(){
+      document.getElementById('image').innerHTML = '';
+      var newImg = document.createElement("img");
+      newImg.src = obj.rend();
+      console.log(newImg.src)
+      document.getElementById('image').appendChild(newImg);
+      document.getElementById('imageData').value = newImg.src;
+      newImg.style.height = '100%';
+      newImg.style.width = '100%';
+      return false;
+    }
+
+    move = function(){
+
+      els = document.getElementsByClassName('formInput');
+      var i = els.length;
+
+      while(i > 0){
+        i--;
+        var el = document.getElementById('d'+els[i].id);
+        if(el != null && el.id != undefined)
+          el.innerHTML = els[i].value;
+      }
+
+      var camH = document.getElementById('camH').value;
+      var rot = document.getElementById('rot').value;
+      var x = document.getElementById('x').value;
+      var z = document.getElementById('z').value;
+      var scale = document.getElementById('scale').value;
+      obj.objPosSet(x,z,rot,scale,camH);
+    }
+
+    </script>
+  </head>
+  <body>
+    <div id='objArea'>
+    </div>
+    <div id='editArea'>
+      <div id='image'>
+      </div>
+      <div id='formArea'>
+        <form>
+          <p class='formItem mono'>
+            Object Name:<br>
+            <input name='objName' type='text' class='formInput'></input>
+          </p>
+          <p class='formItem mono'>
+            Upload File:<br>
+            <input name='file' type='file' class='formInput' onchange='newObj(event)'></input>
+          </p>
+          <p class='formItem mono'>
+            Object Type:<br>
+            &nbsp;<input name='type' type='radio' onchange='changeType'> Engine</input><br>
+            &nbsp;<input name='type' type='radio' onchange='changeType'> Rail Car</input><br>
+            &nbsp;<input name='type' type='radio' onchange='changeType'> Other</input><br>
+          </p>
+          <p class='formItem mono'>
+            <input type='submit' onclick='takePic(); return false' value='Take Picture' class='formInput'></input>
+          </p>
+          <p class='formItem mono'>
+            Camera Height: <span id='dcamH'>150</span><br>
+            <input id='camH' type='range' min='-50' max='200' value='150' step='10'class='formInput' onchange='move()'></input><br>
+            Object Rotation: <span id='drot'>0</span><br>
+            <input id = 'rot' type='range' min='0' max='360' value='180' step='10' class='formInput' onchange='move()'></input><br>
+            Object X: <span id='dx'>0</span><br>
+            <input id='x' type='range' min='-50' max='50' value='0' step='10' class='formInput' onchange='move()'></input><br>
+            Object Z: <span id='dz'>0</span><br>
+            <input id='z' type='range' min='-50' max='50' value='0' step='10' class='formInput' onchange='move()'></input><br>
+          </p>
+          <p class='formItem mono'>
+            Max Acceleration: <span id='dmaxAcc'>10</span><br>
+            <input id='maxAcc' name='maxAcc' type='range' min='1' max='100' value='10' step='1' class='formInput' onchange='move()'></input><br>
+            Top Speed: <span id='dtop'>80</span><br>
+            <input id='top' name='top' type='range' min='10' max='1000' value='80' step='10' class='formInput' onchange='move()'></input><br>
+            Deceleration: <span id='ddec'>10</span><br>
+            <input id='dec' type='range' min='1' max='100' value='10' step='1' class='formInput' onchange='move()'></input><br>
+          </p>
+          <p class='formItem mono'>
+            Axle Offset: <span id='daxleOffset'>70</span><br>
+            <input id='axleOffset' name='axleOffset' type='range' min='1' max='200' value='70' step='1' class='formInput' onchange='move()'></input><br>
+            Size Length: <span id='dsizeLength'>70</span><br>
+            <input id='sizeLength' name='sizeLength' type='range' min='1' max='200' value='70' step='1' class='formInput' onchange='move()'></input><br>
+          </p>
+          <p class='formItem mono'>
+            Scale: <span id='dscale'>10</span><br>
+            <input id='scale' name='scale' type='range' min='1' max='20' value='10' step='1' class='formInput' onchange='move()'></input><br>
+          </p>
+          <p class='formItem mono'>
+            Image Data: <br>
+            <input name='imageData' type='text' class='formInput' id='imageData' disabled='true'></input>
+          </p>
+          <p class='formItem mono'>
+            <input name='submit' type='submit' class='formInput' ></input>
+          </p>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>

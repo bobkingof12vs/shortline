@@ -105,7 +105,10 @@
 			console.log('railcars',railcars);
 			//-- things to do once we have all of our objects loaded --//
 			train.addTrain('shunter')
-			//train.addRailcar('flatcar',train.train.length-1);
+			train.addRailcar('flatcar',0);
+			train.addRailcar('flatcar',0);
+			train.addRailcar('flatcar',0);
+			train.addRailcar('flatcar',0);
 			//train.addRailcar('flatcar',train.train.length-1);
 			//train.addRailcar('flatcar',train.train.length-1);
 			//train.addRailcar('flatcar',train.train.length-1);

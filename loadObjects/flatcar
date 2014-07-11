@@ -1,10 +1,10 @@
 {
 				'path': 'js/trains/flatcar.js',
 				'type': 'railcar',
-				'axleOffset': 30,
-				'sizeLength': 50,
+				'axleOffset': 20,
+				'sizeLength': 30,
 				'dispOpts': {
-								'scale': new THREE.Vector3(10, 10, 10),
+								'scale': new THREE.Vector3(6, 6, 6),
 								'castShadow': true,
 								'receiveShadow': true,
 								'line': true

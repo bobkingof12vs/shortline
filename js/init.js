@@ -140,11 +140,13 @@ function testCube(p1,col,scale) {
   return cube;
 }
 
-function testText(text,p1,rot,scale){
-  scale = scale != undefined ? scale : 1;
+function testText(text,p1,rot,scale,col1,col2){
+  var col1 = col1 != undefined ? col1 : 0xff0000
+  var col2 = col2 != undefined ? col2 : 0x000088
+  var scale = scale != undefined ? scale : 1;
 	// add 3D text
-	var materialFront = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
-	var materialSide = new THREE.MeshBasicMaterial( { color: 0x000088 } );
+	var materialFront = new THREE.MeshBasicMaterial( { color: col1 } );
+	var materialSide = new THREE.MeshBasicMaterial( { color: col2 } );
 	var materialArray = [ materialFront, materialSide ];
 	var textGeom = new THREE.TextGeometry( text,
 	{

@@ -63,15 +63,38 @@
         renderer.render(scene, camera);
       }
       render();
-      setTimeout(function(){
-          var i = track.sections.length;
-          while (i > 0){
-            i--;
-            if(track.sections[i] != null){
-              var j = Math.floor(track.sections[i].points.length/2);
-              testText(i,recalcY(track.sections[i].points[j],10),THREE.Vector3(9,0,0));
-            }
-        }},1000);
+
+      var dispObjects = [];
+      var demObjs = function(){
+        i = dispObjects.length;
+        while( i > 0){
+          i--;
+          scene.remove(dispObjects[i]);
+        }
+        dispObjects = [];
+        var i = track.sections.length;
+        while (i > 0){
+          i--;
+          if(track.sections[i] != null){
+            var j = Math.floor(track.sections[i].points.length/2);
+            dispObjects.push(testText(i,recalcY(track.sections[i].points[j],30),THREE.Vector3(9,0,0),THREE.Vector3(.5,.5,.5)));
+          }
+        }
+        var i = track.segments.length;
+        while (i > 0){
+          i--;
+          if(track.segments[i] != null){
+            dispObjects.push(testText(i,recalcY(track.segments[i].p2,10),THREE.Vector3(9,0,0),THREE.Vector3(.5,.5,.5),0x000088,0xff0000));
+          }
+        }
+        var i = track.switches.length
+        while (i > 0){
+          i--;
+          dispObjects.push(testText(i,recalcY(track.switches[i].origin,10),THREE.Vector3(9,0,0),THREE.Vector3(.5,.5,.5),0x00ff88,0xffff00));
+        }
+        setTimeout(demObjs,10000);
+      };
+      demObjs();
     </script>
   </div>
 
