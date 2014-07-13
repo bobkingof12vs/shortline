@@ -197,7 +197,6 @@ var trainFunc = function(){
 		var curSegDist = 0;
 		while(true){
 			//console.log('rem',remDist, 'moveDir', moveDir, 'inc', inc, 'curPath', curPath, 'curPointId',curPointId);
-			if(reverse < 0) console.log(moveDir, reverse, curPointId);
 			if (((curPointId <= 0 || curPointId >= curPath.sec.points.length - 1) && reverse > 0)
 				|| (((curPointId <= 1 && moveDir == 0) || (curPointId >= curPath.sec.points.length - 2 && moveDir == 1)) && reverse < 0)
 				|| (curPointId < -1 || curPointId > curPath.sec.points.length)){

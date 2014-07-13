@@ -78,13 +78,11 @@
 	<div class='lowerMenu'>
 		<div class='speed mono'>
 			current&nbsp; <span id='curspeed'>0</span><br>
-			accell&nbsp;&nbsp; <span id='accell'>1</span>
+			accell&nbsp;&nbsp; <span id='accell'>1</span><br>
 			throttle <span id='topspeed'>1</span>
 		</div>
-		<input id='userAcc' type='range' value=100  step=2.5 onchange='userAcc()'></input>
-		<span class='mono backwords'>Acceleration</span>
-		<input id='userSpeed' type='range' value=100  step=2.5 onchange='topUserSpeed()'></input>
-		<span class='backwords mono'>Top Speed</span>
+		<input id='userAcc' type='range' value=100  step=2.5 onchange='userAcc()'><span class='mono backwords'>Acceleration</span></input>
+		<input id='userSpeed' type='range' value=100  step=2.5 onchange='topUserSpeed()'><span class='backwords mono'>Top Speed</span></input>
 		<script>document.onload = function(){userAcc(); topUserSpeed();}</script>
 	</div>
 </span>

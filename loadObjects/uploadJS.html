@@ -1,7 +1,7 @@
 <html>
   <head>
     <style>
-    .mono{
+    .uploadMono{
       font-family: monospace;
     }
     #objArea{
@@ -11,6 +11,7 @@
       bottom: 0;
       right: 25%;
       background-color: #111;
+      overflow-y: noscroll;
     }
     #editArea{
       position: absolute;
@@ -50,8 +51,8 @@
     }
 
     </style>
-    <script src="sources/threejs/build/three.min.js"></script>
-    <script src='js/3dImage.js'></script>
+    <script src="../sources/threejs/build/three.min.js"></script>
+    <script src='../js/3dImage.js'></script>
     <script>
     var obj;
     newObj = function(e){
@@ -108,25 +109,24 @@
       <div id='image'>
       </div>
       <div id='formArea'>
-        <form>
-          <p class='formItem mono'>
+        <form action='uploadjs.php' method='post' enctype="multipart/form-data">
+          <p class='formItem uploadMono'>
             Object Name:<br>
             <input name='objName' type='text' class='formInput'></input>
           </p>
-          <p class='formItem mono'>
+          <p class='formItem uploadMono'>
             Upload File:<br>
+            <input type="hidden" name="MAX_FILE_SIZE" value="30000" />
             <input name='file' type='file' class='formInput' onchange='newObj(event)'></input>
           </p>
-          <p class='formItem mono'>
-            Object Type:<br>
-            &nbsp;<input name='type' type='radio' onchange='changeType'> Engine</input><br>
-            &nbsp;<input name='type' type='radio' onchange='changeType'> Rail Car</input><br>
-            &nbsp;<input name='type' type='radio' onchange='changeType'> Other</input><br>
+          <hr>
+          <p class='uploadMono'>
+            Image Detail
           </p>
-          <p class='formItem mono'>
+          <p class='formItem uploadMono'>
             <input type='submit' onclick='takePic(); return false' value='Take Picture' class='formInput'></input>
           </p>
-          <p class='formItem mono'>
+          <p class='formItem uploadMono'>
             Camera Height: <span id='dcamH'>150</span><br>
             <input id='camH' type='range' min='-50' max='200' value='150' step='10'class='formInput' onchange='move()'></input><br>
             Object Rotation: <span id='drot'>0</span><br>
@@ -136,29 +136,37 @@
             Object Z: <span id='dz'>0</span><br>
             <input id='z' type='range' min='-50' max='50' value='0' step='10' class='formInput' onchange='move()'></input><br>
           </p>
-          <p class='formItem mono'>
+          <hr>
+          <p class='uploadMono'>
+            Object Detail
+          </p>
+          <p class='formItem uploadMono'>
+            Object Type:<br>
+            &nbsp;<input name='type' type='radio' onchange='changeType' value = 'engine'> Engine</input><br>
+            &nbsp;<input name='type' type='radio' onchange='changeType' value = 'railcar'> Rail Car</input><br>
+            &nbsp;<input name='type' type='radio' onchange='changeType' value = 'other'> Other</input><br>
+          </p>
+          <p class='formItem uploadMono'>
             Max Acceleration: <span id='dmaxAcc'>10</span><br>
             <input id='maxAcc' name='maxAcc' type='range' min='1' max='100' value='10' step='1' class='formInput' onchange='move()'></input><br>
             Top Speed: <span id='dtop'>80</span><br>
             <input id='top' name='top' type='range' min='10' max='1000' value='80' step='10' class='formInput' onchange='move()'></input><br>
             Deceleration: <span id='ddec'>10</span><br>
-            <input id='dec' type='range' min='1' max='100' value='10' step='1' class='formInput' onchange='move()'></input><br>
+            <input id='dec' name='dec' type='range' min='1' max='100' value='10' step='1' class='formInput' onchange='move()'></input><br>
           </p>
-          <p class='formItem mono'>
+          <p class='formItem uploadMono'>
             Axle Offset: <span id='daxleOffset'>70</span><br>
             <input id='axleOffset' name='axleOffset' type='range' min='1' max='200' value='70' step='1' class='formInput' onchange='move()'></input><br>
             Size Length: <span id='dsizeLength'>70</span><br>
             <input id='sizeLength' name='sizeLength' type='range' min='1' max='200' value='70' step='1' class='formInput' onchange='move()'></input><br>
           </p>
-          <p class='formItem mono'>
+          <p class='formItem uploadMono'>
             Scale: <span id='dscale'>10</span><br>
             <input id='scale' name='scale' type='range' min='1' max='20' value='10' step='1' class='formInput' onchange='move()'></input><br>
           </p>
-          <p class='formItem mono'>
-            Image Data: <br>
-            <input name='imageData' type='text' class='formInput' id='imageData' disabled='true'></input>
-          </p>
-          <p class='formItem mono'>
+          <hr>
+            <input name='imageData' type='text' class='formInput' id='imageData' hidden='hidden'></input>
+          <p class='formItem uploadMono'>
             <input name='submit' type='submit' class='formInput' ></input>
           </p>
         </form>

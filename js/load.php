@@ -11,7 +11,7 @@
 	function jsObjToGlobalMesh(name,opts,objData,callback){
 		gOpts[name] = (opts !== undefined) ? opts : {};
 		gOpts[name].scale = (gOpts[name].scale !== undefined) ? gOpts[name].scale : new THREE.Vector3(10,10,10);
-		console.log('name: '+name,'scale: ');
+		console.log('name: '+name,'scale: ',gOpts[name].scale);
 		//THREE.GeometryUtils.merge(geometry, outlineGeometry(geometry));
 		return function(geometry,materials){
 			//obj[name].newGeom = geometry;
@@ -69,18 +69,19 @@
 		}
 	}
 
-	var numOfLoaderObjects = 0;
 	/*function waitForPreLoadObjects(){
 		if (
 			endPoints.length > 0
 		) {*/
 			<?php
 				$loadObjFiles = glob('loadObjects/*');
-				echo "\nnumOfLoaderObjects = ".count($loadObjFiles).';';
+				$numLoaded = 0;
 				foreach($loadObjFiles as $Loadobjs){
 					$ex = explode('/',$Loadobjs);
 					$name = end($ex);
 					if(strpos($name,'.') === false){
+						$numLoaded++;
+						echo "console.log('@@@$name');";
 						$data = file_get_contents($Loadobjs);
 						echo "\nloadedObjData['$name'] = $data;";
 						echo "\nloader.load(
@@ -98,25 +99,21 @@
 	}*/
 
 	function waitForAllLoadedObjs(){
-		if (countOfLoadedLoaderObjs == numOfLoaderObjects & numOfLoaderObjects > 0) {
-			console.log('num objs loaded: ',countOfLoadedLoaderObjs);
+		if (countOfLoadedLoaderObjs == <?= $numLoaded; ?> & <?= $numLoaded; ?> > 0) {
+			console.log('num objs loaded: ',<?= $numLoaded; ?>);
 			console.log('obj',obj);
 			console.log('engines',engines);
 			console.log('railcars',railcars);
 			//-- things to do once we have all of our objects loaded --//
-			train.addTrain('shunter')
+			train.addTrain('shunter');
+			train.addRailcar('boxcar',0);
+			train.addRailcar('boxcar',0);
 			train.addRailcar('flatcar',0);
-			train.addRailcar('flatcar',0);
-			train.addRailcar('flatcar',0);
-			train.addRailcar('flatcar',0);
-			//train.addRailcar('flatcar',train.train.length-1);
-			//train.addRailcar('flatcar',train.train.length-1);
-			//train.addRailcar('flatcar',train.train.length-1);
 			/*setTimeout(function(){
 				train.addTrain('shunter');
-				train.addRailcar(train.train.length-1);
-				train.addRailcar(train.train.length-1);
-				train.addRailcar(train.train.length-1);
+				train.addRailcar('flatcar',train.train.length-1);
+				train.addRailcar('flatcar',train.train.length-1);
+				train.addRailcar('flatcar',train.train.length-1);
 			},10000);*/
 			render();
 		}
