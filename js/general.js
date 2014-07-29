@@ -1,5 +1,5 @@
 function angleBetweenVectors(a,b,o){
-  
+
   if (o == undefined) {
     o = new THREE.Vector3(0,0,0);
   }
@@ -7,9 +7,9 @@ function angleBetweenVectors(a,b,o){
     a = new THREE.Vector3 (a.x - o.x, a.y - o.y, a.z - o.z)
     b = new THREE.Vector3 (b.x - o.x, b.y - o.y, b.z - o.z)
   }
-  
+
   dotAB = a.dot(b)
-  
+
   magA = o.distanceTo(a);
   magB = o.distanceTo(b);
   if (magA == 0 | magB == 0) {
@@ -30,7 +30,7 @@ function angleBetweenFlattenedVectors(a,b,o){
     a = new THREE.Vector3 (a.x - o.x, 0, a.z - o.z)
     b = new THREE.Vector3 (b.x - o.x, 0, b.z - o.z)
   }
-  
+
   return angleBetweenVectors(
     new THREE.Vector3(a.x,0,a.z),
     new THREE.Vector3(b.x,0,b.z)
@@ -82,34 +82,34 @@ function lineLineIntersect(m1,b1,m2,b2) {
 function gridPointsOnLine(gridSize, p1, p2) {
   gridsize = gridSize/2
   if (p1.x == p2.x & p1.z == p2.z) {return p1;}
-  
+
   mx = maxX = p1.x >= p2.x ? p1.x : p2.x;
   mz = maxZ = p1.z >= p2.z ? p1.z : p2.z;
-  
+
   minX = p1.x < p2.x ? p1.x : p2.x;
   minZ = p1.z < p2.z ? p1.z : p2.z;
-  
+
   m1 = -1;
   m2 = ((p2.z-p1.z)/(p2.x-p1.x));
-  
+
   newPoints = [];
   newPoints.push(recalcY(p1));
   if (maxX - gridSize > minX) {
     while(maxX > minX){
-      
+
       tempx = Math.floor(maxX/gridSize)*gridSize;
       tempz = (m2*(tempx-p2.x))+p2.z;
-      
+
       b1 = (Math.ceil(minZ/100)*100)-(m1*tempx);
       b2 = p2.z-(m2*p2.x);
       np = lineLineIntersect(m1,b1,m2,b2);
       if (np.y != -1 & mx > np.x & minX < np.x & mz > np.z & minZ < np.z)
         {newPoints.push(new THREE.Vector3(np.x,findY(np.x,np.z)+3,np.z));}
-        
-      
+
+
       if(maxX > tempx & minX < tempx)
         {newPoints.push(new THREE.Vector3(tempx,findY(tempx,tempz)+1,tempz));}
-      
+
       maxX -= gridSize;
     }
   }
@@ -117,23 +117,23 @@ function gridPointsOnLine(gridSize, p1, p2) {
     while(maxZ > minZ){
       tempz = Math.floor(maxZ/gridSize)*gridSize;
       tempx = ((tempz-p2.z)/m2)+p2.x
-      
+
       b1 = tempz-(m1*(Math.ceil(minX/100)*100));
       b2 = p2.z-(m2*p2.x);
       np = lineLineIntersect(m1,b1,m2,b2);
       if (np.y != -1 & mx > np.x & minX < np.x & mz > np.z & minZ < np.z)
         {newPoints.push(new THREE.Vector3(np.x,findY(np.x,np.z)+1,np.z));}
-      
+
       if(maxZ > tempz & minZ < tempz)
         {newPoints.push(new THREE.Vector3(tempx,findY(tempx,tempz)+1,tempz));}
-      
+
       maxZ -= gridSize;
     }
   }
   newPoints.push(recalcY(p2));
-  
-  newPoints.sort(function(a,b){return a.x-b.x});  
-  
+
+  newPoints.sort(function(a,b){return a.x-b.x});
+
   return newPoints;
 
 }
@@ -160,23 +160,23 @@ function outlineGeometry(geometry){
     while(j >= 0){
       var set1 = -1;
       var set2 = -1;
-      if (geometry.faces[i].a == geometry.faces[j].a 
+      if (geometry.faces[i].a == geometry.faces[j].a
       | geometry.faces[i].a == geometry.faces[j].b
       | geometry.faces[i].a == geometry.faces[j].c
       ){set1 = geometry.faces[i].a}
-      if (geometry.faces[i].b == geometry.faces[j].a 
+      if (geometry.faces[i].b == geometry.faces[j].a
       | geometry.faces[i].b == geometry.faces[j].b
       | geometry.faces[i].b == geometry.faces[j].c
       ){
         if(set1 != -1){set2 = geometry.faces[i].b}
         else{set1 = geometry.faces[i].b}
       }
-      if (geometry.faces[i].c == geometry.faces[j].a 
+      if (geometry.faces[i].c == geometry.faces[j].a
       | geometry.faces[i].c == geometry.faces[j].b
       | geometry.faces[i].c == geometry.faces[j].c
       ){if(set2 != -1){set2 = -1}
         else if(set1 != -1){set2 = geometry.faces[i].c}}
-      
+
       if (set2 >= 0) {
         var caught = 0;
         for(k = lineVecs.length-1; k = 0; k--){
@@ -184,8 +184,8 @@ function outlineGeometry(geometry){
           |  (set1 == lineVecs[k][1] & set2 == lineVecs[k][0])
           ) {caught = 1;}
         }
-        
-        if(caught <= 0 
+
+        if(caught <= 0
         & (angleBetweenVectors(geometry.faces[i].normal,geometry.faces[j].normal) > 15
           |angleBetweenVectors(geometry.faces[i].normal,geometry.faces[j].normal) < -10)
         ){lineVecs.push([set1,set2]);}
@@ -195,11 +195,11 @@ function outlineGeometry(geometry){
     i--;
   }
   var outlineGeometry = new THREE.Geometry();
-  for (i = 0; i < lineVecs.length; i++) { 
+  for (i = 0; i < lineVecs.length; i++) {
     outlineGeometry.vertices.push(geometry.vertices[lineVecs[i][0]]);
     outlineGeometry.vertices.push(geometry.vertices[lineVecs[i][1]]);
   }
-  
+
   return outlineGeometry;
   //var lineMaterial = new THREE.LineBasicMaterial( { color: 0x222222, linewidth: 3 } );
   //var mline = new THREE.Line( outlineGeometry, lineMaterial, THREE.LinePieces);
@@ -241,9 +241,9 @@ function extendVector(newLength,v1,origin){
   else{
     origin = new THREE.Vector3(0,0,0);
   }
-  
+
   var extendFactor = newLength / v1.distanceTo(origin);
-  
+
   return new THREE.Vector3(
     (v1.x * extendFactor) + origin.x,
     (v1.y * extendFactor) + origin.y,

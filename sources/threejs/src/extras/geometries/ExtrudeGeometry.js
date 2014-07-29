@@ -35,11 +35,8 @@ THREE.ExtrudeGeometry = function ( shapes, options ) {
 
 	shapes = shapes instanceof Array ? shapes : [ shapes ];
 
-	this.shapebb = shapes[ shapes.length - 1 ].getBoundingBox();
-
 	this.addShapeList( shapes, options );
 
-	this.computeCentroids();
 	this.computeFaceNormals();
 
 	// can't really use automatic vertex normals
@@ -85,11 +82,6 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 	// Use default WorldUVGenerator if no UV generators are specified.
 	var uvgen = options.UVGenerator !== undefined ? options.UVGenerator : THREE.ExtrudeGeometry.WorldUVGenerator;
-
-	var shapebb = this.shapebb;
-	//shapebb = shape.getBoundingBox();
-
-
 
 	var splineTube, binormal, normal, position2;
 	if ( extrudePath ) {
@@ -137,7 +129,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 	var vertices = shapePoints.shape;
 	var holes = shapePoints.holes;
 
-	var reverse = !THREE.Shape.Utils.isClockWise( vertices ) ;
+	var reverse = ! THREE.Shape.Utils.isClockWise( vertices ) ;
 
 	if ( reverse ) {
 
@@ -179,7 +171,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 	function scalePt2 ( pt, vec, size ) {
 
-		if ( !vec ) console.log( "die" );
+		if ( ! vec ) console.log( "die" );
 
 		return vec.clone().multiplyScalar( size ).add( pt );
 
@@ -262,8 +254,8 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 			if ( v_prev_x > EPSILON ) {
 				if ( v_next_x > EPSILON ) { direction_eq = true; }
 			} else {
-				if ( v_prev_x < -EPSILON ) {
-					if ( v_next_x < -EPSILON ) { direction_eq = true; }
+				if ( v_prev_x < - EPSILON ) {
+					if ( v_next_x < - EPSILON ) { direction_eq = true; }
 				} else {
 					if ( sign(v_prev_y) == sign(v_next_y) ) { direction_eq = true; }
 				}
@@ -271,7 +263,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 			if ( direction_eq ) {
 				// console.log("Warning: lines are a straight sequence");
-				v_trans_x = -v_prev_y;
+				v_trans_x = - v_prev_y;
 				v_trans_y =  v_prev_x;
 				shrink_by = Math.sqrt( v_prev_lensq );
 			} else {
@@ -347,24 +339,23 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 		for ( i = 0, il = contour.length; i < il; i ++ ) {
 
 			vert = scalePt2( contour[ i ], contourMovements[ i ], bs );
-			//vert = scalePt( contour[ i ], contourCentroid, bs, false );
+
 			v( vert.x, vert.y,  - z );
 
 		}
 
 		// expand holes
 
-		for ( h = 0, hl = holes.length; h < hl; h++ ) {
+		for ( h = 0, hl = holes.length; h < hl; h ++ ) {
 
 			ahole = holes[ h ];
 			oneHoleMovements = holesMovements[ h ];
 
-			for ( i = 0, il = ahole.length; i < il; i++ ) {
+			for ( i = 0, il = ahole.length; i < il; i ++ ) {
 
 				vert = scalePt2( ahole[ i ], oneHoleMovements[ i ], bs );
-				//vert = scalePt( ahole[ i ], holesCentroids[ h ], bs, true );
 
-				v( vert.x, vert.y,  -z );
+				v( vert.x, vert.y,  - z );
 
 			}
 
@@ -380,7 +371,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 		vert = bevelEnabled ? scalePt2( vertices[ i ], verticesMovements[ i ], bs ) : vertices[ i ];
 
-		if ( !extrudeByPath ) {
+		if ( ! extrudeByPath ) {
 
 			v( vert.x, vert.y, 0 );
 
@@ -410,7 +401,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 			vert = bevelEnabled ? scalePt2( vertices[ i ], verticesMovements[ i ], bs ) : vertices[ i ];
 
-			if ( !extrudeByPath ) {
+			if ( ! extrudeByPath ) {
 
 				v( vert.x, vert.y, amount / steps * s );
 
@@ -462,7 +453,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 				vert = scalePt2( ahole[ i ], oneHoleMovements[ i ], bs );
 
-				if ( !extrudeByPath ) {
+				if ( ! extrudeByPath ) {
 
 					v( vert.x, vert.y,  amount + z );
 
@@ -523,7 +514,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 			// Bottom faces
 
-			for ( i = 0; i < flen; i++ ) {
+			for ( i = 0; i < flen; i ++ ) {
 
 				face = faces[ i ];
 				f3( face[ 2 ], face[ 1 ], face[ 0 ], true );

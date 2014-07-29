@@ -429,22 +429,23 @@ var Viewport = function ( editor ) {
 
 	} );
 
-	signals.playAnimations.add( function (animations) {
-		
-		function animate() {
+	var animations = [];
 
-			requestAnimationFrame( animate );
-			
-			for ( var i = 0; i < animations.length ; i ++ ) {
+	signals.playAnimation.add( function ( animation ) {
 
-				animations[i].update(0.016);
+		animations.push( animation );
 
-			} 
+	} );
 
-			render();
+	signals.stopAnimation.add( function ( animation ) {
+
+		var index = animations.indexOf( animation );
+
+		if ( index !== -1 ) {
+
+			animations.splice( index, 1 );
+
 		}
-
-		animate();
 
 	} );
 
@@ -496,11 +497,6 @@ var Viewport = function ( editor ) {
 
 					vertices += geometry.vertices.length;
 					faces += geometry.faces.length;
-
-				} else if ( geometry instanceof THREE.Geometry2 ) {
-
-					vertices += geometry.vertices.length / 3;
-					faces += geometry.vertices.length / 9;
 
 				} else if ( geometry instanceof THREE.BufferGeometry ) {
 
@@ -568,6 +564,28 @@ var Viewport = function ( editor ) {
 
 		requestAnimationFrame( animate );
 
+		// animations
+
+		if ( THREE.AnimationHandler.animations.length > 0 ) {
+
+			THREE.AnimationHandler.update( 0.016 );
+
+			for ( var i = 0, l = sceneHelpers.children.length; i < l; i ++ ) {
+
+				var helper = sceneHelpers.children[ i ];
+
+				if ( helper instanceof THREE.SkeletonHelper ) {
+
+					helper.update();
+
+				}
+
+			}
+
+			render();
+
+		}
+
 	}
 
 	function render() {
@@ -577,7 +595,12 @@ var Viewport = function ( editor ) {
 
 		renderer.clear();
 		renderer.render( scene, camera );
-		renderer.render( sceneHelpers, camera );
+
+		if ( renderer instanceof THREE.RaytracingRenderer === false ) {
+
+			renderer.render( sceneHelpers, camera );
+
+		}
 
 	}
 

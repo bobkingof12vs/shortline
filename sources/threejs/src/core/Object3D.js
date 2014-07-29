@@ -15,17 +15,41 @@ THREE.Object3D = function () {
 	this.parent = undefined;
 	this.children = [];
 
-	this.up = new THREE.Vector3( 0, 1, 0 );
+	this.up = THREE.Object3D.DefaultUp.clone();
 
-	this.position = new THREE.Vector3();
-	this._rotation = new THREE.Euler();
-	this._quaternion = new THREE.Quaternion();
-	this.scale = new THREE.Vector3( 1, 1, 1 );
+	var scope = this;
 
-	// keep rotation and quaternion in sync
+	var position = new THREE.Vector3();
+	var rotation = new THREE.Euler();
+	var quaternion = new THREE.Quaternion();
+	var scale = new THREE.Vector3( 1, 1, 1 );
 
-	this._rotation._quaternion = this.quaternion;
-	this._quaternion._euler = this.rotation;
+	rotation.onChange( function () {
+		quaternion.setFromEuler( rotation, false );
+	} );
+
+	quaternion.onChange( function () {
+		rotation.setFromQuaternion( quaternion, undefined, false );
+	} );
+
+	Object.defineProperties( this, {
+		position: {
+			enumerable: true,
+			value: position
+		},
+		rotation: {
+			enumerable: true,
+			value: rotation
+		},
+		quaternion: {
+			enumerable: true,
+			value: quaternion
+		},
+		scale: {
+			enumerable: true,
+			value: scale
+		},
+	} );
 
 	this.renderDepth = null;
 
@@ -35,7 +59,7 @@ THREE.Object3D = function () {
 	this.matrixWorld = new THREE.Matrix4();
 
 	this.matrixAutoUpdate = true;
-	this.matrixWorldNeedsUpdate = true;
+	this.matrixWorldNeedsUpdate = false;
 
 	this.visible = true;
 
@@ -48,40 +72,15 @@ THREE.Object3D = function () {
 
 };
 
+THREE.Object3D.DefaultUp = new THREE.Vector3( 0, 1, 0 );
 
 THREE.Object3D.prototype = {
 
 	constructor: THREE.Object3D,
-	
-	get rotation () { 
-		return this._rotation; 
-	},
-
-	set rotation ( value ) {
-		
-		this._rotation = value;
-		this._rotation._quaternion = this._quaternion;
-		this._quaternion._euler = this._rotation;
-		this._rotation._updateQuaternion();
-		
-	},
-
-	get quaternion () { 
-		return this._quaternion; 
-	},
-	
-	set quaternion ( value ) {
-		
-		this._quaternion = value;
-		this._quaternion._euler = this._rotation;
-		this._rotation._quaternion = this._quaternion;
-		this._quaternion._updateEuler();
-		
-	},
 
 	get eulerOrder () {
 
-		console.warn( 'DEPRECATED: Object3D\'s .eulerOrder has been moved to Object3D\'s .rotation.order.' );
+		console.warn( 'THREE.Object3D: .eulerOrder has been moved to .rotation.order.' );
 
 		return this.rotation.order;
 
@@ -89,7 +88,7 @@ THREE.Object3D.prototype = {
 
 	set eulerOrder ( value ) {
 
-		console.warn( 'DEPRECATED: Object3D\'s .eulerOrder has been moved to Object3D\'s .rotation.order.' );
+		console.warn( 'THREE.Object3D: .eulerOrder has been moved to .rotation.order.' );
 
 		this.rotation.order = value;
 
@@ -97,13 +96,13 @@ THREE.Object3D.prototype = {
 
 	get useQuaternion () {
 
-		console.warn( 'DEPRECATED: Object3D\'s .useQuaternion has been removed. The library now uses quaternions by default.' );
+		console.warn( 'THREE.Object3D: .useQuaternion has been removed. The library now uses quaternions by default.' );
 
 	},
 
 	set useQuaternion ( value ) {
 
-		console.warn( 'DEPRECATED: Object3D\'s .useQuaternion has been removed. The library now uses quaternions by default.' );
+		console.warn( 'THREE.Object3D: .useQuaternion has been removed. The library now uses quaternions by default.' );
 
 	},
 
@@ -145,7 +144,7 @@ THREE.Object3D.prototype = {
 
 	},
 
-	rotateOnAxis: function() {
+	rotateOnAxis: function () {
 
 		// rotate object on axis in object space
 		// axis is assumed to be normalized
@@ -209,9 +208,7 @@ THREE.Object3D.prototype = {
 
 		return function ( axis, distance ) {
 
-			v1.copy( axis );
-
-			v1.applyQuaternion( this.quaternion );
+			v1.copy( axis ).applyQuaternion( this.quaternion );
 
 			this.position.add( v1.multiplyScalar( distance ) );
 
@@ -223,7 +220,7 @@ THREE.Object3D.prototype = {
 
 	translate: function ( distance, axis ) {
 
-		console.warn( 'DEPRECATED: Object3D\'s .translate() has been removed. Use .translateOnAxis( axis, distance ) instead. Note args have been changed.' );
+		console.warn( 'THREE.Object3D: .translate() has been removed. Use .translateOnAxis( axis, distance ) instead.' );
 		return this.translateOnAxis( axis, distance );
 
 	},
@@ -300,10 +297,22 @@ THREE.Object3D.prototype = {
 
 	add: function ( object ) {
 
+		if ( arguments.length > 1 ) {
+
+			for ( var i = 0; i < arguments.length; i++ ) {
+
+				this.add( arguments[ i ] );
+
+			}
+
+			return this;
+
+		};
+
 		if ( object === this ) {
 
-			console.warn( 'THREE.Object3D.add: An object can\'t be added as a child of itself.' );
-			return;
+			console.error( "THREE.Object3D.add:", object, "can't be added as a child of itself." );
+			return this;
 
 		}
 
@@ -336,11 +345,27 @@ THREE.Object3D.prototype = {
 
 			}
 
+		} else {
+		
+			console.error( "THREE.Object3D.add:", object, "is not an instance of THREE.Object3D." );
+		
 		}
+
+		return this;
 
 	},
 
 	remove: function ( object ) {
+
+		if ( arguments.length > 1 ) {
+
+			for ( var i = 0; i < arguments.length; i++ ) {
+
+				this.remove( arguments[ i ] );
+
+			}
+
+		};
 
 		var index = this.children.indexOf( object );
 
@@ -371,6 +396,8 @@ THREE.Object3D.prototype = {
 
 	},
 
+	raycast: function () {},
+
 	traverse: function ( callback ) {
 
 		callback( this );
@@ -378,6 +405,20 @@ THREE.Object3D.prototype = {
 		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
 
 			this.children[ i ].traverse( callback );
+
+		}
+
+	},
+
+	traverseVisible: function ( callback ) {
+
+		if ( this.visible === false ) return;
+
+		callback( this );
+
+		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+
+			this.children[ i ].traverseVisible( callback );
 
 		}
 
@@ -445,24 +486,8 @@ THREE.Object3D.prototype = {
 
 	getChildByName: function ( name, recursive ) {
 
-		console.warn( 'DEPRECATED: Object3D\'s .getChildByName() has been renamed to .getObjectByName().' );
+		console.warn( 'THREE.Object3D: .getChildByName() has been renamed to .getObjectByName().' );
 		return this.getObjectByName( name, recursive );
-
-	},
-
-	getDescendants: function ( array ) {
-
-		if ( array === undefined ) array = [];
-
-		Array.prototype.push.apply( array, this.children );
-
-		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
-
-			this.children[ i ].getDescendants( array );
-
-		}
-
-		return array;
 
 	},
 

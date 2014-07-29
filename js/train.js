@@ -95,6 +95,7 @@ var trainFunc = function(){
 			reverseDir: 0
 		}
 		this.train[trainNum].engine.mesh = engines[name].newMesh();
+		this.train[trainNum].engine.mesh.position.set(0,0,0);
 		this.train[trainNum].engine.userSpeed = this.train[trainNum].engine.opts.top;
 		this.train[trainNum].engine.opts.acc = this.train[trainNum].engine.opts.maxAcc;
 		this.train[trainNum].path.nextP.push(track.getNextSec(this.train[trainNum].path.currentP.sec.id,this.train[trainNum].path.currentP.dir))
@@ -472,7 +473,7 @@ var trainFunc = function(){
 					this.train[i].curDist = moved.remDist;
 				}
 			}*/
-			this.train[i].engine.mesh.position = moved.pos;
+			this.train[i].engine.mesh.position.set(moved.pos.x,moved.pos.y,moved.pos.z);
 			this.train[i].engine.backP = this.moveBackOnPath(
 				this.train[i].engine.curSpeed > 0 ? (moved.curSegDist - this.train[i].curDist) : this.train[i].curDist,
 				this.train[i].engine.opts.axleOffset,
@@ -491,13 +492,14 @@ var trainFunc = function(){
 			j = this.train[i].railcars.length
 			while(j > 0){
 				j--;
-				this.train[i].railcars[j].mesh.position = this.moveBackOnPath(
+				var newpos = this.moveBackOnPath(
 					this.train[i].engine.curSpeed > 0 ? (moved.curSegDist - this.train[i].curDist) : this.train[i].curDist,
 					this.train[i].railcars[j].distanceBehind,
 					this.train[i].path,
 					this.train[i].engine.curSpeed > 0 ? (this.train[i].curPointId + ( -2 * (this.train[i].path.currentP.dir == 1 ? -1 : 1))) : this.train[i].curPointId,
 					-1
 				).pos
+				this.train[i].railcars[j].mesh.position.set(newpos.x,newpos.y,newpos.z)
 				this.train[i].railcars[j].mesh.lookAt(this.moveBackOnPath(
 					this.train[i].engine.curSpeed > 0 ? (moved.curSegDist - this.train[i].curDist) : this.train[i].curDist,
 					this.train[i].railcars[j].distanceBehind + this.train[i].railcars[j].opts.axleOffset,

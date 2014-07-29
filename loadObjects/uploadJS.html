@@ -52,6 +52,7 @@
 
     </style>
     <script src="../sources/threejs/build/three.min.js"></script>
+    <script src="../sources/threejs/examples/js/controls/OrbitControls.js"></script>
     <script src='../js/3dImage.js'></script>
     <script>
     var obj;
@@ -71,7 +72,7 @@
     takePic = function(){
       document.getElementById('image').innerHTML = '';
       var newImg = document.createElement("img");
-      newImg.src = obj.rend();
+      newImg.src = obj.getPic();
       console.log(newImg.src)
       document.getElementById('image').appendChild(newImg);
       document.getElementById('imageData').value = newImg.src;
@@ -92,12 +93,8 @@
           el.innerHTML = els[i].value;
       }
 
-      var camH = document.getElementById('camH').value;
-      var rot = document.getElementById('rot').value;
-      var x = document.getElementById('x').value;
-      var z = document.getElementById('z').value;
       var scale = document.getElementById('scale').value;
-      obj.objPosSet(x,z,rot,scale,camH);
+      obj.objPosSet(scale);
     }
 
     </script>
@@ -119,22 +116,8 @@
             <input type="hidden" name="MAX_FILE_SIZE" value="30000" />
             <input name='file' type='file' class='formInput' onchange='newObj(event)'></input>
           </p>
-          <hr>
-          <p class='uploadMono'>
-            Image Detail
-          </p>
           <p class='formItem uploadMono'>
             <input type='submit' onclick='takePic(); return false' value='Take Picture' class='formInput'></input>
-          </p>
-          <p class='formItem uploadMono'>
-            Camera Height: <span id='dcamH'>150</span><br>
-            <input id='camH' type='range' min='-50' max='200' value='150' step='10'class='formInput' onchange='move()'></input><br>
-            Object Rotation: <span id='drot'>0</span><br>
-            <input id = 'rot' type='range' min='0' max='360' value='180' step='10' class='formInput' onchange='move()'></input><br>
-            Object X: <span id='dx'>0</span><br>
-            <input id='x' type='range' min='-50' max='50' value='0' step='10' class='formInput' onchange='move()'></input><br>
-            Object Z: <span id='dz'>0</span><br>
-            <input id='z' type='range' min='-50' max='50' value='0' step='10' class='formInput' onchange='move()'></input><br>
           </p>
           <hr>
           <p class='uploadMono'>
@@ -156,9 +139,9 @@
           </p>
           <p class='formItem uploadMono'>
             Axle Offset: <span id='daxleOffset'>70</span><br>
-            <input id='axleOffset' name='axleOffset' type='range' min='1' max='200' value='70' step='1' class='formInput' onchange='move()'></input><br>
+            <input id='axleOffset' name='axleOffset' type='range' min='1' max='200' value='70' step='5' class='formInput' onchange='move()'></input><br>
             Size Length: <span id='dsizeLength'>70</span><br>
-            <input id='sizeLength' name='sizeLength' type='range' min='1' max='200' value='70' step='1' class='formInput' onchange='move()'></input><br>
+            <input id='sizeLength' name='sizeLength' type='range' min='1' max='200' value='70' step='5' class='formInput' onchange='move()'></input><br>
           </p>
           <p class='formItem uploadMono'>
             Scale: <span id='dscale'>10</span><br>

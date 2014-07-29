@@ -587,7 +587,8 @@ trackFunc = function(){
 						this.switchTestBoxes[i][j] = testCube(this.getThrowPoint(i,this.switches[i].secIds[j],this.switches[i].segIds[j]));
 					}
 					else{
-						this.switchTestBoxes[i][j].position = this.getThrowPoint(i,this.switches[i].secIds[j],this.switches[i].segIds[j]);
+						pos = this.getThrowPoint(i,this.switches[i].secIds[j],this.switches[i].segIds[j])
+						this.switchTestBoxes[i][j].position.set(pos.x,pos.y,pos.z);
 					}
 				}
 			}
@@ -972,7 +973,7 @@ trackFunc = function(){
 	}
 
 	this.buildGeomPoints = function(origin,originOffset,x,y,z){
-		var tie = new THREE.CubeGeometry(x,y,z);
+		var tie = new THREE.BoxGeometry(x,y,z);
 		tie.applyMatrix( new THREE.Matrix4().makeTranslation(origin.x,origin.y+2,origin.z).lookAt( origin,originOffset,new THREE.Vector3(0,1,0)));
 		tie.verticesNeedUpdate = true;
 		tie.origin = origin;
@@ -1023,7 +1024,7 @@ trackFunc = function(){
 			path   = path.concat(l);
 			lleft  = lleft.concat(this.buildLinePointsLeft(l,lPlus));
 			lright = lright.concat(this.buildLinePointsRight(l,lPlus));
-			THREE.GeometryUtils.merge(geom, this.buildGeomPoints(l,lPlus,14,2,2));
+			geom.merge( this.buildGeomPoints(l,lPlus,14,2,2));
 
 			i -= spacing;
 		}
@@ -1036,7 +1037,7 @@ trackFunc = function(){
 		lleft  = lleft.concat(this.buildLinePointsLeft(l,lPlus));
 		lright = lright.concat(this.buildLinePointsRight(l,lPlus));
 
-		THREE.GeometryUtils.merge(geom, this.buildGeomPoints(lerp(startP2,p1,p1,endP2, lim),lerp(startP2,p1,p1,endP2,lim+.01),14,2,2));
+		geom.merge( this.buildGeomPoints(lerp(startP2,p1,p1,endP2, lim),lerp(startP2,p1,p1,endP2,lim+.01),14,2,2));
 
 		baseExtrudeSettings.extrudePath = new THREE.SplineCurve3(path)
 		leftExtrudeSettings.extrudePath = new THREE.SplineCurve3(lleft)
@@ -1065,22 +1066,22 @@ trackFunc = function(){
 					i--;
 					if (angleBetweenFlattenedVectors(p2,pointsFromP1[i].p2,p1)) {
 						var builtPoints = this.calcFromP2toP2(p2,p1,pointsFromP1[i].p2,true);
-						THREE.GeometryUtils.merge(geom, builtPoints.geom);
-						THREE.GeometryUtils.merge(trackLines, this.segments['trackShape'].extrude(builtPoints.lleft));
-						THREE.GeometryUtils.merge(trackLines, this.segments['trackShape'].extrude(builtPoints.lright));
-						THREE.GeometryUtils.merge(base, this.segments['baseShape'].extrude(builtPoints.base));
+						geom.merge( builtPoints.geom);
+						trackLines.merge( this.segments['trackShape'].extrude(builtPoints.lleft));
+						trackLines.merge( this.segments['trackShape'].extrude(builtPoints.lright));
+						base.merge( this.segments['baseShape'].extrude(builtPoints.base));
 					}
 				}
 			}
 			else{
 				var builtPoints = this.calcFromP2toP2(p2,midpoint(p2,p1),p1,false);
-				THREE.GeometryUtils.merge(geom, builtPoints.geom);
-				THREE.GeometryUtils.merge(trackLines, this.segments['trackShape'].extrude(builtPoints.lleft));
-				THREE.GeometryUtils.merge(trackLines, this.segments['trackShape'].extrude(builtPoints.lright));
-				THREE.GeometryUtils.merge(base, this.segments['baseShape'].extrude(builtPoints.base));
+				geom.merge( builtPoints.geom);
+				trackLines.merge( this.segments['trackShape'].extrude(builtPoints.lleft));
+				trackLines.merge( this.segments['trackShape'].extrude(builtPoints.lright));
+				base.merge( this.segments['baseShape'].extrude(builtPoints.base));
 				var tempGeom = this.buildGeomPoints(p1,p2,15,9,5)
 				tempGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0,-4,0));
-				THREE.GeometryUtils.merge(trackLines, tempGeom);
+				trackLines.merge( tempGeom);
 			}
 			var pointsFromP3 = this.findP2OfConnectingSegs(p3,segIds[j]);
 			if (pointsFromP3 != false) {
@@ -1088,21 +1089,21 @@ trackFunc = function(){
 				while( i > 0){
 					i--;
 					var builtPoints = this.calcFromP2toP2(p2,p3,pointsFromP3[i].p2,true);
-					THREE.GeometryUtils.merge(geom, builtPoints.geom);
-					THREE.GeometryUtils.merge(trackLines, this.segments['trackShape'].extrude(builtPoints.lleft));
-					THREE.GeometryUtils.merge(trackLines, this.segments['trackShape'].extrude(builtPoints.lright));
-					THREE.GeometryUtils.merge(base, this.segments['baseShape'].extrude(builtPoints.base));
+					geom.merge( builtPoints.geom);
+					trackLines.merge( this.segments['trackShape'].extrude(builtPoints.lleft));
+					trackLines.merge( this.segments['trackShape'].extrude(builtPoints.lright));
+					base.merge( this.segments['baseShape'].extrude(builtPoints.base));
 				}
 			}
 			else{
 				var builtPoints = this.calcFromP2toP2(p2,midpoint(p2,p3),p3,false);
-				THREE.GeometryUtils.merge(geom, builtPoints.geom);
-				THREE.GeometryUtils.merge(trackLines, this.segments['trackShape'].extrude(builtPoints.lleft));
-				THREE.GeometryUtils.merge(trackLines, this.segments['trackShape'].extrude(builtPoints.lright));
-				THREE.GeometryUtils.merge(base, this.segments['baseShape'].extrude(builtPoints.base));
+				geom.merge( builtPoints.geom);
+				trackLines.merge( this.segments['trackShape'].extrude(builtPoints.lleft));
+				trackLines.merge( this.segments['trackShape'].extrude(builtPoints.lright));
+				base.merge( this.segments['baseShape'].extrude(builtPoints.base));
 				var tempGeom = this.buildGeomPoints(p3,p2,15,9,5)
 				tempGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0,-4,0));
-				THREE.GeometryUtils.merge(trackLines, tempGeom);
+				trackLines.merge( tempGeom);
 			}
 			if (this.segments[segIds[j]].mesh != undefined){
 				scene.remove(this.segments[segIds[j]].mesh)
@@ -1191,17 +1192,9 @@ track.bulkAddTrack(trackPoints);
 console.log('track',track);
 
 
-function getThrows( mouse ) {
-  var vector = new THREE.Vector3(
-    (( event.clientX / window.innerWidth ) * 2 - 1),
-    (- ( event.clientY / window.innerHeight ) * 2 + 1),
-    1
-	);
-	console.log(track.throws);
-	var ray = projector.pickingRay( vector, camera );
-	var intersects = ray.intersectObjects( track.throws );
-	var i = intersects.length
+function getThrows( intersects ) {
 	console.log('numIntersected',intersects)
+	var i = intersects.length
 	while ( i > 0 ) {
 		i--;
 		if (intersects[i].object.clickCall != undefined) {
@@ -1209,5 +1202,4 @@ function getThrows( mouse ) {
 			intersects[i].object.clickCall();
 		}
 	}
-	console.log(track.switches)
 }

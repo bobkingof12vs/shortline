@@ -13,9 +13,12 @@ var zoom = .5;
 //initialize Three.js
 
 var scene = new THREE.Scene();
-var camera =  new THREE.OrthographicCamera(window.innerWidth / -zoom, window.innerWidth / zoom, window.innerHeight / zoom, window.innerHeight / -zoom, -1, 100000);
-camera.position = new THREE.Vector3(10000,15000,10000);
+var camera =  new THREE.OrthographicCamera(window.innerWidth/-zoom, window.innerWidth/zoom, window.innerHeight/zoom,window.innerHeight/-zoom, -1, 100000);
+camera.position.x = 1000;
+camera.position.y = 1500;
+camera.position.z = 1000;
 camera.lookAt(new THREE.Vector3(0,0,0));
+//camera.updateProjectionMatrix()
 console.log("'camera'",camera);
 
 //var toonMaterial = new THREE.MeshLambertMaterial
@@ -111,19 +114,43 @@ console.log("'renderer'",renderer);
 
 //init controls
 var controls = new THREE.OrbitControls( camera, renderer.domElement );
-controls.maxPolarAngle = Math.PI/2.5;
+
+				/*controls.rotateSpeed = 1.0;
+				controls.zoomSpeed = 1.2;
+				controls.panSpeed = 0.8;
+
+				controls.noZoom = false;
+				controls.noPan = false;
+
+				controls.staticMoving = true;
+				controls.dynamicDampingFactor = 0.3;
+
+				controls.keys = [ 65, 83, 68 ];*/
+
+controls.maxPolarAngle = Math.PI/2.1;
 controls.noZoom = true;
-console.log("'controls'",controls);
+//console.log("'controls'",controls);
 
 //init mouse intersections
 projector = new THREE.Projector();
 function getMouseIntersect( mouse, objects, callback) {
   var vector = new THREE.Vector3(
-    (( event.clientX / window.innerWidth ) * 2 - 1),
-    (- ( event.clientY / window.innerHeight ) * 2 + 1),
+    (( mouse.x / window.innerWidth ) * 2 - 1),
+    (- ( mouse.y / window.innerHeight ) * 2 + 1),
     1 );
   var ray = projector.pickingRay( vector, camera );
-  var intersects = ray.intersectObjects( objects );
+  console.log(ray, objects)
+
+  var allObjs = [];
+  var j = objects.length
+  while(j > 0){
+    j--;
+    if(objects[j] != undefined)
+      allObjs.push(objects[j]);
+  }
+
+  var intersects = ray.intersectObjects( allObjs );
+  console.log(intersects)
   if ( intersects.length > 0 ){
     callback(intersects);
   }
@@ -133,7 +160,7 @@ function testCube(p1,col,scale) {
   scale = scale != undefined ? scale : 1;
   col = col != undefined ? col : 0x00ff00;
   var cubeMaterial = new THREE.MeshBasicMaterial( {color: col} );
-  var cubeGeometry = new THREE.CubeGeometry( 10*scale, 10*scale, 10*scale, 1, 1, 1 );
+  var cubeGeometry = new THREE.BoxGeometry( 10*scale, 10*scale, 10*scale, 1, 1, 1 );
   cube = new THREE.Mesh( cubeGeometry, cubeMaterial );
 	cube.position.set(p1.x, p1.y, p1.z);
 	scene.add(cube);

@@ -1,0 +1,15 @@
+{
+				'path': 'js/trains/steamer040.js',
+				'type': 'engine',
+				'maxAcc': 10,
+				'top': 30,
+				'dec': 10,
+				'axleOffset': 15,
+				'sizeLength': 33,
+				'dispOpts': {
+								'scale': new THREE.Vector3(5, 5, 5),
+								'castShadow': true,
+								'receiveShadow': true,
+								'line': true
+				}
+}

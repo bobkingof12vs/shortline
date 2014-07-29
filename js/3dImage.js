@@ -12,12 +12,13 @@ objectInit = function(train_js,i_id,rot){
   var I_ASPECT = i_el_box.width / i_el_box.height
   var I_NEAR = 0.1
   var I_FAR = 20000;
-  this.i_camera = new THREE.PerspectiveCamera( I_VIEW_ANGLE, I_ASPECT, I_NEAR, I_FAR);
+  var zoom = 15;
+  this.i_camera =  new THREE.OrthographicCamera(window.innerWidth / -zoom, window.innerWidth / zoom, window.innerHeight / zoom, window.innerHeight / -zoom, -1, 100000);
 
+  this.i_camera.position = new THREE.Vector3(100,5,100);
+  this.i_camera.lookAt(new THREE.Vector3(0,0,0));
   this.i_scene.add(this.i_camera);
 
-  this.i_camera.position.set(0,100,150);
-  this.i_camera.lookAt(this.i_scene.position);
 
   var i_ambientLight = new THREE.AmbientLight(0x555555);
   this.i_scene.add(i_ambientLight);
@@ -41,6 +42,11 @@ objectInit = function(train_js,i_id,rot){
   this.i_renderer.setSize(i_el_box.width, i_el_box.height);
   this.i_renderer.setClearColorHex(0x333F47, 1);
 
+  this.i_controls = new THREE.OrbitControls( this.i_camera, this.i_renderer.domElement );
+  this.i_controls.maxPolarAngle = Math.PI/2.5;
+  this.i_controls.noZoom = true;
+  console.log(this.i_controls);
+
   i_el.appendChild(this.i_renderer.domElement);
 
   //-- init object --//
@@ -54,19 +60,18 @@ objectInit = function(train_js,i_id,rot){
   this.i_scene.add(this.i_mesh);
 
   this.rend = function(){
-    var d = new Date();
-    this.i_camera.lookAt(new THREE.Vector3(0,0,0));
-    this.i_renderer.render( this.i_scene, this.i_camera );
-    return this.i_renderer.domElement.toDataURL();
+    obj.i_controls.update();
+    obj.i_renderer.render( obj.i_scene, obj.i_camera );
+    setTimeout(obj.rend,200);
   }
 
-  this.objPosSet = function(x,z,rot,scale,camH){
-    this.i_camera.position.y = camH;
-    this.i_mesh.rotation.y = ((rot*(Math.PI*2))/360);
-    this.i_mesh.position.x = x;
-    this.i_mesh.position.z = z;
+  this.objPosSet = function(scale){
     this.i_mesh.scale.set(scale,scale,scale);
     this.rend();
+  }
+
+  this.getPic = function(){
+    return this.i_renderer.domElement.toDataURL();
   }
 
   function i_wait(){
@@ -77,5 +82,23 @@ objectInit = function(train_js,i_id,rot){
   }
 
   i_wait();
+
+  this.i_renderer.domElement.addEventListener( 'mousewheel', function( event ) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    var delta = 0;
+    delta = event.wheelDelta * .001;
+    if (((zoom + delta > .5) & delta < 0) | ((zoom + delta < 25) & delta > 0)) {
+      zoom += delta;
+    }
+
+    obj.i_camera.left = window.innerWidth / -zoom;
+    obj.i_camera.right = window.innerWidth / zoom;
+    obj.i_camera.top = window.innerHeight / zoom;
+    obj.i_camera.bottom = window.innerHeight / -zoom;
+
+    obj.i_camera.updateProjectionMatrix();
+  },false);
 
 }

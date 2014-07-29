@@ -105,10 +105,11 @@
 			console.log('engines',engines);
 			console.log('railcars',railcars);
 			//-- things to do once we have all of our objects loaded --//
-			train.addTrain('shunter');
+			train.addTrain('steamer040');
+			train.addRailcar('gondolacar',0);
 			train.addRailcar('boxcar',0);
-			train.addRailcar('boxcar',0);
-			train.addRailcar('flatcar',0);
+			train.addRailcar('passengercar',0);
+			train.addRailcar('passengercar',0);
 			/*setTimeout(function(){
 				train.addTrain('shunter');
 				train.addRailcar('flatcar',train.train.length-1);

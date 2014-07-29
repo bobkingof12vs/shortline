@@ -18,7 +18,7 @@
   <div id='game' style='bottom: 40px'>
     <canvas id='c'></canvas>
 
-    <script src="sources/threejs/build/three.min.js"></script>
+    <script src="sources/threejs/build/three.js"></script>
     <script src="sources/threejs/examples/js/controls/OrbitControls.js"></script>
     <script src="sources/threejs/examples/fonts/helvetiker_regular.typeface.js"></script>
     <script src="js/general.js"></script>
@@ -47,24 +47,26 @@
       document.title = 'Shortline';
       var then = Date.now(), now=Date.now();
 
-      var work = 0;
+      var work = working = 0;
       var render = function() {
         //requestAnimationFrame(render);
         //setTimeout(render,1000/2);
         setTimeout(render,1000/20);
         now = Date.now();
-        if(work != -1 && m['m_hlt'].clicked != 1){
+        if(work != -1
+          && m['m_hlt'].clicked != 1
+          && m['m_tgo'].clicked == 1){
           work = train.workJobs(50);
           then = now;
           track.endTrack();
           checkMenus();
-          controls.update();
         }//now-then);
+        controls.update();
         renderer.render(scene, camera);
       }
       render();
 
-      var dispObjects = [];
+      /*var dispObjects = [];
       var demObjs = function(){
         i = dispObjects.length;
         while( i > 0){
@@ -94,7 +96,7 @@
         }
         setTimeout(demObjs,10000);
       };
-      demObjs();
+      demObjs();*/
     </script>
   </div>
 

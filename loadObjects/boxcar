@@ -1,12 +1,12 @@
 {
-    "path": 'js/trains/boxcar.js',
-    "type": "railcar",
-    "axleOffset": 36,
-    "sizeLength": 46,
-    "dispOpts": {
-        "scale": new THREE.Vector3(5, 5, 5),
-        "castShadow": true,
-        "receiveShadow": true,
-        "line": true
-    }
+				'path': 'js/trains/boxcar.js',
+				'type': 'railcar',
+				'axleOffset': 30,
+				'sizeLength': 40,
+				'dispOpts': {
+								'scale': new THREE.Vector3(6, 6, 6),
+								'castShadow': true,
+								'receiveShadow': true,
+								'line': true
+				}
 }
