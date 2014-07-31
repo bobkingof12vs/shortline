@@ -1,5 +1,5 @@
 {
-				'path': 'js/trains/shunter.js',
+				'path': 'libs/trains/shunter.js',
 				'type': 'engine',
 				'maxAcc': 10,
 				'top': 30,

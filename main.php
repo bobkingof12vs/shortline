@@ -21,17 +21,17 @@
     <script src="sources/threejs/build/three.js"></script>
     <script src="sources/threejs/examples/js/controls/OrbitControls.js"></script>
     <script src="sources/threejs/examples/fonts/helvetiker_regular.typeface.js"></script>
-    <script src="js/general.js"></script>
-    <script src="js/init.js"></script>
-    <script src="js/terraform.js"></script>
-    <script src="js/menu.js"></script>
-    <script src="js/buildTrack.js"></script>
-    <script src="js/events.js"></script>
-    <script src="js/train.js"></script>
-    <?php include('js/load.php') ?>
+    <script src="libs/general.js"></script>
+    <script src="libs/init.js"></script>
+    <script src="libs/terraform.js"></script>
+    <script src="libs/menu.js"></script>
+    <script src="libs/buildTrack.js"></script>
+    <script src="libs/events.js"></script>
+    <script src="libs/train.js"></script>
+    <?php include('libs/load.php') ?>
 
     <?php
-      $loadHTMLFiles = glob('js/html/*');
+      $loadHTMLFiles = glob('libs/html/*');
       foreach($loadHTMLFiles as $load){
         echo "\n".file_get_contents($load);
       }

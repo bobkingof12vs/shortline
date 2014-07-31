@@ -1,5 +1,5 @@
 {
-				'path': 'js/trains/steamer040.js',
+				'path': 'libs/trains/steamer040.js',
 				'type': 'engine',
 				'maxAcc': 10,
 				'top': 30,
