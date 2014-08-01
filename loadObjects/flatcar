@@ -1,4 +1,5 @@
 {
+				'name': 'flatcar',
 				'path': 'libs/trains/flatcar.js',
 				'type': 'railcar',
 				'axleOffset': 20,

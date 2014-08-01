@@ -1,4 +1,5 @@
 {
+				'name': 'boxcar',
 				'path': 'libs/trains/boxcar.js',
 				'type': 'railcar',
 				'axleOffset': 30,

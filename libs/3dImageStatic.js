@@ -1,3 +1,5 @@
+var i_renderer = new THREE.WebGLRenderer( {antialias:true, alpha:true} );
+
 staticObj = function(){
   this.i_camera_height = 10;
   this.zoom = 15;
@@ -18,12 +20,9 @@ staticObj = function(){
     i_light1.lookAt(new THREE.Vector3(0,0,0));
     this.i_scene.add(i_light1);
 
-    this.i_renderer = new THREE.WebGLRenderer( {antialias:true, alpha:true} );
-    this.i_renderer.setSize(i_el_box.width, i_el_box.height);
-    this.i_renderer.setClearColor( 0x000000, 0 );
 
-    //this.i_renderer.domElement.class += ' at_item'
-    i_el.appendChild(this.i_renderer.domElement);
+    i_renderer.setSize(i_el_box.width, i_el_box.height);
+    i_renderer.setClearColor( 0x000000, 0 );
 
     //-- init object --//
     this.i_mesh;
@@ -52,7 +51,8 @@ staticObj = function(){
       obj.i_camera.lookAt(midpoint);
 
       obj.i_scene.add(obj.i_mesh);
-      obj.i_renderer.render( obj.i_scene, obj.i_camera );
+      i_renderer.render( obj.i_scene, obj.i_camera );
+      obj.image = i_renderer.domElement.toDataURL();
       obj.done = 1;
     });
   }

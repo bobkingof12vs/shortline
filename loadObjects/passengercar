@@ -1,4 +1,5 @@
 {
+				'name': 'passengercar',
 				'path': 'libs/trains/passengercar.js',
 				'type': 'railcar',
 				'axleOffset': 30,

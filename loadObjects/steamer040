@@ -1,4 +1,5 @@
 {
+				'name': 'steamer040',
 				'path': 'libs/trains/steamer040.js',
 				'type': 'engine',
 				'maxAcc': 10,

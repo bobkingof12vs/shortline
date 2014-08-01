@@ -1,4 +1,5 @@
 {
+				'name': 'gondolacar',
 				'path': 'libs/trains/gondolacar.js',
 				'type': 'railcar',
 				'axleOffset': 30,
