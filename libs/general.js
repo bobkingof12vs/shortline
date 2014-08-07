@@ -61,7 +61,7 @@ function midpoint(p1,p2){
 
 function findY(x,z){
   var ray = new THREE.Raycaster (new THREE.Vector3(x, 1000, z), new THREE.Vector3(0, -1, 0));
-  var where = ray.intersectObject(obj['plane'],true);
+  var where = ray.intersectObject(plane,true);
   return where[0].point.y;
 }
 

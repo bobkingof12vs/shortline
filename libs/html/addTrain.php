@@ -1,5 +1,15 @@
-<span id='addTrain' style='display: block;'>
+<span id='addTrain'>
   <style scoped>
+    #addTrain{
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -khtml-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      z-index: 1;
+      position: absolute;
+    }
     .at_lowerMenu{
       position: fixed;
       bottom: 0px;
@@ -73,7 +83,9 @@
       line-height: 82px;
       vertical-align: center;
       text-align: center;
-      overflow-x: hidden
+      overflow-x: hidden;
+      display: block;
+      position: relative;
     }
 
     div::-webkit-scrollbar {
@@ -91,9 +103,14 @@
       height: 10px;
     }
 
+    .mid{
+      position: absolute;
+      top: 38px;
+      left: 02px;
+    }
+
   </style>
 
-  <script src="sources/threejs/build/three.js"></script>
   <script src='libs/3dImageStatic.js'></script>
   <script>
 
@@ -140,7 +157,7 @@
     var at_objs = 0;
 
     delete_from_addTrain = function(e){
-      var par_el = e.target.parentNode;
+      var par_el = document.getElementById('at_train_area');
       if(e.target.type == 'railcar'){
         par_el.removeChild(e.target);
         addTrain.railcars.splice(e.target.trainNum,1);
@@ -235,6 +252,25 @@
       }
     }
 
+    addNewTrain = function(){
+      if(addTrain.engine == '') return
+      var trainId = train.train.length;
+      train.addTrain(addTrain.engine);
+      setTimeout(function(addATrain,j){
+        var i = 0;
+        while( i < addATrain.railcars.length){
+          console.log(addATrain.railcars[i],j)
+          train.addRailcar(addATrain.railcars[i],j);
+          i++;
+        }
+        delete_from_addTrain({target: {type: 'engine'}});
+
+      }(addTrain,trainId),200);
+
+      m['m_tgo_tr'+trainId] = makeMenu('Train '+trainId, 'm_tad_tr'+trainId, 'm_tgo',trainId+1);
+      setAllMenu();
+      m['m_tad'].e.click();
+    }
     window.onload = function(){
       var urls = [
       <?php
@@ -251,16 +287,22 @@
       runNextAddTrainItem(urls,0);
       setTimeout(function(){displayOneType('engine')},2000);
     }
+
+    m['m_tad'].onclickEvent = function(menu,click){
+      if(click == 1){
+        document.getElementById('addTrain').style.zIndex = 4;
+      }
+      else
+        document.getElementById('addTrain').style.zIndex = 1;
+    }
   </script>
 
   <div class='at_lowerMenu'>
-    <div class='at_train_area_pre at_add'>
-        +
+    <div class='at_train_area_pre at_add' onclick="addNewTrain()">
+      <img src='libs/images/left.png' class='mid'> </img>
     </div>
     <div id='at_train_area_pre' class='at_selectArea at_train_area_pre'>
-      <div id='at_train_area' class='at_train_area'>
-
-      </div>
+      <div id='at_train_area' class='at_train_area'></div>
     </div>
     <div id='at_selectArea' class='at_selectArea'>
     </div>

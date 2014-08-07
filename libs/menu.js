@@ -1,3 +1,5 @@
+var menuHW = {x:0, y:0};
+
 function outline(octx,x,y,w,h,r){
   octx.beginPath();
   octx.moveTo(x+r, y);
@@ -40,7 +42,7 @@ function makeBackground(id){
     draw: draw, clicked: 0, parent: id, id: id}
 }
 
-function makeMenu( str, id, parent, order){
+function makeMenu( str, id, parent, order, oncmousedownEventFunc){
   var posx = 1000, posy = 1000;
   var menuCanvas = document.createElement('canvas');
   menuCanvas.style.position = 'absolute';
@@ -73,6 +75,9 @@ function makeMenu( str, id, parent, order){
   menu.style.width = (mc.mw+2)+'px'
   menu.style.height = (mc.mh+2)+'px';
   menu.style.zIndex = '3';
+
+  menu.order = order;
+
   document.body.appendChild(menu);
   menu.appendChild(menuCanvas);
 
@@ -163,17 +168,18 @@ function setAllMenu(){
             ' m[oth_m].clicked = -1'+
           ' }'+
         ' }'+
-        ' checkClick();'
+        ' checkClick();'+
+        ' if(m["'+cur_m+'"].onclickEvent != undefined) m["'+cur_m+'"].onclickEvent(m["'+cur_m+'"], m["'+cur_m+'"].clicked)'
       );
     }
   }
 }
 
-var menuHW = {x:0, y:0};
-
 var m = [];
 m['background'] = makeBackground('background');
 m['main'] = makeMenu('Tool Kit', 'main', 'main',0);
+m['main'].clickInEvent = function(menu){alert('yep in '+menu.id)}
+m['main'].clickOutEvent = function(menu){alert('yep out '+menu.order)}
 
 m['m_ter'] = makeMenu('Terraform Tools', 'm_ter', 'main',1);
 m['m_tra'] = makeMenu('Track Tools', 'm_tra', 'main',2);
@@ -189,15 +195,3 @@ m['m_tra_remove'] = makeMenu('Remove Track', 'm_tra_remove', 'm_tra',2);
 
 setAllMenu();
 m['main'].e.click();
-
-//--
-
-function checkMenus(){
-  if (m['m_tad'].clicked == 1) {
-
-  }
-}
-
-function lowerLeftMenu(){
-
-}

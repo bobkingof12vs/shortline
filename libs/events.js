@@ -40,7 +40,7 @@ document.addEventListener( 'mousedown', function (e){
   if (mouseInMenu == 0) {
 
     //terrain
-    getMouseIntersect(mouse, [obj['plane'].children[1]],function(i){
+    getMouseIntersect(mouse, [plane.children[1]],function(i){
       console.log("'intersect'",i);
       if(m['m_ter_raise'].clicked == 1){raiseLowerTerrain(i,+10);}
       if(m['m_ter_lower'].clicked == 1){raiseLowerTerrain(i,-10);}

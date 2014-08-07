@@ -1,5 +1,4 @@
 var i_renderer = new THREE.WebGLRenderer( {antialias:true, alpha:true} );
-
 staticObj = function(){
   this.i_camera_height = 10;
   this.zoom = 15;

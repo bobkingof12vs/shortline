@@ -1,6 +1,15 @@
 <html>
 <head>
   <style>
+    #b{
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -khtml-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      z-index: 2;
+    }
     #c {
       left: 0;
       bottom: 0px;
@@ -8,7 +17,7 @@
       height: 100%;
       position: fixed;
       background-color: #000000;
-      z-index: 0;
+      z-index: 2;
     }
 
   </style>
@@ -29,13 +38,7 @@
     <script src="libs/events.js"></script>
     <script src="libs/train.js"></script>
     <?php include('libs/load.php') ?>
-
-    <?php
-      $loadHTMLFiles = glob('libs/html/*');
-      foreach($loadHTMLFiles as $load){
-        echo "\n".file_get_contents($load);
-      }
-    ?>
+    <?php echo "\n".file_get_contents('libs/html/trainInfo.html')?>
 
     <script>
       //console.log(THREE.UniformsUtils)
@@ -51,15 +54,14 @@
       var render = function() {
         //requestAnimationFrame(render);
         //setTimeout(render,1000/2);
-        setTimeout(render,1000/20);
+        if(m['m_hlt'].clicked != 1)
+          setTimeout(render,1000/20);
         now = Date.now();
         if(work != -1
-          && m['m_hlt'].clicked != 1
           && m['m_tgo'].clicked == 1){
           work = train.workJobs(50);
           then = now;
           track.endTrack();
-          checkMenus();
         }//now-then);
         controls.update();
         renderer.render(scene, camera);
@@ -99,6 +101,7 @@
       demObjs();*/
     </script>
   </div>
+  <?php include('libs/html/addTrain.php')?>
 
 
 </body>
