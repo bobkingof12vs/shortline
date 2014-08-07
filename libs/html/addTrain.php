@@ -269,6 +269,12 @@
 
       m['m_tgo_tr'+trainId] = makeMenu('Train '+trainId, 'm_tad_tr'+trainId, 'm_tgo',trainId+1);
       setAllMenu();
+      m['m_tgo_tr'+trainId].trainId = trainId;
+      m['m_tgo_tr'+trainId].onclickEvent = function(menu){
+        trainMenuTrain = menu.trainId
+          document.getElementById('userSpeed').value = (train.train[trainMenuTrain].engine.userSpeed * 50) + 50;
+          document.getElementById('userAcc').value = (train.train[trainMenuTrain].engine.opts.acc * 50) + 50;
+      };
       m['m_tad'].e.click();
     }
     window.onload = function(){

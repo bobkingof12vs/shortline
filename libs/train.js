@@ -26,7 +26,7 @@ var trainFunc = function(){
 				var curSec = this.train[i].path.currentP = this.train[i].path.nextP[0];
 				var klim = this.train[i].path.previousP.length; //-1
 				while(k < klim){
-					prevTotalDist += track.sectionDistance(this.train[i].path.previousP[i].sec.id);
+					prevTotalDist += track.sectionDistance(this.train[i].path.previousP[k].sec.id);
 					if(prevTotalDist >= trainLength + brakeDist){
 						this.train[i].path.previousP.splice(k+1,klim);
 						klim = this.train[i].path.previousP.length;
@@ -42,7 +42,7 @@ var trainFunc = function(){
 				var curSec = this.train[i].path.currentP = this.train[i].path.previousP[0];
 				var klim = this.train[i].path.nextP.length; //-1
 				while(k < klim){
-					nextTotalDist += track.sectionDistance(this.train[i].path.nextP[i].sec.id);
+					nextTotalDist += track.sectionDistance(this.train[i].path.nextP[k].sec.id);
 					if(nextTotalDist >= brakeDist){
 						this.train[i].path.nextP.splice(k+1,klim);
 						klim = this.train[i].path.nextP.length;
@@ -100,7 +100,7 @@ var trainFunc = function(){
 		this.train[trainNum].engine.opts.acc = this.train[trainNum].engine.opts.maxAcc;
 		this.train[trainNum].path.nextP.push(track.getNextSec(this.train[trainNum].path.currentP.sec.id,this.train[trainNum].path.currentP.dir))
 		this.train[trainNum].path.previousP.push(track.getNextSec(this.train[trainNum].path.currentP.sec.id,(this.train[trainNum].path.currentP.dir)))
-		console.log('train added','id: ' + this.train.length,this.train[trainNum]);
+		console.log('train added','id: ' + trainNum,this.train[trainNum]);
 		scene.add(this.train[trainNum].engine.mesh);
 		this.rebuildPath();
 	}
@@ -418,6 +418,9 @@ var trainFunc = function(){
 
 			travDist = this.train[i].engine.curSpeed*dTime;
 			brakeDist = (Math.pow(this.train[i].engine.curSpeed,2)/(2*this.train[i].engine.opts.dec));
+
+			if(travDist == 0)
+				continue;
 
 			/*if((this.train[i].engine.curSpeed > 0 && this.train[i].path.reverseDir == 1) || (this.train[i].engine.curSpeed < 0 && this.train[i].path.reverseDir == 0)){
 				this.train[i].path.reverseDir = this.train[i].path.reverseDir == 1 ? 0 : 1;

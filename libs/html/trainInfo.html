@@ -23,7 +23,8 @@
 			padding: 8px;
 			border: solid 2px #473119;
 			border-radius: 0px 15px 0px 0px;
-			background-color: #c37547
+			background-color: #c37547;
+			z-index: 1;
 		}
 		.max{
 			bottom: 80px;
@@ -62,20 +63,26 @@
 	<script>
 		trainMenuTrain = 0;
 		setInterval(function(){
-			document.getElementById('curspeed').innerHTML = (Math.round(train.train[trainMenuTrain].engine.curSpeed*100)/100);
-		},1000)
+			if(m['m_tgo'].clicked == 1){
+				document.getElementById('lowerMenu').style.zIndex = 4;
+				document.getElementById('curspeed').innerHTML = (Math.round(train.train[trainMenuTrain].engine.curSpeed*100)/100);
+			}
+			else{
+				document.getElementById('lowerMenu').style.zIndex = 1;
+			}
+		},200)
 		function topUserSpeed(){
-			var newX = (document.getElementById('userSpeed').value-50)/50;
-			train.train[trainMenuTrain].engine.userSpeed = (train.train[trainMenuTrain].engine.opts.top * newX);
-			document.getElementById('topspeed').innerHTML = train.train[trainMenuTrain].engine.userSpeed;
+			document.getElementById('topspeed').innerHTML =
+				train.train[trainMenuTrain].engine.userSpeed =
+					(train.train[trainMenuTrain].engine.opts.top * ((document.getElementById('userSpeed').value - 50) / 50));
 		}
 		function userAcc(){
-			var newX = (document.getElementById('userAcc').value-50)/50;
-			train.train[trainMenuTrain].engine.opts.acc = train.train[trainMenuTrain].engine.opts.maxAcc * newX;
-			document.getElementById('accell').innerHTML = train.train[trainMenuTrain].engine.opts.acc
+			document.getElementById('accell').innerHTML =
+				train.train[trainMenuTrain].engine.opts.acc =
+					(train.train[trainMenuTrain].engine.opts.maxAcc * ((document.getElementById('userAcc').value - 50) / 50));
 		}
 	</script>
-	<div class='lowerMenu'>
+	<div id='lowerMenu' class='lowerMenu'>
 		<div class='speed mono'>
 			current&nbsp; <span id='curspeed'>0</span><br>
 			accell&nbsp;&nbsp; <span id='accell'>1</span><br>
