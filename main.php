@@ -37,6 +37,7 @@
     <script src="libs/buildTrack.js"></script>
     <script src="libs/events.js"></script>
     <script src="libs/train.js"></script>
+    <script src="libs/tree.js"></script>
     <?php include('libs/load.php') ?>
     <?php echo "\n".file_get_contents('libs/html/trainInfo.html')?>
 
@@ -102,6 +103,7 @@
     </script>
   </div>
   <?php include('libs/html/addTrain.php')?>
+  <?php include('libs/html/addBuilding.php')?>
 
 
 </body>

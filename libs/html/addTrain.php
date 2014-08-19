@@ -122,7 +122,6 @@
       var i = children.length;
       while (i > 0){
         i--;
-        console.log(children[i].style.display);
         if(type == 'all' || children[i].type == type)
           children[i].style.display = 'block';
         else
@@ -137,7 +136,7 @@
     }
 
     highlightOut = function(e){
-      if(e.target.className.indexOf('at_item') >= 0){
+      if(e.target.className.indexOf('_item') >= 0){
         e.target.className = 'at_item'
       }
     }
@@ -161,7 +160,6 @@
       if(e.target.type == 'railcar'){
         par_el.removeChild(e.target);
         addTrain.railcars.splice(e.target.trainNum,1);
-        console.log(addTrain);
       }
       else if (e.target.type == 'engine'){
         addTrain = {
@@ -172,7 +170,6 @@
           par_el.removeChild(par_el.lastChild);
         }
         displayOneType('engine');
-        console.log(addTrain);
       }
     }
 
@@ -207,13 +204,12 @@
       else if(addTrainDisplayType == 'object'){
 
       }
-      console.log(addTrainDisplayType,addTrain);
     }
 
-    runNextAddTrainItem = function(urls,curUrlNum){
+    runNextAddTrainItem = function(urls,curUrlNum,callback){
 
       if(urls[curUrlNum] == undefined)
-        return
+        return callback();
 
       var parEl = document.getElementById('at_selectArea');
       var div = document.createElement('img');
@@ -234,18 +230,18 @@
       parEl.appendChild(div);
 
       obj = new staticObj();
+      obj.zoom = 15;
       obj.loadFile(urls[curUrlNum].path,div)
       if(urls.length > curUrlNum) {
         var keepGoing = function(){
-          console.log(obj.done);
           if(obj.done == 1){
             div.src = obj.image;
             div.title = urls[curUrlNum].name;
-            runNextAddTrainItem(urls,curUrlNum+1);
+            runNextAddTrainItem(urls,curUrlNum+1,callback);
             return
           }
           else{
-            setTimeout(keepGoing,2);
+            setTimeout(keepGoing,20);
           }
         }
         keepGoing();
@@ -259,7 +255,6 @@
       setTimeout(function(addATrain,j){
         var i = 0;
         while( i < addATrain.railcars.length){
-          console.log(addATrain.railcars[i],j)
           train.addRailcar(addATrain.railcars[i],j);
           i++;
         }
@@ -276,22 +271,6 @@
           document.getElementById('userAcc').value = (train.train[trainMenuTrain].engine.opts.acc * 50) + 50;
       };
       m['m_tad'].e.click();
-    }
-    window.onload = function(){
-      var urls = [
-      <?php
-        $loadObjFiles = glob('loadObjects/*');
-        foreach($loadObjFiles as $Loadobjs){
-          $ex = explode('/',$Loadobjs);
-          if(strpos(end($ex),'.') === false){
-            echo file_get_contents($Loadobjs).",";
-          }
-        }
-      ?>
-      ]
-      console.log(urls);
-      runNextAddTrainItem(urls,0);
-      setTimeout(function(){displayOneType('engine')},2000);
     }
 
     m['m_tad'].onclickEvent = function(menu,click){

@@ -1,7 +1,7 @@
 var i_renderer = new THREE.WebGLRenderer( {antialias:true, alpha:true} );
 staticObj = function(){
   this.i_camera_height = 10;
-  this.zoom = 15;
+  this.zoom = 7;
   this.loadFile = function(obj_file,i_el){
     var i_el_box = i_el.getBoundingClientRect()
 
@@ -32,13 +32,13 @@ staticObj = function(){
 
       geom.computeBoundingBox();
       var boundBox = geom.boundingBox
-      console.log(boundBox)
+
       var width = boundBox.max.x - boundBox.min.x
 
-      obj.i_camera.left =  width / -obj.zoom ;
-      obj.i_camera.right = width / obj.zoom;
-      obj.i_camera.top = width / obj.zoom;
-      obj.i_camera.bottom = width / -obj.zoom;
+      obj.i_camera.left =  width // -obj.zoom ;
+      obj.i_camera.right = width // obj.zoom;
+      obj.i_camera.top = width /// obj.zoom;
+      obj.i_camera.bottom = width // -obj.zoom;
 
       var midpoint = new THREE.Vector3(
         boundBox.min.x + ((boundBox.max.x - boundBox.min.x) / 2),
@@ -46,7 +46,9 @@ staticObj = function(){
         boundBox.min.z + ((boundBox.max.z - boundBox.min.z) / 2)
       )
 
-      obj.i_camera.position.set(midpoint.x - 200,midpoint.y,midpoint.z)
+      obj.i_camera.position.x = midpoint.x - 1000
+      obj.i_camera.position.y = midpoint.y
+      obj.i_camera.position.z = midpoint.z
       obj.i_camera.lookAt(midpoint);
 
       obj.i_scene.add(obj.i_mesh);

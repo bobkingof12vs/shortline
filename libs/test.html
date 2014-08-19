@@ -1,0 +1,69 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+</head>
+<body>
+
+<script src="../sources/threejs/build/three.js"></script>
+<script src="../sources/threejs/examples/js/controls/OrbitControls.js"></script>
+<script src="tree.js"></script>
+
+<div id="ThreeJS" style="position: absolute; left:0px; top:0px"></div>
+
+<script>
+
+// standard global variables
+var container, scene, camera, renderer, controls, stats;
+
+init();
+animate();
+
+// FUNCTIONS
+function init()
+{
+	// SCENE
+	scene = new THREE.Scene();
+
+	// CAMERA
+	var SCREEN_WIDTH = window.innerWidth, SCREEN_HEIGHT = window.innerHeight;
+	var VIEW_ANGLE = 45, ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT, NEAR = 0.1, FAR = 20000;
+	camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR);
+	scene.add(camera);
+	camera.position.set(0,25,40);
+	camera.lookAt(new THREE.Vector3(0,15,0));
+
+	// RENDERER
+	renderer = new THREE.WebGLRenderer( {antialias:true} );
+	renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+  container = document.getElementById( 'ThreeJS' );
+	container.appendChild( renderer.domElement );
+
+	// CONTROLS
+	controls = new THREE.OrbitControls( camera, renderer.domElement );
+
+	// LIGHT
+	var light = new THREE.PointLight(0xffffff);
+	light.position.set(0,250,0);
+	light.position.set(0,-250,0);
+	light.position.set(250,0,0);
+	light.position.set(-250,0,0);
+	light.position.set(0,0,250);
+	light.position.set(0,0,-250);
+	scene.add(light);
+
+}
+
+function animate()
+{
+  setTimeout( animate , 50);
+	controls.update();
+  renderer.render( scene, camera );
+}
+
+</script>
+
+</body>
+</html>

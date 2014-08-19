@@ -139,7 +139,6 @@ function getMouseIntersect( mouse, objects, callback) {
     (- ( mouse.y / window.innerHeight ) * 2 + 1),
     1 );
   var ray = projector.pickingRay( vector, camera );
-  console.log(ray, objects)
 
   var allObjs = [];
   var j = objects.length
@@ -150,7 +149,7 @@ function getMouseIntersect( mouse, objects, callback) {
   }
 
   var intersects = ray.intersectObjects( allObjs );
-  console.log(intersects)
+  //console.log(intersects)
   if ( intersects.length > 0 ){
     callback(intersects);
   }

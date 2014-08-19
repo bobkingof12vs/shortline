@@ -74,7 +74,9 @@
 			endPoints.length > 0
 		) {*/
 			<?php
-				$loadObjFiles = glob('loadObjects/*');
+				$loadObjFiles = array_merge(glob('loadObjects/train/*'), glob('loadObjects/building/*'));
+				//glob('loadObjects/buildings/*');
+				//echo "\nconsole.log(".json_encode($loadObjFiles).")";
 				$numLoaded = 0;
 				foreach($loadObjFiles as $Loadobjs){
 					$ex = explode('/',$Loadobjs);
@@ -124,5 +126,33 @@
 	}
 
 	//waitForPreLoadObjects();
+
+window.addEventListener('load', function(){
+	runNextAddTrainItem([
+		<?php
+			$loadObjFiles = glob('loadObjects/train/*');
+			foreach($loadObjFiles as $Loadobjs){
+				$ex = explode('/',$Loadobjs);
+				if(strpos(end($ex),'.') === false){
+					echo file_get_contents($Loadobjs).",";
+				}
+			}
+		?>
+	],0,function(){
+		runNextAddBuildingItem([
+			<?php
+				$loadObjFiles = glob('loadObjects/building/*');
+				foreach($loadObjFiles as $Loadobjs){
+					$ex = explode('/',$Loadobjs);
+					if(strpos(end($ex),'.') === false){
+						echo file_get_contents($Loadobjs).",";
+					}
+				}
+			?>
+		],0,displayOneType('engine'));
+	});
+});
+
+
 
 </script>

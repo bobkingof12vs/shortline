@@ -1,0 +1,11 @@
+{
+				'name': 'small station',
+				'path': 'libs/buildings/smallstation.js',
+				'type': 'other',
+				'dispOpts': {
+								'scale': new THREE.Vector3(6, 6, 6),
+								'castShadow': true,
+								'receiveShadow': true,
+								'line': true
+				}
+}

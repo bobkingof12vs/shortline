@@ -1,5 +1,5 @@
-var trackPoints = [
-	{p1: new THREE.Vector3(300, 0, 0),
+var trackPoints = [];
+/*	{p1: new THREE.Vector3(300, 0, 0),
 	 p2: new THREE.Vector3(300, 0, 50),
 	 p3: new THREE.Vector3(300, 0, 100)
 	},
@@ -22,7 +22,7 @@ var trackPoints = [
 	{p1: new THREE.Vector3(300, 0, 100),
 	 p2: new THREE.Vector3(250, 0, 100),
 	 p3: new THREE.Vector3(200, 0, 100)
-}/*,
+},
 	{p1: new THREE.Vector3(200, 0, 0),
 	 p2: new THREE.Vector3(200, 0, 50),
 	 p3: new THREE.Vector3(200, 0, 100)
@@ -30,7 +30,7 @@ var trackPoints = [
 	{p1: new THREE.Vector3(100, 0, 100),
 	 p2: new THREE.Vector3(100, 0, 150),
 	 p3: new THREE.Vector3(100, 0, 200)
-}*/,
+},
 	{p1: new THREE.Vector3(100, 0, 200),
 	 p2: new THREE.Vector3(100, 0, 250),
 	 p3: new THREE.Vector3(100, 0, 300)
@@ -38,11 +38,11 @@ var trackPoints = [
 	{p1: new THREE.Vector3(100, 0, 300),
 	 p2: new THREE.Vector3(150, 0, 300),
 	 p3: new THREE.Vector3(200, 0, 300)
-}/*,
+},
 	{p1: new THREE.Vector3(200, 0, 200),
 	 p2: new THREE.Vector3(200, 0, 250),
 	 p3: new THREE.Vector3(200, 0, 300)
-}*/,
+},
 	{p1: new THREE.Vector3(200, 0, 200),
 	 p2: new THREE.Vector3(150, 0, 200),
 	 p3: new THREE.Vector3(100, 0, 200)
@@ -54,11 +54,11 @@ var trackPoints = [
 	{p1: new THREE.Vector3(300, 0, 100),
 	 p2: new THREE.Vector3(300, 0, 150),
 	 p3: new THREE.Vector3(300, 0, 200)
-}/*,
+},
 	{p1: new THREE.Vector3(200, 0, 100),
 	 p2: new THREE.Vector3(200, 0, 150),
 	 p3: new THREE.Vector3(200, 0, 200)
-}*/,
+},
 	{p1: new THREE.Vector3(100, 0, 100),
 	 p2: new THREE.Vector3(50,  0, 100),
 	 p3: new THREE.Vector3(0,   0, 100)
@@ -82,7 +82,7 @@ var trackPoints = [
 	{p1: new THREE.Vector3(400,   0, 100),
 	 p2: new THREE.Vector3(350,   0, 100),
 	 p3: new THREE.Vector3(300,   0, 100)
-}/*,
+},
 	{p1: new THREE.Vector3(-50,  0,-50),
 	 p2: new THREE.Vector3(-50,  0,  0),
 	 p3: new THREE.Vector3(-50,  0, 50)
@@ -118,8 +118,8 @@ var trackPoints = [
 	{p1: new THREE.Vector3(-150,  0,-150),
 	 p2: new THREE.Vector3(-150,  0,-200),
 	 p3: new THREE.Vector3(-150,  0,-250)
-}*/
-];
+}
+];*/
 console.log('track points',trackPoints)
 
 uploadFunc = function(){
@@ -329,10 +329,10 @@ trackFunc = function(){
 				point = winner;
 			}
 			else{
-				console.log('ddd',point);
+				//console.log('ddd',point);
 				point.x = Math.round(point.x/50)*50;
 				point.z = Math.round(point.z/50)*50;
-				console.log(point);
+				//console.log(point);
 			}
 			return point;
 		}
@@ -361,7 +361,7 @@ trackFunc = function(){
 					scene.remove(track.trackPreLine.children[track.trackPreLine.curSeg]);
 
 				if (m['m_tra_lay'].clicked == 1 & mouseInMenu == 0) {
-					getMouseIntersect(mouse, [obj['plane'].children[1]],function(i){
+					getMouseIntersect(mouse, [plane],function(i){
 
 						if (i != 1) {
 							i[0].point = closePoint(i[0].point);

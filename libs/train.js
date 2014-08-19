@@ -11,17 +11,17 @@ var trainFunc = function(){
 		while(i > j) {
 			i--;
 			//var stay = (specNum != undefined || this.train[i].engine.curSpeed == 0) ? false : true;
-			//console.log(stay ? 'true' : 'fa;lse')
+			//.log(stay ? 'true' : 'fa;lse')
 			var trainLength = this.train[i].engine.opts.sizeLength;
 			if(this.train[i].railcars.length > 0)
 				trainLength += this.train[i].railcars[this.train[i].railcars.length - 1].distanceBehind + this.train[i].railcars[this.train[i].railcars.length - 1].opts.sizeLength
 			var brakeDist = 4*((Math.pow(this.train[i].engine.opts.top,2)/(2*this.train[i].engine.opts.dec)) + this.train[i].engine.curSpeed);
-			//console.log(';;;',brakeDist,Math.pow(this.train[i].engine.opts.top,2));
+			//.log(';;;',brakeDist,Math.pow(this.train[i].engine.opts.top,2));
 			var nextTotalDist = 0;
 			var prevTotalDist = 0;
 			var k = 0
 			if(this.train[i].engine.curSpeed >= 0){
-				//console.log('forward')
+				//.log('forward')
 				this.train[i].path.previousP.unshift(this.train[i].path.currentP);
 				var curSec = this.train[i].path.currentP = this.train[i].path.nextP[0];
 				var klim = this.train[i].path.previousP.length; //-1
@@ -37,7 +37,7 @@ var trainFunc = function(){
 				this.train[i].path.nextP.push(track.getNextSec(this.train[i].path.currentP.sec.id,this.train[i].path.currentP.dir))
 			}
 			if(this.train[i].engine.curSpeed <= 0){
-				//console.log('backward')
+				//.log('backward')
 				this.train[i].path.nextP.unshift(this.train[i].path.currentP);
 				var curSec = this.train[i].path.currentP = this.train[i].path.previousP[0];
 				var klim = this.train[i].path.nextP.length; //-1
@@ -71,13 +71,13 @@ var trainFunc = function(){
 				);
 				prevTotalDist += track.sectionDistance(this.train[i].path.previousP[this.train[i].path.previousP.length - 1].sec.id);
 			}
-			console.log('train',i,'path', this.train[i].path);
+			//.log('train',i,'path', this.train[i].path);
 		}
 	}
 
 	this.addTrain = function(name){
 		var trainNum = this.train.length
-		console.log(engines[name].newEngine(0));
+		//.log(engines[name].newEngine(0));
 		this.train.push({
 			engine: engines[name].newEngine(0),
 			railcars: [],
@@ -87,7 +87,7 @@ var trainFunc = function(){
 		});
 		this.train[trainNum].path = {
 			currentP: {
-				sec: track.sections[4],
+				sec: track.sections[track.sections.length - 1],
 				dir: 0
 			},
 			nextP: [],
@@ -100,7 +100,7 @@ var trainFunc = function(){
 		this.train[trainNum].engine.opts.acc = this.train[trainNum].engine.opts.maxAcc;
 		this.train[trainNum].path.nextP.push(track.getNextSec(this.train[trainNum].path.currentP.sec.id,this.train[trainNum].path.currentP.dir))
 		this.train[trainNum].path.previousP.push(track.getNextSec(this.train[trainNum].path.currentP.sec.id,(this.train[trainNum].path.currentP.dir)))
-		console.log('train added','id: ' + trainNum,this.train[trainNum]);
+		//.log('train added','id: ' + trainNum,this.train[trainNum]);
 		scene.add(this.train[trainNum].engine.mesh);
 		this.rebuildPath();
 	}
@@ -121,7 +121,7 @@ var trainFunc = function(){
 		this.train[i].railcars[this.train[i].railcars.length - 1].distanceBehind = this.carDistBehindEngine(i,this.train[i].railcars.length - 1)
 		scene.add(this.train[i].railcars[this.train[i].railcars.length - 1].mesh);
 
-		console.log('railcars',this.train[i].railcars)
+		//.log('railcars',this.train[i].railcars)
 	}
 
 	this.moveBackOnPath = function(curDist, moveDist, path, curPointId, reverse){
@@ -130,7 +130,7 @@ var trainFunc = function(){
 		var prevPId = -1;
 		while(moved.pointId === false){
 			if(path.previousP[prevPId + 1] == undefined  || path.previousP[prevPId + 1] == false){
-				console.error('path not long enough in moveBackOnPath; returning false. prevPId:'+prevPId)
+				//.error('path not long enough in moveBackOnPath; returning false. prevPId:'+prevPId)
 				return false;
 			}
 
@@ -141,7 +141,7 @@ var trainFunc = function(){
 			else
 				curPointId = -1;
 
-			//console.log(path.previousP[prevPId],path.previousP[prevPId + 1], prevPId, path.previousP.length, moved.remDist)
+			//.log(path.previousP[prevPId],path.previousP[prevPId + 1], prevPId, path.previousP.length, moved.remDist)
 			moved = this.moveOnPath(
 				0,
 				moved.remDist,{
@@ -162,7 +162,7 @@ var trainFunc = function(){
 		curPath = path.currentP;
 
 		if(curPointId == undefined){
-			console.warn('curPointId is undefined');
+			//.warn('curPointId is undefined');
 			return false;
 		}
 
@@ -178,7 +178,7 @@ var trainFunc = function(){
 			moveDist = Math.abs(moveDist);
 			var moveDir = curPath.dir == 0 ? 1 : 0;
 			var inc = curPath.dir == 0 ? 1 : -1;
-			//console.log('curDist, moveDist, path, curPointId, reverse',curDist, moveDist, path, curPointId, reverse)
+			//.log('curDist, moveDist, path, curPointId, reverse',curDist, moveDist, path, curPointId, reverse)
 		}
 		else{
 			return {
@@ -192,12 +192,12 @@ var trainFunc = function(){
 
 		var remDist = (curDist + moveDist);
 
-		//console.log('rem',remDist, 'moveDir', moveDir, 'inc', inc, 'curPath', curPath, 'curPointId',curPointId)
+		//.log('rem',remDist, 'moveDir', moveDir, 'inc', inc, 'curPath', curPath, 'curPointId',curPointId)
 
 		var nextPoint = 0;
 		var curSegDist = 0;
 		while(true){
-			//console.log('rem',remDist, 'moveDir', moveDir, 'inc', inc, 'curPath', curPath, 'curPointId',curPointId);
+			//.log('rem',remDist, 'moveDir', moveDir, 'inc', inc, 'curPath', curPath, 'curPointId',curPointId);
 			if (((curPointId <= 0 || curPointId >= curPath.sec.points.length - 1) && reverse > 0)
 				|| (((curPointId <= 1 && moveDir == 0) || (curPointId >= curPath.sec.points.length - 2 && moveDir == 1)) && reverse < 0)
 				|| (curPointId < -1 || curPointId > curPath.sec.points.length)){
@@ -209,10 +209,10 @@ var trainFunc = function(){
 				}
 			}
 			else if((curPointId == 1  && moveDir == 0 && reverse > 0) || (curPointId == -1 && moveDir == 1 && reverse < 0)){
-				//console.log('ta');
+				//.log('ta');
 				if(curPath.sec.ends[0].type == 'end'){
 
-					//console.log('end')
+					//.log('end')
 					var curSegDist = track.lerpDistance({
 						p1: curPath.sec.points[1],
 						p2: midpoint(curPath.sec.points[1],curPath.sec.points[0]),
@@ -221,7 +221,7 @@ var trainFunc = function(){
 				}
 				else{
 
-					//console.log('switch')
+					//.log('switch')
 					var curSegDist = track.lerpDistance({
 						p1: curPath.sec.points[1],
 						p2: curPath.sec.points[0],
@@ -231,7 +231,7 @@ var trainFunc = function(){
 			}
 			else if((curPointId == curPath.sec.points.length - 2  && moveDir == 1 && reverse > 0) || (curPointId == curPath.sec.points.length && moveDir == 0 && reverse < 0)){
 				if(curPath.sec.ends[0].type == 'end'){
-					//console.log('end')
+					//.log('end')
 					var curSegDist = track.lerpDistance({
 						p1: curPath.sec.points[curPath.sec.points.length - 2],
 						p2: midpoint(curPath.sec.points[curPath.sec.points.length - 2],curPath.sec.points[curPath.sec.points.length - 1]),
@@ -239,7 +239,7 @@ var trainFunc = function(){
 					});
 				}
 				else{
-					//console.log('switch',track.getSwitchThrowId(curPath.sec.ends[1].id,curPath.sec.id,curPath.sec.segmentIds[curPath.sec.segmentIds.length - 1]))
+					//.log('switch',track.getSwitchThrowId(curPath.sec.ends[1].id,curPath.sec.id,curPath.sec.segmentIds[curPath.sec.segmentIds.length - 1]))
 					var curSegDist = track.lerpDistance({
 						p1: curPath.sec.points[curPath.sec.points.length - 2],
 						p2: curPath.sec.points[curPath.sec.points.length - 1],
@@ -255,7 +255,7 @@ var trainFunc = function(){
 				});
 			}
 			else if(curPointId == curPath.sec.points.length - 1){
-				//console.log('td');
+				//.log('td');
 				var curSegDist = track.lerpDistance({
 					p1: curPath.sec.points[curPath.sec.points.length - 2],
 					p2: midpoint(curPath.sec.points[curPath.sec.points.length - 2],curPath.sec.points[curPath.sec.points.length - 1]),
@@ -263,21 +263,21 @@ var trainFunc = function(){
 				});
 			}
 			else {
-				//console.log('te',curPath.sec.points,curPointId,curPath.sec.points[curPointId + inc],curPath.sec.points[curPointId + (2 * inc)]);
+				//.log('te',curPath.sec.points,curPointId,curPath.sec.points[curPointId + inc],curPath.sec.points[curPointId + (2 * inc)]);
 				var curSegDist = track.lerpDistance({
 					p1: curPath.sec.points[curPointId],
 					p2: curPath.sec.points[curPointId + inc],
 					p3: curPath.sec.points[curPointId + (2 * inc)]
 				});
-				//console.log(curSegDist)
+				//.log(curSegDist)
 			}
 
 			if(curSegDist < remDist){
 				remDist -= curSegDist;
 
-				//console.log('les',curPointId,curPath.sec.points.length - 1,curSegDist,remDist)
+				//.log('les',curPointId,curPath.sec.points.length - 1,curSegDist,remDist)
 				curPointId += (2*inc);
-				//console.log('cpi',curPointId, 'mdir',moveDir)
+				//.log('cpi',curPointId, 'mdir',moveDir)
 			}
 			else
 				break;
@@ -286,9 +286,9 @@ var trainFunc = function(){
 		}
 
 		if((curPointId == 1  && moveDir == 0 && reverse > 0) || (curPointId == -1 && moveDir == 1 && reverse < 0)){
-			//console.log('pa');
+			//.log('pa');
 			if(curPath.sec.ends[0].type == 'end'){
-				//console.log('end')
+				//.log('end')
 				var point = track.lerpToDist({
 					p1: curPath.sec.points[1],
 					p2: midpoint(curPath.sec.points[1],curPath.sec.points[0]),
@@ -296,8 +296,8 @@ var trainFunc = function(){
 				},remDist);
 			}
 			else{
-				//console.log('switch',curPath.sec.ends[0],curPath.sec.ends[0].points[track.getSwitchThrowId(curPath.sec.ends[0].id,curPath.sec.id,curPath.sec.segmentIds[0])]);
-				//console.log('curPath.sec.ends[0].id,curPath.sec.id,curPath.sec.segmentIds[0])',curPath.sec.ends[0].id,curPath.sec.id,curPath.sec.segmentIds[0])
+				//.log('switch',curPath.sec.ends[0],curPath.sec.ends[0].points[track.getSwitchThrowId(curPath.sec.ends[0].id,curPath.sec.id,curPath.sec.segmentIds[0])]);
+				//.log('curPath.sec.ends[0].id,curPath.sec.id,curPath.sec.segmentIds[0])',curPath.sec.ends[0].id,curPath.sec.id,curPath.sec.segmentIds[0])
 				var point = track.lerpToDist({
 					p1: curPath.sec.points[1],
 					p2: curPath.sec.points[0],
@@ -306,9 +306,9 @@ var trainFunc = function(){
 			}
 		}
 		else if ((curPointId == curPath.sec.points.length - 2  && moveDir == 1 && reverse > 0) || (curPointId == curPath.sec.points.length && moveDir == 0 && reverse < 0)){
-			//console.log('pb');
+			//.log('pb');
 			if(curPath.sec.ends[0].type == 'end'){
-				//console.log('end')
+				//.log('end')
 				var point = track.lerpToDist({
 					p1: curPath.sec.points[curPath.sec.points.length - 2],
 					p2: midpoint(curPath.sec.points[curPath.sec.points.length - 2],curPath.sec.points[curPath.sec.points.length - 1]),
@@ -316,8 +316,8 @@ var trainFunc = function(){
 				},remDist);
 			}
 			else{
-				//console.log('switch',curPath.sec.ends[0],curPath.sec.ends[0].points[track.getSwitchThrowId(curPath.sec.ends[0].id,curPath.sec.id,curPath.sec.segmentIds[0])]);
-				//console.log('curPath.sec.ends[0].id,curPath.sec.id,curPath.sec.segmentIds[0])',curPath.sec.ends[0].id,curPath.sec.id,curPath.sec.segmentIds[0])
+				//.log('switch',curPath.sec.ends[0],curPath.sec.ends[0].points[track.getSwitchThrowId(curPath.sec.ends[0].id,curPath.sec.id,curPath.sec.segmentIds[0])]);
+				//.log('curPath.sec.ends[0].id,curPath.sec.id,curPath.sec.segmentIds[0])',curPath.sec.ends[0].id,curPath.sec.id,curPath.sec.segmentIds[0])
 				var point = track.lerpToDist({
 					p1: curPath.sec.points[curPath.sec.points.length - 2],
 					p2: curPath.sec.points[curPath.sec.points.length - 1],
@@ -326,7 +326,7 @@ var trainFunc = function(){
 			}
 		}
 		else if(curPointId == 0){
-			//console.log('pc');
+			//.log('pc');
 			var point = track.lerpToDist({
 				p1: curPath.sec.points[1],
 				p2: midpoint(curPath.sec.points[1],curPath.sec.points[0]),
@@ -334,7 +334,7 @@ var trainFunc = function(){
 			},remDist);
 		}
 		else if(curPointId == curPath.sec.points.length - 1){
-			//console.log('pd');
+			//.log('pd');
 			var point = track.lerpToDist({
 				p1: curPath.sec.points[curPath.sec.points.length - 2],
 				p2: midpoint(curPath.sec.points[curPath.sec.points.length - 2],curPath.sec.points[curPath.sec.points.length - 1]),
@@ -342,15 +342,15 @@ var trainFunc = function(){
 			},remDist);
 		}
 		else{
-			//console.log('pe',curPath.sec.points[curPointId],curPath.sec.points[curPointId + inc],curPath.sec.points[curPointId + (2 * inc)]);
+			//.log('pe',curPath.sec.points[curPointId],curPath.sec.points[curPointId + inc],curPath.sec.points[curPointId + (2 * inc)]);
 			var point = track.lerpToDist({
 				p1: curPath.sec.points[curPointId],
 				p2: curPath.sec.points[curPointId + inc],
 				p3: curPath.sec.points[curPointId + (2 * inc)]
 			},remDist);
-			//console.log(curSegDist)
+			//.log(curSegDist)
 		}
-		//console.log('yo',remDist, curPointId)
+		//.log('yo',remDist, curPointId)
 		return {
 			curSegDist: curSegDist,
 			remDist: remDist,
@@ -366,7 +366,7 @@ var trainFunc = function(){
 		while(i < this.train.length - 1) {
 			i++;
 
-			//console.log(this.train[i].engine.opts.acc, this.train[i].engine.userSpeed)
+			//.log(this.train[i].engine.opts.acc, this.train[i].engine.userSpeed)
 			if (this.train[i].engine.opts.acc > 0 & this.train[i].engine.userSpeed > 0){
 				if ((this.train[i].engine.curSpeed + this.train[i].engine.opts.acc*dTime) < 0)
 					this.train[i].engine.curSpeed += this.train[i].engine.opts.dec*dTime;
@@ -430,8 +430,8 @@ var trainFunc = function(){
 			}*/
 
 			//-- Find Distance on track --//
-			//console.log(this.train[i].path)
-			//console.log(this.train[i].curDist, travDist, this.train[i].path.currentP, this.train[i].curPointId)
+			//.log(this.train[i].path)
+			//.log(this.train[i].curDist, travDist, this.train[i].path.currentP, this.train[i].curPointId)
 
 			var moved = this.moveOnPath(this.train[i].curDist, travDist, this.train[i].path, this.train[i].curPointId , this.train[i].engine.curSpeed);
 			if(!moved) return -1;
@@ -440,7 +440,7 @@ var trainFunc = function(){
 
 			//if(this.train[i].engine.curSpeed > 0){
 				while(moved.pointId === false){
-					//console.log('-----',this.train[i].path.currentP)
+					//.log('-----',this.train[i].path.currentP)
 					this.rebuildPath(i);
 
 					if (this.train[i].path.currentP.dir == 0 & this.train[i].engine.curSpeed > 0)
@@ -469,7 +469,7 @@ var trainFunc = function(){
 					else
 						curPointId = 1;
 
-					//console.log(path.previousP[prevPId],path.previousP[prevPId + 1], prevPId, path.previousP.length, moved.remDist)
+					//.log(path.previousP[prevPId],path.previousP[prevPId + 1], prevPId, path.previousP.length, moved.remDist)
 					moved = this.moveOnPath(0, this.train[i].curDist, this.train[i].path, this.train[i].curPointId, this.train[i].engine.curSpeed);
 
 					this.train[i].curPointId = moved.pointId;
@@ -486,7 +486,7 @@ var trainFunc = function(){
 			).pos
 			this.train[i].engine.mesh.lookAt(this.train[i].engine.backP);
 			this.train[i].engine.mesh.verticesNeedUpdate = true;
-			//console.log(this.train[i].curPointId)
+			//.log(this.train[i].curPointId)
 
 			//-- calc rem T --//
 			//-- apply to curP --//
