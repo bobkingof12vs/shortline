@@ -13,7 +13,7 @@ function angleBetweenVectors(a,b,o){
   magA = o.distanceTo(a);
   magB = o.distanceTo(b);
   if (magA == 0 | magB == 0) {
-    console.log('0 distance found in angleBetweenVectors');
+    //console.log('0 distance found in angleBetweenVectors');
     return 0;
   }
   val = Math.round(dotAB/(magA * magB)*1000)/1000;
@@ -60,7 +60,7 @@ function midpoint(p1,p2){
 }
 
 function findY(x,z){
-  var ray = new THREE.Raycaster (new THREE.Vector3(x, 1000, z), new THREE.Vector3(0, -1, 0));
+  var ray = new THREE.Raycaster (new THREE.Vector3(x, 10000, z), new THREE.Vector3(0, -1, 0));
   var where = ray.intersectObject(plane,true);
   return where[0].point.y;
 }

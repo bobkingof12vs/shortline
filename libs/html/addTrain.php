@@ -229,13 +229,13 @@
       //append to parent
       parEl.appendChild(div);
 
-      obj = new staticObj();
-      obj.zoom = 15;
-      obj.loadFile(urls[curUrlNum].path,div)
+      tempObj = new staticObj();
+      tempObj.zoom = 15;
+      tempObj.loadFile(urls[curUrlNum].path,div)
       if(urls.length > curUrlNum) {
         var keepGoing = function(){
-          if(obj.done == 1){
-            div.src = obj.image;
+          if(tempObj.done == 1){
+            div.src = tempObj.image;
             div.title = urls[curUrlNum].name;
             runNextAddTrainItem(urls,curUrlNum+1,callback);
             return

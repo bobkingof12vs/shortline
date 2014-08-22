@@ -3,7 +3,7 @@
 //---Init---//
 
 //global variables
-var obj = [];
+var worldObj = [];
 var globalMesh = [];
 var id = -1;
 var mouse = {};
@@ -74,21 +74,21 @@ plane = new THREE.Mesh(planeGeometry,pm);
 //plane.castShadow = true;
 group.add(plane);
 console.log("'plane'",plane);
-obj['plane'] = group;
+worldObj['plane'] = group;
 scene.add(group);
 console.log("'group'",group)
 
 //add track line object
-obj['trkPreLine'] = new THREE.Object3D();
-console.log('preline',obj['trkPreLine']);
+worldObj['trkPreLine'] = new THREE.Object3D();
+console.log('preline',worldObj['trkPreLine']);
 
 //add track line object
-obj['trkLine'] = new THREE.Object3D();
-console.log('drawline',obj['trkLine']);
+worldObj['trkLine'] = new THREE.Object3D();
+console.log('drawline',worldObj['trkLine']);
 
 //add track line object
-obj['switches'] = new THREE.Object3D();
-console.log('switches',obj['switches']);
+worldObj['switches'] = new THREE.Object3D();
+console.log('switches',worldObj['switches']);
 
 //add lights
 var ambientLight = new THREE.AmbientLight(0xbbbbbb);

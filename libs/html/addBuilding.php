@@ -151,108 +151,147 @@
 
   <script>
 
-    var buildingHeight = 0;
-    var buildingRotation = 270;
-    userRot = function(){
-      buildingRotation = document.getElementById('brot').value * 3.6;
-      document.getElementById('buildingRotation').value = buildingRotation;
-    }
-    inputRot = function(){
-      var preChange = buildingRotation;
-      buildingRotation = document.getElementById('buildingRotation').value.replace(/[^\d]/g, '');
-      if(buildingRotation > 10000 || buildingRotation < -10000){
-        alert("no numbers over 10000 or under -10000 please\nno changes made")
-        buildingRotation = preChange;
+    var building = new (function(){
+      this.building = [];
+
+      this.buildingRotation = 270;
+      this.userRot = function(){
+        this.buildingRotation = document.getElementById('brot').value * 3.6;
+        document.getElementById('buildingRotation').value = this.buildingRotation;
+        this.processBuildingMove();
       }
-      while(buildingRotation > 360)
-        buildingRotation -= 360;
-      while(buildingRotation < 0)
-        buildingRotation += 360
-      document.getElementById('buildingRotation').value = buildingRotation;
-      document.getElementById('brot').value = buildingRotation / 3.6;
-    }
 
-    userHeight = function(){
-      buildingRotation = (document.getElementById('bheight').value - 50)/5;
-      document.getElementById('buildingHeight').value = buildingRotation;
-    }
-    inputHeight = function(){
-      var preChange = buildingHeight;
-      buildingHeight = document.getElementById('buildingHeight').value.replace(/[^\d]/g, '');
-      document.getElementById('buildingHeight').value = buildingHeight;
-      document.getElementById('bheight').value = (buildingHeight * 5) + 50;
-    }
-
-
-    processBuildingClick = function(e){
-      console.log('add '+e.target.title+"\n"+e.target.path)
-    }
-
-    runNextAddBuildingItem = function(urls,curUrlNum,callback){
-
-      if(urls[curUrlNum] == undefined)
-        return callback();
-
-      var parEl = document.getElementById('ab_selectArea');
-      var div = document.createElement('img');
-
-      //divinfo
-      div.className = 'at_item';
-      div.id = 'obj_'+urls[curUrlNum].path;
-      div.style.display = 'block';
-      div.innerHTML = '';
-
-      //events
-      div.onmouseover = highlightIn;
-      div.onmouseout = highlightOut;
-      div.onmousedown = function(e){highlightClick(e); processBuildingClick(e);};
-
-      //append to parent
-      parEl.appendChild(div);
-
-      obj = new staticObj();
-      obj.zoom = 7;
-      obj.loadFile(urls[curUrlNum].path,div)
-      if(urls.length > curUrlNum) {
-        var keepGoing = function(){
-          if(obj.done == 1){
-            div.src = obj.image;
-            div.path = urls[curUrlNum].path
-            div.title = urls[curUrlNum].name;
-            runNextAddBuildingItem(urls,curUrlNum+1,callback);
-            return
-          }
-          else{
-            setTimeout(keepGoing,2);
-          }
+      this.inputRot = function(){
+        var preChange = this.buildingRotation;
+        this.buildingRotation = document.getElementById('buildingRotation').value.replace(/[^\d]/g, '');
+        if(this.buildingRotation > 10000 || this.buildingRotation < -10000){
+          alert("no numbers over 10000 or under -10000 please\nno changes made")
+          this.buildingRotation = preChange;
         }
-        keepGoing();
+        while(this.buildingRotation > 360)
+          this.buildingRotation -= 360;
+        while(this.buildingRotation < 0)
+          this.buildingRotation += 360
+        document.getElementById('buildingRotation').value = this.buildingRotation;
+        document.getElementById('brot').value = this.buildingRotation / 3.6;
+        this.processBuildingMove();
       }
-    }
 
-    m['m_bld'].onclickEvent = function(menu,click){
-      if(click == 1){
-        document.getElementById('addBuilding').style.zIndex = 4;
+      this.buildingHeight = 0;
+      this.userHeight = function(){
+        this.buildingHeight = (document.getElementById('bheight').value - 50)/5;
+        document.getElementById('buildingHeight').value = this.buildingHeight;
+        this.processBuildingMove();
       }
-      else
-        document.getElementById('addBuilding').style.zIndex = 1;
-    }
+
+      this.inputHeight = function(){
+        var preChange = this.buildingHeight;
+        this.buildingHeight = document.getElementById('buildingHeight').value.replace(/[^\d]/g, '');
+        document.getElementById('buildingHeight').value = this.buildingHeight;
+        document.getElementById('bheight').value = (this.buildingHeight * 5) + 50;
+        this.processBuildingMove();
+      }
+
+      this.buildingSelection = '';
+      this.curBuildingId = 0;
+      this.buildingMoving = 'yes'
+      this.processBuildingClick = function(point){
+        if(this.buildingMoving == 'no' && building.building[this.curBuildingId].position.distanceTo(point) <= 50)
+          this.buildingMoving = 'yes'
+        else
+          this.buildingMoving = 'no'
+      }
+
+      this.processBuildingMove = function(point){
+        if(this.buildingSelection == '') return;
+        if(this.buildingMoving == 'yes'){
+          this.building[this.curBuildingId].position.x = point.x;
+          this.building[this.curBuildingId].position.z = point.z;
+          this.building[this.curBuildingId].baseY = findY(point.x,point.z);
+        }
+        this.building[this.curBuildingId].position.y = this.building[this.curBuildingId].baseY + this.buildingHeight;
+        this.building[this.curBuildingId].rotation.y = this.buildingRotation * 0.0174532925;
+      }
+
+      this.runNextAddBuildingItem = function(urls,curUrlNum,callback){
+
+        if(urls[curUrlNum] == undefined)
+          return callback();
+
+        var parEl = document.getElementById('ab_selectArea');
+        var div = document.createElement('img');
+
+        //divinfo
+        div.className = 'at_item';
+        div.id = 'obj_'+urls[curUrlNum].path;
+        div.style.display = 'block';
+        div.innerHTML = '';
+
+        //events
+        div.onmouseover = this.highlightIn;
+        div.onmouseout = this.highlightOut;
+        div.onmousedown = function(e){
+          building.curBuildingId++;
+          building.buildingMoving = 'yes'
+          building.buildingSelection = e.target.title
+          building.building[building.curBuildingId] = worldObj[e.target.objName].newMesh();
+          scene.add(building.building[building.curBuildingId]);
+        };
+
+        //append to parent
+        parEl.appendChild(div);
+
+        tempObj = new staticObj();
+        tempObj.zoom = 7;
+        tempObj.loadFile(urls[curUrlNum].path,div)
+        if(urls.length > curUrlNum) {
+          var keepGoing = function(){
+            if(tempObj.done == 1){
+              div.src = tempObj.image;
+              div.path = urls[curUrlNum].path
+              div.title = urls[curUrlNum].name;
+              div.objName = urls[curUrlNum].path.substr(urls[curUrlNum].path.lastIndexOf('/')+1).slice(0,-3);
+              building.runNextAddBuildingItem(urls,curUrlNum+1,callback);
+              return
+            }
+            else{
+              setTimeout(keepGoing,2);
+            }
+          }
+          keepGoing();
+        }
+      }
+
+      m['m_bld'].onclickEvent = function(menu,click){
+        this.buildingSelection = '';
+        if(click == 1){
+          document.getElementById('addBuilding').style.zIndex = 4;
+        }
+        else
+          document.getElementById('addBuilding').style.zIndex = 1;
+          if(building.buildingSelection != ''){
+            scene.remove(building.building[building.curBuildingId]);
+          }
+      }
+    })();
+
+    console.log('building',building)
   </script>
 
   <div class='ab_lowerMenu'>
     <div id='ab_editArea'>
 
     <div style="position: relative;">
-      <input id='brot' type='range' value=75  step=6.25 onchange='userRot()'>
+      <input id='brot' type='range' value=75  step=6.25 onchange='building.userRot()'>
         <span class='mono backwords'>Rotation</span>
       </input>
-      <input id='buildingRotation' type='text' onchange='inputRot()' class='mono ab_textArea gray' style='text-align:center;' value=270> </input>
+      <input id='buildingRotation' type='text' onchange='building.inputRot()' class='mono ab_textArea gray' style='text-align:center;' value=270> </input>
     </div>
     <div style="position: relative;">
-      <input id='bheight' type='range' value=50  step=5 onchange='userHeight()'>
+      <input id='bheight' type='range' value=50  step=5 onchange='building.userHeight()'>
         <span class='mono backwords'>Height</span>
       </input>
-      <input id='buildingHeight' type='text'' onchange='inputHeight()' class='mono ab_textArea gray' style='text-align:center;' value=0> </input>
+      <input id='buildingHeight' type='text' onchange='building.inputHeight()' class='mono ab_textArea gray' style='text-align:center;' value=0> </input>
     </div>
     </div>
     <div id='ab_selectArea' class='ab_selectArea'>

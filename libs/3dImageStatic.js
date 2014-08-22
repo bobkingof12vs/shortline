@@ -28,17 +28,17 @@ staticObj = function(){
     this.done = 0;
     var i_loader = new THREE.JSONLoader();
     i_loader.load(obj_file,function(geom,mat){
-      obj.i_mesh = new THREE.Mesh(geom, new THREE.MeshFaceMaterial(mat));
+      tempObj.i_mesh = new THREE.Mesh(geom, new THREE.MeshFaceMaterial(mat));
 
       geom.computeBoundingBox();
       var boundBox = geom.boundingBox
 
       var width = boundBox.max.x - boundBox.min.x
 
-      obj.i_camera.left =  width // -obj.zoom ;
-      obj.i_camera.right = width // obj.zoom;
-      obj.i_camera.top = width /// obj.zoom;
-      obj.i_camera.bottom = width // -obj.zoom;
+      tempObj.i_camera.left =  width // -tempObj.zoom ;
+      tempObj.i_camera.right = width // tempObj.zoom;
+      tempObj.i_camera.top = width /// tempObj.zoom;
+      tempObj.i_camera.bottom = width // -tempObj.zoom;
 
       var midpoint = new THREE.Vector3(
         boundBox.min.x + ((boundBox.max.x - boundBox.min.x) / 2),
@@ -46,15 +46,15 @@ staticObj = function(){
         boundBox.min.z + ((boundBox.max.z - boundBox.min.z) / 2)
       )
 
-      obj.i_camera.position.x = midpoint.x - 1000
-      obj.i_camera.position.y = midpoint.y
-      obj.i_camera.position.z = midpoint.z
-      obj.i_camera.lookAt(midpoint);
+      tempObj.i_camera.position.x = midpoint.x - 1000
+      tempObj.i_camera.position.y = midpoint.y
+      tempObj.i_camera.position.z = midpoint.z
+      tempObj.i_camera.lookAt(midpoint);
 
-      obj.i_scene.add(obj.i_mesh);
-      i_renderer.render( obj.i_scene, obj.i_camera );
-      obj.image = i_renderer.domElement.toDataURL();
-      obj.done = 1;
+      tempObj.i_scene.add(tempObj.i_mesh);
+      i_renderer.render( tempObj.i_scene, tempObj.i_camera );
+      tempObj.image = i_renderer.domElement.toDataURL();
+      tempObj.done = 1;
     });
   }
 }

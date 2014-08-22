@@ -54,11 +54,11 @@
 				}
 			}
 			else{
-				obj[name] = {};
-				obj[name].opts = objData;
-				obj[name].newMesh = function(){
+				worldObj[name] = {};
+				worldObj[name].opts = objData;
+				worldObj[name].newMesh = function(){
 					var retMesh = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial(materials));
-					retMesh.scale.set(sc.x,sc.y,sc.z);
+					retMesh.scale.set(gOpts[name].scale.x,gOpts[name].scale.y,gOpts[name].scale.z);
 					retMesh.castShadow = (opts.castShadow !== undefined) ? opts.castShadow : false;
 					retMesh.receiveShadow = (opts.receiveShadow !== undefined) ? opts.receiveShadow : false;
 					return retMesh;
@@ -103,7 +103,7 @@
 	function waitForAllLoadedObjs(){
 		if (countOfLoadedLoaderObjs == <?= $numLoaded; ?> & <?= $numLoaded; ?> > 0) {
 			console.log('num objs loaded: ',<?= $numLoaded; ?>);
-			console.log('obj',obj);
+			console.log('worldObj',worldObj);
 			console.log('engines',engines);
 			console.log('railcars',railcars);
 			//-- things to do once we have all of our objects loaded --//
@@ -139,7 +139,7 @@ window.addEventListener('load', function(){
 			}
 		?>
 	],0,function(){
-		runNextAddBuildingItem([
+		building.runNextAddBuildingItem([
 			<?php
 				$loadObjFiles = glob('loadObjects/building/*');
 				foreach($loadObjFiles as $Loadobjs){
@@ -149,7 +149,9 @@ window.addEventListener('load', function(){
 					}
 				}
 			?>
-		],0,displayOneType('engine'));
+		],0,function(){
+			displayOneType('engine');
+		});
 	});
 });
 

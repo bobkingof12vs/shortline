@@ -30,9 +30,20 @@ function onWindowResize() {
 
 mouseInMenu = 0;
 document.addEventListener( 'mousemove', function (e){
-  if (e.clientX > menuHW.x | e.clientY > menuHW.y) {mouseInMenu = 0;}
-  else{mouseInMenu = 1;}
+  mouse.x = e.clientX;
+  mouse.y = e.clientY;
+  if (e.target.id == 'c') {
+    mouseInMenu = 0;
+    getMouseIntersect(mouse, [plane],function(i){
+      if(m['m_bld'].clicked == 1){building.processBuildingMove(i[0].point);}
+    });
+  }
+  else{
+    mouseInMenu = 1;
+  }
 });
+
+
 
 document.addEventListener( 'mousedown', function (e){
   mouse.x = e.clientX;
@@ -47,6 +58,7 @@ document.addEventListener( 'mousedown', function (e){
       if(m['m_ter_lower'].clicked == 1){raiseLowerTerrain(i,-10);}
       if(m['m_tra_lay'].clicked == 1 ){track.layTrack(i);}
       if(m['m_tre'].clicked == 1){tree.onclickAddTree(i[0].point);}
+      if(m['m_bld'].clicked == 1){building.processBuildingClick(i[0].point);}
     });
 
     //trackswitches
