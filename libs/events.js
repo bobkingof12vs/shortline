@@ -56,7 +56,7 @@ document.addEventListener( 'mousedown', function (e){
       console.log("'intersect'",i);
       if(m['m_ter_raise'].clicked == 1){raiseLowerTerrain(i,+10);}
       if(m['m_ter_lower'].clicked == 1){raiseLowerTerrain(i,-10);}
-      if(m['m_tra_lay'].clicked == 1 ){track.layTrack(i);}
+      if(m['m_tra_lay'].clicked == 1 ){layTrack.processClick(i);}
       if(m['m_tre'].clicked == 1){tree.onclickAddTree(i[0].point);}
       if(m['m_bld'].clicked == 1){building.processBuildingClick(i[0].point);}
     });

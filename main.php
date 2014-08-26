@@ -35,6 +35,7 @@
     <script src="libs/terraform.js"></script>
     <script src="libs/menu.js"></script>
     <script src="libs/buildTrack.js"></script>
+    <script src="libs/layTrack.js"></script>
     <script src="libs/events.js"></script>
     <script src="libs/train.js"></script>
     <script src="libs/tree.js"></script>
@@ -60,9 +61,8 @@
         now = Date.now();
         if(work != -1
           && m['m_tgo'].clicked == 1){
-          work = train.workJobs(50);
+          work = train.workJobs(now - then);
           then = now;
-          track.endTrack();
         }//now-then);
         controls.update();
         renderer.render(scene, camera);

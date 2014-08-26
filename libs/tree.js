@@ -162,7 +162,7 @@ treeFunc = function(){
     //this.trees[treeId].Mesh.add(leavesGroup);
     this.trees[treeId].Mesh.position.x = x;
     this.trees[treeId].Mesh.position.z = z;
-    this.trees[treeId].Mesh.position.y = recalcY(i).y;
+    this.trees[treeId].Mesh.position.y = findY(x,z);
     this.trees[treeId].Mesh.scale.x = 6;
     this.trees[treeId].Mesh.scale.y = 6;
     this.trees[treeId].Mesh.scale.z = 6;

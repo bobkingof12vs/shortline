@@ -76,6 +76,8 @@ function makeMenu( str, id, parent, order, oncmousedownEventFunc){
   menu.style.height = (mc.mh+2)+'px';
   menu.style.zIndex = '3';
 
+  func = function(){console.log('click called '+id);};
+
   menu.order = order;
 
   document.body.appendChild(menu);
@@ -84,7 +86,7 @@ function makeMenu( str, id, parent, order, oncmousedownEventFunc){
   drawMenu(mc,lightBrown,darkBrown);
   drawMenu(mc,lightBrown,darkBrown);
 
-  var retMenu = {e: menu, c: menuCanvas, ctx: mc, t: 0, clicked: -1,
+  var retMenu = {e: menu, c: menuCanvas, ctx: mc, t: 0, clicked: -1, onclickEvent: func,
     x: posx, y: posy, parent: parent, id: id, order: order, type: "menu"}
   return retMenu;
 }
@@ -158,18 +160,19 @@ function setAllMenu(){
         ' for(var oth_m in m){'+
           ' if (m["'+cur_m+'"].type == "menu" & (oth_m != "'+cur_m+'" & m[oth_m].parent == m["'+cur_m+'"].parent'+
           ' & m[oth_m].clicked == 1 & m[oth_m].id != m[oth_m].parent)) {'+
-            ' m[oth_m].clicked = -1'+
+            ' m[oth_m].clicked = -1;'+
           ' }'+
         ' }'+
         ' m["'+cur_m+'"].clicked *= -1;'+
         ' moveMenu("'+cur_m+'",m[m["'+cur_m+'"].parent].posx + 16, m[m["'+cur_m+'"].parent].posy + m["'+cur_m+'"].ctx.mh+2);'+
         ' for(var oth_m in m){'+
           ' if (m["'+cur_m+'"].type == "menu" & (m[m[oth_m].parent].clicked == -1 & m[oth_m].id != m[oth_m].parent)) {'+
-            ' m[oth_m].clicked = -1'+
+            ' m[oth_m].clicked = -1;'+
           ' }'+
+          'if(oth_m != "background" && oth_m != "'+cur_m+'"){m[oth_m].onclickEvent(m[oth_m], m[oth_m].clicked);}'+
         ' }'+
         ' checkClick();'+
-        ' if(m["'+cur_m+'"].onclickEvent != undefined) m["'+cur_m+'"].onclickEvent(m["'+cur_m+'"], m["'+cur_m+'"].clicked)'
+        ' m["'+cur_m+'"].onclickEvent(m["'+cur_m+'"], m["'+cur_m+'"].clicked)'
       );
     }
   }
@@ -178,22 +181,20 @@ function setAllMenu(){
 var m = [];
 m['background'] = makeBackground('background');
 m['main'] = makeMenu('Tool Kit', 'main', 'main',0);
-m['main'].clickInEvent = function(menu){alert('yep in '+menu.id)}
-m['main'].clickOutEvent = function(menu){alert('yep out '+menu.order)}
 
 m['m_ter'] = makeMenu('Terraform Tools', 'm_ter', 'main',1);
-m['m_tra'] = makeMenu('Track Tools', 'm_tra', 'main',2);
+m['m_tra_lay'] = makeMenu('Add Track', 'm_tra_lay', 'main',2); //makeMenu('Track Tools', 'm_tra', 'main',2);
 m['m_tad'] = makeMenu('Add Train', 'm_tad', 'main',3);
-m['m_hlt'] = makeMenu('Halt Program', 'm_hlt', 'main',4);
-m['m_tgo'] = makeMenu('Run Trains', 'm_tgo', 'main',5);
-m['m_tre'] = makeMenu('Add Tree', 'm_tre', 'main',6);
-m['m_bld'] = makeMenu('Add Building', 'm_bld', 'main',7);
+m['m_bld'] = makeMenu('Add Building', 'm_bld', 'main',4);
+m['m_tre'] = makeMenu('Add Tree', 'm_tre', 'main',5);
+m['m_tgo'] = makeMenu('Run Trains', 'm_tgo', 'main',6);
+m['m_hlt'] = makeMenu('Halt Program', 'm_hlt', 'main',7);
 
 m['m_ter_raise'] = makeMenu('Raise Ground', 'm_ter_raise', 'm_ter',1);
 m['m_ter_lower'] = makeMenu('Lower Ground', 'm_ter_lower', 'm_ter',2);
 
-m['m_tra_lay'] = makeMenu('Lay Track', 'm_tra_lay', 'm_tra',1);
-m['m_tra_remove'] = makeMenu('Remove Track', 'm_tra_remove', 'm_tra',2);
+//m['m_tra_lay'] = makeMenu('Lay Track', 'm_tra_lay', 'm_tra',1);
+//m['m_tra_remove'] = makeMenu('Remove Track', 'm_tra_remove', 'm_tra',2);
 
 setAllMenu();
 m['main'].e.click();

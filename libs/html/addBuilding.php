@@ -209,6 +209,7 @@
           this.building[this.curBuildingId].position.z = point.z;
           this.building[this.curBuildingId].baseY = findY(point.x,point.z);
         }
+        this.building[this.curBuildingId].buildingHeight = this.buildingHeight;
         this.building[this.curBuildingId].position.y = this.building[this.curBuildingId].baseY + this.buildingHeight;
         this.building[this.curBuildingId].rotation.y = this.buildingRotation * 0.0174532925;
       }
