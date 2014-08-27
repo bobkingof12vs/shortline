@@ -349,7 +349,6 @@ trackFunc = function(){
 	}
 
 	this.switchByPoint = function(inPoint){
-
 		var points = [inPoint];
 		var secs = this.findPointInSec(inPoint);
 		var i = secs.length
@@ -376,12 +375,12 @@ trackFunc = function(){
 				if(this.sections[i] != null){
 					if(equalXZ(this.sections[i].points[0],p1) == 1)
 						secIds.push({secId: i, pointId: 1, segId: this.sections[i].segmentIds[0]});
-					else if(equalXZ(this.sections[i].points[this.sections[i].points.length - 1],p1) == 1)
+					if(equalXZ(this.sections[i].points[this.sections[i].points.length - 1],p1) == 1)
 						secIds.push({secId: i, pointId: this.sections[i].points.length - 2, segId: this.sections[i].segmentIds[this.sections[i].segmentIds.length - 1]});
 				}
 			}
 
-			if(secIds.length <= 1)
+			if(secIds.length <= 1) // && equalXZ(this.sections[0].points[0], this.sections[i].points[this.sections[i].points.length - 1]) != 1)
 				continue;
 
 
@@ -579,6 +578,7 @@ trackFunc = function(){
 					secId = this.findSegInSec(pointsP1[0]);
 					this.connectTo(p1,p2,p3,pointsP1[0],this.segments.length);
 					//this.newSwitch(p3,p2,pointsP3[0],this.segments.length,-1);
+					this.switchByPoint(p3);
 				}
 				else{
 					secId = this.combineSecs(p1,p2,p3,pointsP1[0],pointsP3[0],false);
@@ -609,7 +609,11 @@ trackFunc = function(){
 			//point is a new switch
 			if (pointsP3.length == 0) {
 				console.log('and is a new segment and a new end');
-				this.splitSec(pointsP1[1],p1,this.segments.length);
+				//die();console.error('D -=>')
+				if(equalXZ(pointsP1[0],pointsP1[1]) == 1)
+					this.switchByPoint(p1,p2);
+				else
+					this.splitSec(pointsP1[1],p1,this.segments.length);
 				var secId = this.newSec(p1,p2,p3,this.segments.length);
 				//this.newSwitch(p1,p2,pointsP1[0],pointsP1[1],this.segments.length);
 				this.newEnd(p3,secId);
