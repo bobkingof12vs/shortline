@@ -270,7 +270,7 @@
         }
         else
           document.getElementById('addBuilding').style.zIndex = 1;
-          if(building.buildingSelection != ''){
+          if(building.buildingSelection != '' && building.buildingMoving == 'yes'){
             scene.remove(building.building[building.curBuildingId]);
           }
       }
