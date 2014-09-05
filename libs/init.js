@@ -24,8 +24,8 @@ console.log("'camera'",camera);
 //var toonMaterial = new THREE.MeshLambertMaterial
 
 //load plane
-var w = 10;
-var h = 10;
+var w = 20;
+var h = 20;
 var scale = 100;
 var color = 0x7CBA30;
 var planeGeometry = new THREE.Geometry();

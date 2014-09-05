@@ -233,9 +233,10 @@
         div.onmouseout = this.highlightOut;
         div.onmousedown = function(e){
           building.curBuildingId++;
-          building.buildingMoving = 'yes'
-          building.buildingSelection = e.target.title
+          building.buildingMoving = 'yes';
+          building.buildingSelection = e.target.title;
           building.building[building.curBuildingId] = worldObj[e.target.objName].newMesh();
+          building.building[building.curBuildingId].name = e.target.objName;
           scene.add(building.building[building.curBuildingId]);
         };
 

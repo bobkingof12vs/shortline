@@ -41,6 +41,7 @@
     <script src="libs/tree.js"></script>
     <?php include('libs/load.php') ?>
     <?php echo "\n".file_get_contents('libs/html/trainInfo.html')?>
+    <script src="libs/saveGame.js"></script>
 
     <script>
       //console.log(THREE.UniformsUtils)

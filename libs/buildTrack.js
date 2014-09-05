@@ -1,7 +1,5 @@
 var trackPoints = [];
 
-console.log('track points',trackPoints)
-
 uploadFunc = function(){
 	this.queue = [];
 	this.queueData = function(type,data){
@@ -918,7 +916,6 @@ trackFunc = function(){
 }
 
 track = new trackFunc
-track.bulkAddTrack(trackPoints);
 console.log('track',track);
 
 

@@ -34,3 +34,16 @@ function raiseLowerTerrain(i,upDown){
     b.position.y = b.baseY + b.buildingHeight;
   });
 }
+
+function loadTerrain(point){
+  for (j = 0; j < worldObj['plane'].children[0].geometry.vertices.length; j++)
+    if (equalXZ(point, worldObj['plane'].children[0].geometry.vertices[j]) == 1)
+        worldObj['plane'].children[0].geometry.vertices[j].y = point.y;
+
+  for (j = 0; j < worldObj['plane'].children[1].geometry.vertices.length; j++)
+    if (equalXZ(point, worldObj['plane'].children[1].geometry.vertices[j]) == 1)
+        worldObj['plane'].children[1].geometry.vertices[j].y = point.y;
+
+  worldObj['plane'].children[1].geometry.verticesNeedUpdate = true;
+  worldObj['plane'].children[0].geometry.verticesNeedUpdate = true;
+}

@@ -189,6 +189,7 @@ m['m_bld'] = makeMenu('Add Building', 'm_bld', 'main',4);
 m['m_tre'] = makeMenu('Add Tree', 'm_tre', 'main',5);
 m['m_tgo'] = makeMenu('Run Trains', 'm_tgo', 'main',6);
 m['m_hlt'] = makeMenu('Halt Program', 'm_hlt', 'main',7);
+m['m_sav'] = makeMenu('Save Game', 'm_sav', 'main',8);
 
 m['m_ter_raise'] = makeMenu('Raise Ground', 'm_ter_raise', 'm_ter',1);
 m['m_ter_lower'] = makeMenu('Lower Ground', 'm_ter_lower', 'm_ter',2);

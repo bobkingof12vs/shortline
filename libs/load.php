@@ -128,6 +128,7 @@
 	//waitForPreLoadObjects();
 
 window.addEventListener('load', function(){
+	saveGame.load(get('id'));
 	runNextAddTrainItem([
 		<?php
 			$loadObjFiles = glob('loadObjects/train/*');

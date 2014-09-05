@@ -258,3 +258,8 @@ function addVectorToPoint(origin,v1){
     origin.z + v1.z
   );
 }
+
+function get(name) {
+  var match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
+  return match ? decodeURIComponent(match[1].replace(/\+/g, ' ')) : null;
+}
