@@ -87,8 +87,11 @@ var saveGame = new (function(){
   }
 
   this.load = function(id){
-    if(id !== parseInt(id))
+    if(id != parseInt(id)){
+      console.log('no Id given, game not loaded', id, parseInt(id))
       return;
+    }
+
     var loadURL = 'http://98.165.216.50:33033/shortline/trainserver/db.php?id='+id+'&type=get';
     var xhr = this.CORSRequest('GET', loadURL, function(response){
       var gameLoadData = JSON.parse(response);
@@ -112,17 +115,23 @@ var saveGame = new (function(){
         scene.add(building.building[building.curBuildingId]);
       }
 
-
       for(var i = 0; i < gameLoadData.track.length; i += 2){
-        p1 = new THREE.Vector3(gameLoadData.track[i].x,   findY(gameLoadData.track[i].x,  gameLoadData.track[i].z),  gameLoadData.track[i].z);
-        p3 = new THREE.Vector3(gameLoadData.track[i+1].x, findY(gameLoadData.track[i+1].x,gameLoadData.track[i+1].z),gameLoadData.track[i+1].z);
-
         layTrack.trackPreLine.curSeg++;
-        track.addToSection(p1,midpoint(p1,p3),p3);
-        layTrack.addPreLineToScene(p1,p3);
-      }
+        var p1 = new THREE.Vector3(gameLoadData.track[i].x,   findY(gameLoadData.track[i].x,  gameLoadData.track[i].z),  gameLoadData.track[i].z);
+        var p3 = new THREE.Vector3(gameLoadData.track[i+1].x, findY(gameLoadData.track[i+1].x,gameLoadData.track[i+1].z),gameLoadData.track[i+1].z);
 
-       console.log(gameLoadData);
+        track.addToSection(p1,recalcY(midpoint(p1,p3)),p3);
+
+        var loadLine = new THREE.Geometry();
+        loadLine.vertices = gridPointsOnLine(100,p1,p3);
+        lineGeometry.computeLineDistances();
+        layTrack.trackPreLine.children[layTrack.trackPreLine.curSeg] = new THREE.Line(loadLine, layTrack.trackPreLine.blinemat);
+      }
+      layTrack.trackPreLine.curSeg--;
+
+      //scene.remove(layTrack.trackPreLine.temp)
+
+       console.log('game loaded',gameLoadData);
     });
   }
 

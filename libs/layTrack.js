@@ -5,7 +5,8 @@
   this.trackPreLine.curTrack = -1;
   this.trackPreLine.curSeg = -1;
   this.trackPreLine.origin = new THREE.Vector3();
-  this.trackPreLine.blinemat = new THREE.LineBasicMaterial( { color: 0xff0000, linewidth: 5 } );
+  this.trackPreLine.blinemat = new THREE.LineBasicMaterial( { color: 0xaa2222, linewidth: 5 } );
+  this.trackPreLine.blinemat2 = new THREE.LineBasicMaterial( { color: 0x00ff00, linewidth: 5 } );
   this.trackPreLine.children = [];
 
   m['m_tra_lay'].onclickEvent = function(menu, clicked){
@@ -15,8 +16,15 @@
       layTrack.trackPreLine.part = 'init';
 
       var j = layTrack.trackPreLine.children.length;
-      while (j--)
+      while (j--){
+        //layTrack.trackPreLine.children[j].material = this.trackPreLine.blinemat2;//.color.setHex(0x2222aa);
+        var k = layTrack.trackPreLine.children[j].geometry.vertices.length
+        while(k--){
+          layTrack.trackPreLine.children[j].geometry.vertices[k] = recalcY(layTrack.trackPreLine.children[j].geometry.vertices[k],5);
+          layTrack.trackPreLine.children[j].geometry.verticesNeedUpdate = true;
+        }
         scene.add(layTrack.trackPreLine.children[j]);
+      }
 
     }
     else{

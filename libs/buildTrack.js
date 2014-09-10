@@ -893,26 +893,6 @@ trackFunc = function(){
 			}
 		}
 	}
-
-	this.downloadData = function(){
-		//ajax
-		//if newData
-		//add via group
-	}
-
-	this.bulkAddTrack = function(bulkPoints){
-
-		var i = bulkPoints.length
-		while(i > 0){
-			i--;
-			console.log(i)
-			//if(i == 4){console.log(track);die();}
-			layTrack.trackPreLine.curSeg++;
-			this.addToSection(bulkPoints[i].p1,bulkPoints[i].p2,bulkPoints[i].p3);
-			this.addPreLineToScene(bulkPoints[i].p1,bulkPoints[i].p3);
-
-		}
-	}
 }
 
 track = new trackFunc

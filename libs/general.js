@@ -61,7 +61,7 @@ function midpoint(p1,p2){
 
 function findY(x,z){
   var ray = new THREE.Raycaster (new THREE.Vector3(x, 10000, z), new THREE.Vector3(0, -1, 0));
-  var where = ray.intersectObject(plane,true);
+  var where = ray.intersectObject(worldObj['plane'].children[1],true);
   return where[0].point.y;
 }
 
@@ -104,11 +104,11 @@ function gridPointsOnLine(gridSize, p1, p2) {
       b2 = p2.z-(m2*p2.x);
       np = lineLineIntersect(m1,b1,m2,b2);
       if (np.y != -1 & mx > np.x & minX < np.x & mz > np.z & minZ < np.z)
-        {newPoints.push(new THREE.Vector3(np.x,findY(np.x,np.z)+3,np.z));}
+        {newPoints.push(new THREE.Vector3(np.x,findY(np.x,np.z)+8,np.z));}
 
 
       if(maxX > tempx & minX < tempx)
-        {newPoints.push(new THREE.Vector3(tempx,findY(tempx,tempz)+1,tempz));}
+        {newPoints.push(new THREE.Vector3(tempx,findY(tempx,tempz)+5,tempz));}
 
       maxX -= gridSize;
     }
@@ -122,10 +122,10 @@ function gridPointsOnLine(gridSize, p1, p2) {
       b2 = p2.z-(m2*p2.x);
       np = lineLineIntersect(m1,b1,m2,b2);
       if (np.y != -1 & mx > np.x & minX < np.x & mz > np.z & minZ < np.z)
-        {newPoints.push(new THREE.Vector3(np.x,findY(np.x,np.z)+1,np.z));}
+        {newPoints.push(new THREE.Vector3(np.x,findY(np.x,np.z)+5,np.z));}
 
       if(maxZ > tempz & minZ < tempz)
-        {newPoints.push(new THREE.Vector3(tempx,findY(tempx,tempz)+1,tempz));}
+        {newPoints.push(new THREE.Vector3(tempx,findY(tempx,tempz)+5,tempz));}
 
       maxZ -= gridSize;
     }
