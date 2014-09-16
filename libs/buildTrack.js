@@ -1,34 +1,5 @@
 var trackPoints = [];
 
-uploadFunc = function(){
-	this.queue = [];
-	this.queueData = function(type,data){
-		this.queue.push({type: type, data: data});
-		if (this.queue.length == 1) {
-			this.requestUpload();
-		}
-	}
-
-	this.requestUpload = function(){
-		console.log(this.queue[0])
-		xmlhttp = new XMLHttpRequest();
-		xmlhttp.onreadystatechange = function(){
-			if (xmlhttp.readyState == 4 && xmlhttp.status == 200){
-				console.log('success',xmlhttp.responseText);
-				uploader.queue.shift();
-				if (uploader.queue.length > 0) {
-					uploader.requestUpload();
-				}
-			}
-		}
-		xmlhttp.open("GET","../uploadRequest.php?type="+this.queue[0].type+"&data="+JSON.stringify(this.queue[0].data),true);
-		xmlhttp.send();
-	}
-}
-
-var uploader = new uploadFunc();
-console.log(uploader);
-
 trackFunc = function(){
 
 	this.segments = [];
@@ -107,7 +78,6 @@ trackFunc = function(){
 		}
 		return false;
 	}
-
 
 	this.lerpDistance = function(seg,opts) {
 		opts = opts !== undefined ? opts : {};
@@ -252,6 +222,15 @@ trackFunc = function(){
 		if(splitPointPre.length >= 2) console.error(segId,p1,'splitSec found a split point with more than one section, continuing');
 		var splitPoint = splitPointPre[0].pointId;
 
+		/*var isSelfEnclosed = false;
+		if(this.sections[secId].ends[0].secIds.length == 2
+			& this.sections[secId].ends[1].secIds.length == 2
+			& this.sections[secId].ends[0].secIds[0] == this.sections[secId].ends[0].secIds[1]
+			& this.sections[secId].ends[1].secIds[0] == this.sections[secId].ends[1].secIds[1]
+		){
+			isSelfEnclosed = true;
+		}*/
+
 		if (splitPoint == 0 | splitPoint == this.sections[secId].points.length) {
 			return
 		}
@@ -274,6 +253,16 @@ trackFunc = function(){
 
 		this.sections[secId].points = firstHalfPoints;
 		this.sections[secId].segmentIds = firstHalfSegIds;
+
+		/*if(isSelfEnclosed){
+			if(equalXZ(p1,this.sections[secId].ends[0].origin) == 1){
+				console.log('self enclosed, but already happy')
+			}
+			else{
+				console.log('not happy');
+			}
+		}*/
+
 	}
 
 	this.newEnd = function(newPoint, secId){
@@ -346,7 +335,7 @@ trackFunc = function(){
 		return false;
 	}
 
-	this.switchByPoint = function(inPoint){
+	this.switchByPoint = function(inPoint, p2){
 		var points = [inPoint];
 		var secs = this.findPointInSec(inPoint);
 		var i = secs.length
@@ -391,7 +380,8 @@ trackFunc = function(){
 				points: [],
 				target: [],
 				connectsTo: [],
-				throwObjs: []
+				throwObjs: [],
+				line: []
 			};
 
 			var i = secIds.length;
@@ -442,7 +432,8 @@ trackFunc = function(){
 					){
 						this.switches[switchId].connectsTo[i].push({
 							secId: this.findSegInSec(this.switches[switchId].segIds[j]),
-							segId: this.switches[switchId].segIds[j]
+							segId: this.switches[switchId].segIds[j],
+							point: newSegArray[j].p2
 						});
 					}
 				}
@@ -457,7 +448,55 @@ trackFunc = function(){
 						this.buildGeomPoints(recalcY(addVectorToPoint(newSegArray[i].p2,extendVector(12,perpendicularVectorXZ({x:-1,z:1},this.switches[switchId].origin,newSegArray[i].p2)))),recalcY(newSegArray[i].p2),5,5,5),
 						this.switches['material']
 					);
-					this.switches[switchId].throwObjs[i].clickCall = Function(
+					this.switches[switchId].throwObjs[i].clickCall = (function(t, switchId, curId){
+						return function(){
+							if (t.id != track.switches[switchId].throwObjs[curId].id)
+								return;
+
+							track.switches[switchId].target[curId]++;
+							if(track.switches[switchId].target[curId] >= track.switches[switchId].connectsTo[curId].length)
+								track.switches[switchId].target[curId] = 0;
+
+							var eTarget = track.switches[switchId].target[curId];
+							var mat = new THREE.LineBasicMaterial( { color: 0x7777777, linewidth: 3, transparent: true } );
+
+							console.log(eTarget)
+
+							var sPoint = track.switches[switchId].points[curId];
+							var ePoint = track.switches[switchId].connectsTo[curId][eTarget].point;
+							var mPoint = track.switches[switchId].origin;
+
+							var geom = new THREE.Geometry();
+							for(var k = 0; k <= 1; k += .05){
+								var a = recalcY(lerp(sPoint,mPoint,mPoint,ePoint,k),4.1);
+								var b = recalcY(lerp(sPoint,mPoint,mPoint,ePoint,k+.001),4.1);
+								geom.vertices.push(track.buildLinePointsLeft(a,b,-1));
+							}
+
+							//if(track.switches[switchId].line[curId] != undefined)
+							scene.remove(track.switches[switchId].line[curId])
+
+							track.switches[switchId].line[curId] = new THREE.Line(geom,mat);
+
+							track.switches[switchId].line[curId].material.opacity = 1;
+							scene.add(track.switches[switchId].line[curId])
+							/*var waitFunc = function(line){
+								var inFunc = function(){
+									line.material.opacity -= .05
+									if(line.material.opacity > 0)
+										setTimeout(inFunc,100);
+									else
+										scene.remove(line);
+								}
+								return inFunc;
+							}(line);
+							setTimeout(waitFunc,500);*/
+
+						}
+					})(this.switches[switchId].throwObjs[i], switchId, i)
+					this.switches[switchId].throwObjs[i].clickCall();
+
+					/*Function(
 						'if('+this.switches[switchId].throwObjs[i].id+' != track.switches['+switchId+'].throwObjs['+i+'].id) return;'+
 						'console.log("herehere",track.switches['+switchId+'].target['+i+'],'+i+','+switchId+');'+
 						'track.switches['+switchId+'].target['+i+']++;'+
@@ -466,7 +505,7 @@ trackFunc = function(){
 							'track.switches['+switchId+'].target['+i+'] = 0;'+
 						'}'+'console.log("herehere",track.switches['+switchId+'].target['+i+'],'+i+');'+
 						'track.updateSwitchBoxes()'
-					)
+					)*/
 					this.throws[this.switches[switchId].throwObjs[i].id] = this.switches[switchId].throwObjs[i];
 					scene.add(this.switches[switchId].throwObjs[i])
 					//this.updateSwitchBoxes();
@@ -526,9 +565,9 @@ trackFunc = function(){
 
 	this.addToSection = function(p1,p2,p3){
 		console.log('blink');
-	pointsP1 = this.findMatchInTrackPoints(p1);
-	pointsP3 = this.findMatchInTrackPoints(p3);
-	//console.log('p1p3',pointsP1,pointsP3)
+		pointsP1 = this.findMatchInTrackPoints(p1);
+		pointsP3 = this.findMatchInTrackPoints(p3);
+		console.log('p1p3',pointsP1,pointsP3)
 		if (pointsP1.length == 0) {
 			//point connects to nothing thus a new section
 			if (pointsP3.length == 0) {
@@ -571,12 +610,13 @@ trackFunc = function(){
 			}
 			else if (pointsP3.length == 1) {
 				console.log('point connects to two existing ends');
-				if (this.findSegInSec(pointsP1[0]) == this.findSegInSec(pointsP3[0])) {
+				var secId = this.findSegInSec(pointsP1[0]);
+				if (secId == this.findSegInSec(pointsP3[0])) {
 					console.log('self enclosed loop found');
-					secId = this.findSegInSec(pointsP1[0]);
 					this.connectTo(p1,p2,p3,pointsP1[0],this.segments.length);
-					//this.newSwitch(p3,p2,pointsP3[0],this.segments.length,-1);
-					this.switchByPoint(p3);
+					//this.splitSec(secId, (this.sections[secId].points[Math.floor(this.sections[secId].points.length/2)]));
+					this.switchByPoint(p3,p2);
+					this.sections[secId].ends[1] = this.sections[secId].ends[0];
 				}
 				else{
 					secId = this.combineSecs(p1,p2,p3,pointsP1[0],pointsP3[0],false);
@@ -588,7 +628,7 @@ trackFunc = function(){
 				console.log('point splits existing section and connects to a new switch and existing section');
 				this.splitSec(pointsP3[1],p3);
 				this.connectTo(p1,p2,p3,pointsP1[0],this.segments.length);
-				this.removeEnd(p1);
+				//this.removeEnd(p1);
 				//this.newSwitch(p3,p2,pointsP3[0],pointsP3[1],this.segments.length);
 				this.switchByPoint(p3,p2);
 			}
@@ -608,13 +648,15 @@ trackFunc = function(){
 			if (pointsP3.length == 0) {
 				console.log('and is a new segment and a new end');
 				//die();console.error('D -=>')
-				if(equalXZ(pointsP1[0],pointsP1[1]) == 1)
-					this.switchByPoint(p1,p2);
-				else
+				//if(this.findSegInSec(pointsP1[0]) == this.findSegInSec(pointsP1[1]))
 					this.splitSec(pointsP1[1],p1,this.segments.length);
-				var secId = this.newSec(p1,p2,p3,this.segments.length);
-				//this.newSwitch(p1,p2,pointsP1[0],pointsP1[1],this.segments.length);
+
+				var secId = this.newSec(p3,p2,p1,this.segments.length);
 				this.newEnd(p3,secId);
+
+				this.switchByPoint(p1,p2);
+				//due();
+				//this.newSwitch(p1,p2,pointsP1[0],pointsP1[1],this.segments.length);
 			}
 			else if (pointsP3.length == 1) {
 				console.log('point connects existing segement to a new switch');
@@ -628,7 +670,7 @@ trackFunc = function(){
 				var secId = this.newSec(p1,p2,p3,this.segments.length);
 				this.splitSec(pointsP1[1],p1,this.segments.length);
 				this.splitSec(pointsP3[1],p3,this.segments.length);
-				this.switchByPoint(p3,p2,this.segments.length);
+				this.switchByPoint(p3,p2);
 				//this.newSwitch(p3,p2,pointsP3[0],pointsP3[1],this.segments.length);
 				//this.newSwitch(p1,p2,pointsP1[0],pointsP1[1],this.segments.length);
 			}
@@ -638,12 +680,12 @@ trackFunc = function(){
 				this.splitSec(pointsP1[1],p1,this.segments.length);
 				//this.newSwitch(p1,p2,pointsP1[0],pointsP1[1],this.segments.length);
 				//this.addToSwitch(p3,p2,this.segments.length);
-				this.switchByPoint(p3,p2,this.segments.length);
+				this.switchByPoint(p3,p2);
 			}
 			else{
 				console.log('no match 2',this.segments.length);
 			}
-			this.switchByPoint(p1,p2,this.segments.length);
+			this.switchByPoint(p1,p2);
 		}
 		else if (pointsP1.length >= 3) {
 			//point connects to existing switch
@@ -708,8 +750,9 @@ trackFunc = function(){
 		return tie;
 	}
 
-	this.buildLinePointsLeft = function(origin,originOffset){
-		return addVectorToPoint(origin,extendVector(5,perpendicularVectorXZ({x: -1, z:  1},originOffset,origin)));
+	this.buildLinePointsLeft = function(origin,originOffset,further){
+		if(further == undefined) further = 0;
+		return addVectorToPoint(origin,extendVector(5+further,perpendicularVectorXZ({x: -1, z:  1},originOffset,origin)));
 	}
 
 	this.buildLinePointsRight = function(origin,originOffset){

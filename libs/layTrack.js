@@ -12,11 +12,14 @@
   m['m_tra_lay'].onclickEvent = function(menu, clicked){
     if(clicked == 1){
 
+      layTrack.addSpotToScene(new THREE.Vector3(0,0,0));
+
       layTrack.firstClick = 1;
       layTrack.trackPreLine.part = 'init';
 
       var j = layTrack.trackPreLine.children.length;
       while (j--){
+        if(layTrack.trackPreLine.children[j] == undefined) continue;
         //layTrack.trackPreLine.children[j].material = this.trackPreLine.blinemat2;//.color.setHex(0x2222aa);
         var k = layTrack.trackPreLine.children[j].geometry.vertices.length
         while(k--){
@@ -25,7 +28,6 @@
         }
         scene.add(layTrack.trackPreLine.children[j]);
       }
-
     }
     else{
       console.log('here yep',clicked)
@@ -156,6 +158,20 @@
 
     this.trackPreLine.temp = new THREE.Line( this.lgeom, this.trackPreLine.blinemat)
     scene.add(this.trackPreLine.temp);
+  }
+
+  this.addSpotToScene = function(point){
+    console.log('Called called');
+    var geometry = new THREE.TorusGeometry(10, 5, 5, 12);
+    var material = new THREE.MeshBasicMaterial( { color: 0x2222bb, side: THREE.DoubleSide } );
+    var mesh = new THREE.Mesh( geometry, material );
+    mesh.rotation.set(Math.PI/2, 0, 0)
+    mesh.position.x = point.x
+    mesh.position.z = point.z
+    mesh.position.y = point.y + 5
+
+    scene.add( mesh );
+    return mesh;
   }
 
 })();

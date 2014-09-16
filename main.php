@@ -70,7 +70,7 @@
       }
       render();
 
-      /*var dispObjects = [];
+      var dispObjects = [];
       var demObjs = function(){
         i = dispObjects.length;
         while( i > 0){
@@ -100,7 +100,7 @@
         }
         setTimeout(demObjs,10000);
       };
-      demObjs();*/
+      demObjs();
     </script>
   </div>
   <?php include('libs/html/addTrain.php')?>

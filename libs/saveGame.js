@@ -48,8 +48,10 @@ var saveGame = new (function(){
       building: []
     };
 
-    for(var i = 0; i < tree.trees.length; i++)
+    for(var i = 0; i < tree.trees.length; i++){
       data.tree.push({x: tree.trees[i].Mesh.position.x, z: tree.trees[i].Mesh.position.z});
+      rederer.redner();
+    }
 
     for(var i = 0; i < trackPoints.length; i++)
       data.track.push(
@@ -72,7 +74,7 @@ var saveGame = new (function(){
           z: building.building[i].position.z,
           height: building.building[i].buildingHeight,
           rotY: building.building[i].rotation.y
-        })
+        });
 
     console.log('save data',data);
 
@@ -116,6 +118,7 @@ var saveGame = new (function(){
       }
 
       for(var i = 0; i < gameLoadData.track.length; i += 2){
+        //if(i > 14) die();
         layTrack.trackPreLine.curSeg++;
         var p1 = new THREE.Vector3(gameLoadData.track[i].x,   findY(gameLoadData.track[i].x,  gameLoadData.track[i].z),  gameLoadData.track[i].z);
         var p3 = new THREE.Vector3(gameLoadData.track[i+1].x, findY(gameLoadData.track[i+1].x,gameLoadData.track[i+1].z),gameLoadData.track[i+1].z);

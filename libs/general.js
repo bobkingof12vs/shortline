@@ -1,22 +1,22 @@
 function angleBetweenVectors(a,b,o){
 
   if (o == undefined) {
-    o = new THREE.Vector3(0,0,0);
+    var o = new THREE.Vector3(0,0,0);
   }
   else {
-    a = new THREE.Vector3 (a.x - o.x, a.y - o.y, a.z - o.z)
-    b = new THREE.Vector3 (b.x - o.x, b.y - o.y, b.z - o.z)
+    var a = new THREE.Vector3 (a.x - o.x, a.y - o.y, a.z - o.z)
+    var b = new THREE.Vector3 (b.x - o.x, b.y - o.y, b.z - o.z)
   }
 
-  dotAB = a.dot(b)
+  var dotAB = a.dot(b)
 
-  magA = o.distanceTo(a);
-  magB = o.distanceTo(b);
+  var magA = o.distanceTo(a);
+  var magB = o.distanceTo(b);
   if (magA == 0 | magB == 0) {
     //console.log('0 distance found in angleBetweenVectors');
     return 0;
   }
-  val = Math.round(dotAB/(magA * magB)*1000)/1000;
+  var val = Math.round(dotAB/(magA * magB)*1000)/1000;
   return (Math.acos(val))*(180/Math.PI);
 }
 
@@ -27,8 +27,8 @@ function yAngleOfLine(a,b){
 
 function angleBetweenFlattenedVectors(a,b,o){
   if (o != undefined) {
-    a = new THREE.Vector3 (a.x - o.x, 0, a.z - o.z)
-    b = new THREE.Vector3 (b.x - o.x, 0, b.z - o.z)
+    var a = new THREE.Vector3 (a.x - o.x, 0, a.z - o.z)
+    var b = new THREE.Vector3 (b.x - o.x, 0, b.z - o.z)
   }
 
   return angleBetweenVectors(
@@ -45,8 +45,8 @@ function lerp1(p1,p2,t){
 }
 
 function lerp(p1,p2,p3,p4,t){
-  p5 = lerp1(p1,p2,t);
-  p6 = lerp1(p3,p4,t);
+  var p5 = lerp1(p1,p2,t);
+  var p6 = lerp1(p3,p4,t);
   return lerp1(p5,p6,t);
 }
 
@@ -80,29 +80,29 @@ function lineLineIntersect(m1,b1,m2,b2) {
 }
 
 function gridPointsOnLine(gridSize, p1, p2) {
-  gridsize = gridSize/2
+  var gridsize = gridSize/2
   if (p1.x == p2.x & p1.z == p2.z) {return p1;}
 
-  mx = maxX = p1.x >= p2.x ? p1.x : p2.x;
-  mz = maxZ = p1.z >= p2.z ? p1.z : p2.z;
+  var mx = maxX = p1.x >= p2.x ? p1.x : p2.x;
+  var mz = maxZ = p1.z >= p2.z ? p1.z : p2.z;
 
-  minX = p1.x < p2.x ? p1.x : p2.x;
-  minZ = p1.z < p2.z ? p1.z : p2.z;
+  var minX = p1.x < p2.x ? p1.x : p2.x;
+  var minZ = p1.z < p2.z ? p1.z : p2.z;
 
-  m1 = -1;
-  m2 = ((p2.z-p1.z)/(p2.x-p1.x));
+  var m1 = -1;
+  var m2 = ((p2.z-p1.z)/(p2.x-p1.x));
 
-  newPoints = [];
+  var newPoints = [];
   newPoints.push(recalcY(p1));
   if (maxX - gridSize > minX) {
     while(maxX > minX){
 
-      tempx = Math.floor(maxX/gridSize)*gridSize;
-      tempz = (m2*(tempx-p2.x))+p2.z;
+      var tempx = Math.floor(maxX/gridSize)*gridSize;
+      var tempz = (m2*(tempx-p2.x))+p2.z;
 
-      b1 = (Math.ceil(minZ/100)*100)-(m1*tempx);
-      b2 = p2.z-(m2*p2.x);
-      np = lineLineIntersect(m1,b1,m2,b2);
+      var b1 = (Math.ceil(minZ/100)*100)-(m1*tempx);
+      var b2 = p2.z-(m2*p2.x);
+      var np = lineLineIntersect(m1,b1,m2,b2);
       if (np.y != -1 & mx > np.x & minX < np.x & mz > np.z & minZ < np.z)
         {newPoints.push(new THREE.Vector3(np.x,findY(np.x,np.z)+8,np.z));}
 
@@ -115,12 +115,12 @@ function gridPointsOnLine(gridSize, p1, p2) {
   }
   if (maxZ - gridSize > minZ) {
     while(maxZ > minZ){
-      tempz = Math.floor(maxZ/gridSize)*gridSize;
-      tempx = ((tempz-p2.z)/m2)+p2.x
+      var tempz = Math.floor(maxZ/gridSize)*gridSize;
+      var tempx = ((tempz-p2.z)/m2)+p2.x
 
-      b1 = tempz-(m1*(Math.ceil(minX/100)*100));
-      b2 = p2.z-(m2*p2.x);
-      np = lineLineIntersect(m1,b1,m2,b2);
+      var b1 = tempz-(m1*(Math.ceil(minX/100)*100));
+      var b2 = p2.z-(m2*p2.x);
+      var np = lineLineIntersect(m1,b1,m2,b2);
       if (np.y != -1 & mx > np.x & minX < np.x & mz > np.z & minZ < np.z)
         {newPoints.push(new THREE.Vector3(np.x,findY(np.x,np.z)+5,np.z));}
 
