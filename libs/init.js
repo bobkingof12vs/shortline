@@ -8,7 +8,7 @@ var globalMesh = [];
 var id = -1;
 var mouse = {};
 var click = 0;
-var zoom = .5;
+var zoom = 5;
 
 //initialize Three.js
 
@@ -70,7 +70,7 @@ console.log("'line'",line);
 var pm = new THREE.MeshLambertMaterial( {vertexColors: THREE.FaceColors} );
 pm.color.setHex(0x227733);
 plane = new THREE.Mesh(planeGeometry,pm);
-//plane.receiveShadow = true;
+plane.receiveShadow = true;
 //plane.castShadow = true;
 group.add(plane);
 console.log("'plane'",plane);

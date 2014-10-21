@@ -194,6 +194,9 @@ m['m_sav'] = makeMenu('Save Game', 'm_sav', 'main',8);
 m['m_ter_raise'] = makeMenu('Raise Ground', 'm_ter_raise', 'm_ter',1);
 m['m_ter_lower'] = makeMenu('Lower Ground', 'm_ter_lower', 'm_ter',2);
 
+m['m_tre_one'] =  makeMenu('One Tree', 'm_tre_one', 'm_tre',1);
+m['m_tre_five'] =  makeMenu('Five trees', 'm_tre_five', 'm_tre',2);
+
 //m['m_tra_lay'] = makeMenu('Lay Track', 'm_tra_lay', 'm_tra',1);
 //m['m_tra_remove'] = makeMenu('Remove Track', 'm_tra_remove', 'm_tra',2);
 

@@ -370,6 +370,15 @@ trackFunc = function(){
 			if(secIds.length <= 1) // && equalXZ(this.sections[0].points[0], this.sections[i].points[this.sections[i].points.length - 1]) != 1)
 				continue;
 
+			if (this.switches[switchId] != undefined){
+				if(this.switches[switchId].line != undefined)
+					for(var j = 0; j < this.switches[switchId].line.length; j++)
+						scene.remove(this.switches[switchId].line[j]);
+
+				if(this.switches[switchId].throwObjs != undefined)
+					for(var j = 0; j < this.switches[switchId].throwObjs.length; j++)
+						scene.remove(this.switches[switchId].throwObjs[j]);
+			}
 
 			this.switches[switchId] = {
 				type: 'switch',
@@ -467,7 +476,7 @@ trackFunc = function(){
 							var mPoint = track.switches[switchId].origin;
 
 							var geom = new THREE.Geometry();
-							for(var k = 0; k <= 1; k += .05){
+							for(var k = 0; k <= .4; k += .05){
 								var a = recalcY(lerp(sPoint,mPoint,mPoint,ePoint,k),4.1);
 								var b = recalcY(lerp(sPoint,mPoint,mPoint,ePoint,k+.001),4.1);
 								geom.vertices.push(track.buildLinePointsLeft(a,b,-1));

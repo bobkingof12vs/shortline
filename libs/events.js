@@ -36,6 +36,7 @@ document.addEventListener( 'mousemove', function (e){
     mouseInMenu = 0;
     getMouseIntersect(mouse, [plane],function(i){
       if(m['m_bld'].clicked == 1){building.processBuildingMove(i[0].point);}
+      //if(m['m_tre'].clicked == 1){tree.moveCircle(i[0].point);}
     });
   }
   else{
@@ -57,7 +58,8 @@ document.addEventListener( 'mousedown', function (e){
       if(m['m_ter_raise'].clicked == 1){raiseLowerTerrain(i,+10);}
       if(m['m_ter_lower'].clicked == 1){raiseLowerTerrain(i,-10);}
       if(m['m_tra_lay'].clicked == 1 ){layTrack.processClick(i);}
-      if(m['m_tre'].clicked == 1){tree.onclickAddTree(i[0].point);}
+      if(m['m_tre_one'].clicked == 1){tree.onclickAddTree(i[0].point);}
+      if(m['m_tre_five'].clicked == 1){tree.onclickAddManyTrees(5,i[0].point);}
       if(m['m_bld'].clicked == 1){building.processBuildingClick(i[0].point);}
     });
 

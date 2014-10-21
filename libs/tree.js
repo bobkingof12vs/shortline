@@ -66,7 +66,7 @@ treeFunc = function(){
         originStart.y + (r*(originEnd.y - originStart.y)),
         originStart.z + (r*(originEnd.z - originStart.z))
       );
-      var opts = {minLength: thickness, rotation: Math.PI/3};
+      var opts = {minLength: thickness, rotation: Math.PI/9};
 
       twigs.push({
         start: newStart,
@@ -108,9 +108,58 @@ treeFunc = function(){
     return branches;
   }
 
+  this.smallerDist = function(o,a,b){
+    var u = o.distanceTo(a);
+    var v = o.distanceTo(b);
+    if(u <= v)
+      return{dist: u, p: a}
+    else
+      return{dist: v, p: b}
+  }
+
+  this.getNewLeaves = function(treeId){
+
+    var sphereGeom = new THREE.SphereGeometry(this.trees[treeId].height+150,8,7)
+
+    var curBranches = this.trees[treeId].branch;
+
+    var i = sphereGeom.vertices.length
+    while(i > 0){
+      i--;
+      var thickness = 5;
+      var j = curBranches.length - 1;
+      var minLen = this.smallerDist(sphereGeom.vertices[i],curBranches[j].start,curBranches[j].end)
+      while(j > 0){
+        j--;
+        for(var k = 0; k < curBranches[j].twigs.length;k++){
+          var nextTest = this.smallerDist(sphereGeom.vertices[i],curBranches[j].twigs[k].start,curBranches[j].twigs[k].end);
+          if (nextTest.dist < minLen.dist){
+            minLen = nextTest;
+            var thickness = curBranches[j].thickness + 1;
+          }
+        }
+      }
+      var winner = lerp1(minLen.p, sphereGeom.vertices[i], (thickness/minLen.dist))
+      sphereGeom.vertices[i].x = winner.x;
+      sphereGeom.vertices[i].y = winner.y;
+      sphereGeom.vertices[i].z = winner.z;
+    }
+    sphereGeom.vericesNeedUpdate = true;
+    sphereGeom.mergeVertices();
+    sphereGeom.computeVertexNormals()
+    for(var i = 0; i < sphereGeom.faces.length; i++)
+      sphereGeom.faces[i].color.setHex( 0x1B6F1B);
+
+    return new THREE.Mesh(
+      sphereGeom,
+      new THREE.MeshLambertMaterial({vertexColors: THREE.FaceColors, receiveShadow: true, castSahdow: true, shading: THREE.SmoothShading, wireframe: false})
+    );
+  }
+
   this.addTree = function(height, numBreaks, thickness){
     treeId = this.trees.length;
     this.trees.push({
+      height: height,
       branch: [{
         start: new THREE.Vector3(0,0,0),
         end: new THREE.Vector3(0,height,0),
@@ -120,15 +169,28 @@ treeFunc = function(){
       color: {
         leaf: 'green',
         trunk: 'brown'
-      }
+      },
+      object: new THREE.Object3D()
     });
     opts = {};
     this.trees[treeId].branch = this.trees[treeId].branch.concat(this.limb(this.trees[treeId].branch[0], numBreaks, thickness, opts));
-
+    this.trees[treeId].object.children.push(new THREE.Mesh(
+      new THREE.CylinderGeometry(3, 3, 25),
+      new THREE.MeshBasicMaterial({color: 0x603000})
+    ))
+    this.trees[treeId].object.children.push(this.getNewLeaves(treeId));
     return treeId;
   }
 
   this.addTreeToScene = function(treeId,x,z){
+    console.log(this.trees[treeId].object);
+    this.trees[treeId].object.children[0].position.set(x,findY(x,z)+12.5,z);
+    this.trees[treeId].object.children[1].position.set(x,findY(x,z)+25,z);
+    this.trees[treeId].object.children[1].scale.set(3,3,3);
+    scene.add(this.trees[treeId].object);
+  }
+
+  this.addBranchesToScene = function(treeId,x,z){
     var branchGeom = new THREE.Geometry();
     var twigGeom = new THREE.Geometry();
     //var leavesGroup  = new THREE.Object3D();
@@ -167,11 +229,16 @@ treeFunc = function(){
     this.trees[treeId].Mesh.scale.y = 6;
     this.trees[treeId].Mesh.scale.z = 6;
     scene.add(this.trees[treeId].Mesh);
-    console.log(tree)
   }
 
   this.onclickAddTree = function(i){
-    this.addTreeToScene(this.addTree(10,5,5),i.x,i.z)
+    this.addTreeToScene(this.addTree(8,4,4),i.x,i.z)
+    //this.addBranchesToScene(this.addTree(10,5,5),i.x,i.z)
+  }
+  this.onclickAddManyTrees = function(lmh, i){
+    this.addTreeToScene(this.addTree(8,5,5),i.x,i.z)
+    while(lmh--)
+      this.addTreeToScene(this.addTree(8,5,5),i.x+((Math.random()*200)-100),i.z+((Math.random()*200)-100));
   }
 }
 
