@@ -15,6 +15,7 @@ m['m_sav'].onclickEvent = function(menuItem,clicked){
 }
 
 var saveGame = new (function(){
+  this.loaded = false;
   this.CORSRequest = function(method, url, callback, data) {
     var xhr = new XMLHttpRequest();
     if ("withCredentials" in xhr) {
@@ -48,10 +49,8 @@ var saveGame = new (function(){
       building: []
     };
 
-    for(var i = 0; i < tree.trees.length; i++){
-      data.tree.push({x: tree.trees[i].Mesh.position.x, z: tree.trees[i].Mesh.position.z});
-      rederer.redner();
-    }
+    for(var i = 0; i < tree.trees.length; i++)
+      data.tree.push({x: tree.trees[i][0].position.x, z: tree.trees[i][0].position.z});
 
     for(var i = 0; i < trackPoints.length; i++)
       data.track.push(
@@ -81,7 +80,7 @@ var saveGame = new (function(){
     var form = new FormData();
     form.append('data', JSON.stringify(data));
 
-    var saveURL = 'http://98.165.216.50:33033/shortline/trainserver/db.php?email='+email+'&type=add';
+    var saveURL = 'http://24.56.23.241:33033/shortline/trainserver/db.php?email='+email+'&type=add';
     var xhr = this.CORSRequest('POST', saveURL, function(response){
       alert("saveid: "+response);
       m['m_sav'].e.click();
@@ -91,19 +90,23 @@ var saveGame = new (function(){
   this.load = function(id){
     if(id != parseInt(id)){
       console.log('no Id given, game not loaded', id, parseInt(id))
+      this.loaded = true;
       return;
     }
 
-    var loadURL = 'http://98.165.216.50:33033/shortline/trainserver/db.php?id='+id+'&type=get';
+    var loadURL = 'http://24.56.23.241:33033/shortline/trainserver/db.php?id='+id+'&type=get';
     var xhr = this.CORSRequest('GET', loadURL, function(response){
-      var gameLoadData = JSON.parse(response);
+      gameLoadData = JSON.parse(response);
 
+      console.log('load save game: land');
       for(var i = 0; i < gameLoadData.land.length; i++)
         loadTerrain(gameLoadData.land[i]);
 
+      console.log('load save game: tree');
       for(var i = 0; i < gameLoadData.tree.length; i++)
         tree.onclickAddTree(gameLoadData.tree[i]);
 
+      console.log('load save game: building');
       for(var i = 0; i < gameLoadData.building.length; i++){
         building.curBuildingId++;
         building.building[building.curBuildingId] = worldObj[gameLoadData.building[i].name].newMesh();
@@ -117,6 +120,7 @@ var saveGame = new (function(){
         scene.add(building.building[building.curBuildingId]);
       }
 
+      console.log('load save game: track');
       for(var i = 0; i < gameLoadData.track.length; i += 2){
         //if(i > 14) die();
         layTrack.trackPreLine.curSeg++;
@@ -129,14 +133,26 @@ var saveGame = new (function(){
         loadLine.vertices = gridPointsOnLine(100,p1,p3);
         lineGeometry.computeLineDistances();
         layTrack.trackPreLine.children[layTrack.trackPreLine.curSeg] = new THREE.Line(loadLine, layTrack.trackPreLine.blinemat);
+
+        trackPoints.push({
+          p1: p1,
+          p2: midpoint(p1,p2),
+          p3: p3
+        });
+
+        layTrack.trackPreLine.curSeg--;
+
       }
-      layTrack.trackPreLine.curSeg--;
 
-      //scene.remove(layTrack.trackPreLine.temp)
-
-       console.log('game loaded',gameLoadData);
+      console.log('Save Loaded');
+      saveGame.loaded = true;
     });
+
+    //scene.remove(layTrack.trackPreLine.temp)
+
+     //console.log('game loaded',gameLoadData);
   }
+
 
 
 })();

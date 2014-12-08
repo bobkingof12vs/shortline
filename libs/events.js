@@ -1,15 +1,25 @@
 
 //---Events---//
-
+var middleButtonDown = false;
 renderer.domElement.addEventListener( 'mousewheel', function( event ) {
   event.preventDefault();
   event.stopPropagation();
 
-  var delta = 0;
-  delta = event.wheelDelta * .001;
-  if (((zoom + delta > .5) & delta < 0) | ((zoom + delta < 20) & delta > 0)) {
-    zoom += delta;
-  }
+  if(middleButtonDown) return;
+
+  var speed = .0001;
+  var deltaY = event.wheelDelta * speed;
+  var deltaX = event.wheelDeltaX * speed;
+
+  controls.rotateLeft( deltaX * Math.PI);
+
+  if(event.shiftKey & deltaY > 0)
+    controls.rotateUp(deltaY * Math.PI);
+  else if(event.shiftKey & deltaY < 0)
+    controls.rotateUp(deltaY * Math.PI);
+
+  if (!event.shiftKey & (((zoom + deltaY > .5) & deltaY < 0) | ((zoom + deltaY < 20) & deltaY > 0)))
+    zoom += deltaY * 10;
 
   camera.left = window.innerWidth / -zoom;
   camera.right = window.innerWidth / zoom;
@@ -44,17 +54,23 @@ document.addEventListener( 'mousemove', function (e){
   }
 });
 
-
+document.addEventListener( 'mouseup', function (e){
+    middleButtonDown = false;
+});
 
 document.addEventListener( 'mousedown', function (e){
   mouse.x = e.clientX;
   mouse.y = e.clientY;
+
+  if(e.button != undefined && e.button == 1)
+    middleButtonDown = true
+
   if (mouseInMenu == 0) {
 
     //terrain
-    console.log(plane);
+    //console.log(plane);
     getMouseIntersect(mouse, [plane],function(i){
-      console.log("'intersect'",i);
+      //console.log("'intersect'",i);
       if(m['m_ter_raise'].clicked == 1){raiseLowerTerrain(i,+10);}
       if(m['m_ter_lower'].clicked == 1){raiseLowerTerrain(i,-10);}
       if(m['m_tra_lay'].clicked == 1 ){layTrack.processClick(i);}
@@ -64,8 +80,10 @@ document.addEventListener( 'mousedown', function (e){
     });
 
     //trackswitches
-    console.log(track.throws);
+    //console.log(track.throws);
     getMouseIntersect( mouse, track.throws, getThrows);
 
   }
+  //e.preventDefault();
+  //e.stopPropagation();
 }, false );

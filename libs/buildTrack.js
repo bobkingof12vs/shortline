@@ -147,7 +147,7 @@ trackFunc = function(){
 
 	this.newSec = function(p1,p2,p3,segId){
 		var secLen = this.sections.length;
-		console.log(secLen);
+		//console.log(secLen);
 		this.sections.push({
 			id: secLen,
 			points:[p1,p2,p3],
@@ -219,7 +219,16 @@ trackFunc = function(){
 
 		var secId = this.findSegInSec(segId);
 		var splitPointPre = this.findPointInSec(p1,secId)
-		if(splitPointPre.length >= 2) console.error(segId,p1,'splitSec found a split point with more than one section, continuing');
+		if(splitPointPre.length >= 2)
+			for(var i = 0; i < splitPointPre.length; i++)
+				if(splitPointPre[i].pointId == 0 | splitPointPre[i].pointId == this.sections[secId].points.length - 1)
+					splitPointPre.splice(i,1);
+
+		if(splitPointPre.length == 0)
+			return
+		if(splitPointPre.length == 2)
+			console.error(secId, splitPointPre, "error, 2 points found. ")
+
 		var splitPoint = splitPointPre[0].pointId;
 
 		/*var isSelfEnclosed = false;
@@ -231,10 +240,10 @@ trackFunc = function(){
 			isSelfEnclosed = true;
 		}*/
 
-		if (splitPoint == 0 | splitPoint == this.sections[secId].points.length) {
+		if (splitPoint == 0 | splitPoint == this.sections[secId].points.length - 1)
 			return
-		}
-		console.log('splitting section, secId',secId)
+
+		//console.log('splitting section, secId',secId)
 
 		firstHalfPoints = this.sections[secId].points.splice(0,splitPoint+1);
 		secondHalfPoints = this.sections[secId].points;
@@ -256,10 +265,10 @@ trackFunc = function(){
 
 		/*if(isSelfEnclosed){
 			if(equalXZ(p1,this.sections[secId].ends[0].origin) == 1){
-				console.log('self enclosed, but already happy')
+				//console.log('self enclosed, but already happy')
 			}
 			else{
-				console.log('not happy');
+				//console.log('not happy');
 			}
 		}*/
 
@@ -288,13 +297,13 @@ trackFunc = function(){
 
 	this.switchTestBoxes = [];
 	this.updateSwitchBoxes = function(){
-		console.log('got called')
+		//console.log('got called')
 		for(i = 0; i < track.switches.length; i++){
 			if(this.switches[i] != undefined && track.switches[i] != null){
 				if(this.switchTestBoxes[i] == undefined) this.switchTestBoxes[i] = [];
-				console.log(this.switchTestBoxes[i])
+				//console.log(this.switchTestBoxes[i])
 				for(j = 0; j < track.switches[i].secIds.length; j++){
-					console.log(j)
+					//console.log(j)
 					if(this.switchTestBoxes[i][j] == undefined){
 
 						this.switchTestBoxes[i][j] = testCube(this.getThrowPoint(i,this.switches[i].secIds[j],this.switches[i].segIds[j]));
@@ -328,7 +337,7 @@ trackFunc = function(){
 		while(i > 0){
 			i--;
 			if(this.switches[switchId].secIds[i] == secId && this.switches[switchId].segIds[i] == segId){
-				console.log('targetId',this.switches[switchId].target[i])
+				//console.log('targetId',this.switches[switchId].target[i])
 				return this.switches[switchId].target[i];
 			}
 		}
@@ -406,7 +415,7 @@ trackFunc = function(){
 				this.switches[switchId].throwObjs.push(null);
 			}
 
-			console.log('***switch',p1);
+			//console.log('***switch',p1);
 			var newSegArray = []
 			var i = -1;
 			var lim = this.switches[switchId].segIds.length - 1;
@@ -469,7 +478,7 @@ trackFunc = function(){
 							var eTarget = track.switches[switchId].target[curId];
 							var mat = new THREE.LineBasicMaterial( { color: 0x7777777, linewidth: 3, transparent: true } );
 
-							console.log(eTarget)
+							//console.log(eTarget)
 
 							var sPoint = track.switches[switchId].points[curId];
 							var ePoint = track.switches[switchId].connectsTo[curId][eTarget].point;
@@ -507,12 +516,12 @@ trackFunc = function(){
 
 					/*Function(
 						'if('+this.switches[switchId].throwObjs[i].id+' != track.switches['+switchId+'].throwObjs['+i+'].id) return;'+
-						'console.log("herehere",track.switches['+switchId+'].target['+i+'],'+i+','+switchId+');'+
+						'//console.log("herehere",track.switches['+switchId+'].target['+i+'],'+i+','+switchId+');'+
 						'track.switches['+switchId+'].target['+i+']++;'+
-						'console.log("herehere",track.switches['+switchId+'].target['+i+'],'+i+','+switchId+');'+
+						'//console.log("herehere",track.switches['+switchId+'].target['+i+'],'+i+','+switchId+');'+
 						'if(track.switches['+switchId+'].target['+i+'] == track.switches['+switchId+'].connectsTo['+i+'].length){'+
 							'track.switches['+switchId+'].target['+i+'] = 0;'+
-						'}'+'console.log("herehere",track.switches['+switchId+'].target['+i+'],'+i+');'+
+						'}'+'//console.log("herehere",track.switches['+switchId+'].target['+i+'],'+i+');'+
 						'track.updateSwitchBoxes()'
 					)*/
 					this.throws[this.switches[switchId].throwObjs[i].id] = this.switches[switchId].throwObjs[i];
@@ -522,7 +531,7 @@ trackFunc = function(){
 			}
 
 			if(this.switches[switchId].secIds.length == 1){
-				console.error('it happened here');
+				//console.error('it happened here');
 			}
 		}
 	}
@@ -549,7 +558,7 @@ trackFunc = function(){
 					while (j > 0){
 						j--;
 						if(equalXZ(this.sections[i].points[j],p1) == 1) {
-							console.log('1',{secId: i, pointId: j})
+							//console.log('1',{secId: i, pointId: j})
 							ret.push({secId: i, pointId: j});
 						}
 					}
@@ -562,66 +571,66 @@ trackFunc = function(){
 				while (j > 0){
 					j--;
 					if(equalXZ(this.sections[secId].points[j],p1) == 1) {
-						console.log('2',{secId: secId, pointId: j})
+						//console.log('2',{secId: secId, pointId: j})
 						ret.push({secId: secId, pointId: j});
 					}
 				}
 			}
 		}
-		console.log(ret != [] ? ret : false)
+		//console.log(ret != [] ? ret : false)
 		return ret != [] ? ret : false;
 	}
 
 	this.addToSection = function(p1,p2,p3){
-		console.log('blink');
+		//console.log('blink');
 		pointsP1 = this.findMatchInTrackPoints(p1);
 		pointsP3 = this.findMatchInTrackPoints(p3);
-		console.log('p1p3',pointsP1,pointsP3)
+		//console.log('p1p3',pointsP1,pointsP3)
 		if (pointsP1.length == 0) {
 			//point connects to nothing thus a new section
 			if (pointsP3.length == 0) {
-				console.log('point connects to nothing thus a new new section');
+				//console.log('point connects to nothing thus a new new section');
 				var secId = this.newSec(p1,p2,p3,this.segments.length);
 				this.newEnd(p1,secId);
 				this.newEnd(p3,secId);
 				//this.rebuildEnds([secId]);
 			}
 			else if (pointsP3.length == 1) {
-				console.log('point connects to an existing end and is a new end');
+				//console.log('point connects to an existing end and is a new end');
 				this.connectTo(p3,p2,p1,pointsP3[0],this.segments.length);
 				secId = this.findSegInSec(pointsP3[0]);
 				//this.rebuildEnds([secId]);
 			}
 			else if (pointsP3.length == 2) {
-				console.log('point splits an existing section and is a new switch and is a new end');
+				//console.log('point splits an existing section and is a new switch and is a new end');
 				var secId = this.newSec(p3,p2,p1,this.segments.length);
 				this.splitSec(pointsP3[1],p3,this.segments.length);
 				this.newEnd(p1,secId);
 				this.switchByPoint(p3,p2);
 			}
 			else if (pointsP3.length >= 3) {
-				console.log('point connects to existing switch and is a new end');
+				//console.log('point connects to existing switch and is a new end');
 				var secId = this.newSec(p1,p2,p3,this.segments.length);
 				this.newEnd(p1,secId);
 				//this.addToSwitch(p3,p2,this.segments.length);
 				this.switchByPoint(p3,p2);
 			}
 			else{
-				console.log('no match 0',this.segments.length);
+				//console.log('no match 0',this.segments.length);
 			}
 		}
 		else if (pointsP1.length == 1) {
-			console.log('point connects to an existing end');
+			//console.log('point connects to an existing end');
 			if (pointsP3.length == 0) {
-				console.log('and is a new end');
+				//console.log('and is a new end');
 				secId = this.findSegInSec(pointsP1[0]);
 				this.connectTo(p1,p2,p3,pointsP1[0],this.segments.length);
 			}
 			else if (pointsP3.length == 1) {
-				console.log('point connects to two existing ends');
+				//console.log('point connects to two existing ends');
 				var secId = this.findSegInSec(pointsP1[0]);
 				if (secId == this.findSegInSec(pointsP3[0])) {
-					console.log('self enclosed loop found');
+					//console.log('self enclosed loop found');
 					this.connectTo(p1,p2,p3,pointsP1[0],this.segments.length);
 					//this.splitSec(secId, (this.sections[secId].points[Math.floor(this.sections[secId].points.length/2)]));
 					this.switchByPoint(p3,p2);
@@ -634,7 +643,7 @@ trackFunc = function(){
 				}
 			}
 			else if (pointsP3.length == 2) {
-				console.log('point splits existing section and connects to a new switch and existing section');
+				//console.log('point splits existing section and connects to a new switch and existing section');
 				this.splitSec(pointsP3[1],p3);
 				this.connectTo(p1,p2,p3,pointsP1[0],this.segments.length);
 				//this.removeEnd(p1);
@@ -642,21 +651,21 @@ trackFunc = function(){
 				this.switchByPoint(p3,p2);
 			}
 			else if (pointsP3.length >= 3) {
-				console.log('point connects exitsting segment to existing switch');
+				//console.log('point connects exitsting segment to existing switch');
 				this.connectTo(p1,p2,p3,pointsP1[0],this.segments.length);
 				this.removeEnd(p1);
 				//this.addToSwitch(p3,p2,this.segments.length);
 				this.switchByPoint(p3,p2);
 			}
 			else{
-				console.log('no match 1',this.segments.length);
+				//console.log('no match 1',this.segments.length);
 			}
 		}
 		else if (pointsP1.length == 2) {
 			//point is a new switch
 			if (pointsP3.length == 0) {
-				console.log('and is a new segment and a new end');
-				//die();console.error('D -=>')
+				//console.log('and is a new segment and a new end');
+				//die();//console.error('D -=>')
 				//if(this.findSegInSec(pointsP1[0]) == this.findSegInSec(pointsP1[1]))
 					this.splitSec(pointsP1[1],p1,this.segments.length);
 
@@ -668,14 +677,14 @@ trackFunc = function(){
 				//this.newSwitch(p1,p2,pointsP1[0],pointsP1[1],this.segments.length);
 			}
 			else if (pointsP3.length == 1) {
-				console.log('point connects existing segement to a new switch');
+				//console.log('point connects existing segement to a new switch');
 				this.splitSec(pointsP1[1],p1,this.segments.length);
 				this.connectTo(p3,p2,p1,pointsP3[0],this.segments.length);
 				this.removeEnd(p1);
 				//this.newSwitch(p1,p2,pointsP1[0],pointsP1[1],this.segments.length);
 			}
 			else if (pointsP3.length == 2) {
-				console.log('point connects new switch to a new switch');
+				//console.log('point connects new switch to a new switch');
 				var secId = this.newSec(p1,p2,p3,this.segments.length);
 				this.splitSec(pointsP1[1],p1,this.segments.length);
 				this.splitSec(pointsP3[1],p3,this.segments.length);
@@ -684,7 +693,7 @@ trackFunc = function(){
 				//this.newSwitch(p1,p2,pointsP1[0],pointsP1[1],this.segments.length);
 			}
 			else if (pointsP3.length >= 3) {
-				console.log('point connects an existing switch to existing switch');
+				//console.log('point connects an existing switch to existing switch');
 				var secId = this.newSec(p1,p2,p3,this.segments.length);
 				this.splitSec(pointsP1[1],p1,this.segments.length);
 				//this.newSwitch(p1,p2,pointsP1[0],pointsP1[1],this.segments.length);
@@ -692,23 +701,23 @@ trackFunc = function(){
 				this.switchByPoint(p3,p2);
 			}
 			else{
-				console.log('no match 2',this.segments.length);
+				//console.log('no match 2',this.segments.length);
 			}
 			this.switchByPoint(p1,p2);
 		}
 		else if (pointsP1.length >= 3) {
 			//point connects to existing switch
 			if (pointsP3.length == 0) {
-				console.log('and is a new segment and a new end');
+				//console.log('and is a new segment and a new end');
 				var secId = this.newSec(p1,p2,p3,this.segments.length);
 				this.newEnd(p3,secId);
 			}
 			else if (pointsP3.length == 1) {
-				console.log('point connects and existing switch to an existing end');
+				//console.log('point connects and existing switch to an existing end');
 				this.connectTo(p3,p2,p1,pointsP3[0],this.segments.length);
 			}
 			else if (pointsP3.length == 2) {
-				console.log('notpushed','32');
+				//console.log('notpushed','32');
 				var secId = this.newSec(p1,p2,p3,this.segments.length);
 				this.splitSec(pointsP3[1],p3);
 				//.newSwitch(p3,p2,pointsP3[0],pointsP3[1],this.segments.length);
@@ -716,19 +725,19 @@ trackFunc = function(){
 				this.switchByPoint(p3,p2);
 			}
 			else if (pointsP3.length >= 3) {
-				console.log('point connects an existing switch to existing switch');
+				//console.log('point connects an existing switch to existing switch');
 				var secId = this.newSec(p1,p2,p3,this.segments.length);
 				//this.addToSwitch(p3,p2,this.segments.length);
 				//this.addToSwitch(p1,p2,this.segments.length);
 				this.switchByPoint(p3,p2);
 			}
 			else{
-				console.log('no match 3',this.segments.length);
+				//console.log('no match 3',this.segments.length);
 			}
 			this.switchByPoint(p1,p2);
 		}
 		else{
-			console.log('no match -1',this.segments.length);
+			//console.log('no match -1',this.segments.length);
 		}
 
 		var segIdNext = this.segments.length;
@@ -933,14 +942,14 @@ trackFunc = function(){
 					var newY =  findY(this.switches[i].throwObjs[j].geometry.origin.x,this.switches[i].throwObjs[j].geometry.origin.z);
 					var diffY = newY - this.switches[i].throwObjs[j].geometry.origin.y;
 					if ( diffY != 0) {
-						console.log('ny',newY,diffY)
+						//console.log('ny',newY,diffY)
 						this.switches[i].throwObjs[j].translateY(diffY);
 						this.switches[i].throwObjs[j].geometry.origin.y = newY;
 						this.switches[i].throwObjs[j].verticesNeedUpdate = true;
 					}
 				}
 				else{
-					console.log('null found',i,j)
+					//console.log('null found',i,j)
 				}
 			}
 		}
@@ -948,16 +957,16 @@ trackFunc = function(){
 }
 
 track = new trackFunc
-console.log('track',track);
+//console.log('track',track);
 
 
 function getThrows( intersects ) {
-	console.log('numIntersected',intersects)
+	//console.log('numIntersected',intersects)
 	var i = intersects.length
 	while ( i > 0 ) {
 		i--;
 		if (intersects[i].object.clickCall != undefined) {
-			console.log(intersects[i].object.id)
+			//console.log(intersects[i].object.id)
 			intersects[i].object.clickCall();
 		}
 	}

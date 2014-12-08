@@ -1,6 +1,7 @@
 <script>
 
 	//--do this first--//
+	showLoadScreen(true);
 
 	var loadedObjData = [];
 	var countOfLoadedLoaderObjs = 0;
@@ -11,7 +12,7 @@
 	function jsObjToGlobalMesh(name,opts,objData,callback){
 		gOpts[name] = (opts !== undefined) ? opts : {};
 		gOpts[name].scale = (gOpts[name].scale !== undefined) ? gOpts[name].scale : new THREE.Vector3(10,10,10);
-		console.log('name: '+name,'scale: ',gOpts[name].scale);
+		//console.log('name: '+name,'scale: ',gOpts[name].scale);
 		//THREE.GeometryUtils.merge(geometry, outlineGeometry(geometry));
 		return function(geometry,materials){
 			//obj[name].newGeom = geometry;
@@ -32,11 +33,11 @@
 				engines[name].newMesh = function(){
 					var retMesh = new THREE.Mesh(engines[name].geom, new THREE.MeshFaceMaterial(engines[name].mats));
 					retMesh.scale.set(gOpts[name].scale.x,gOpts[name].scale.y,gOpts[name].scale.z);
-					retMesh.castShadow = (gOpts[name].castShadow !== undefined) ? gOpts[name].castShadow : false;
+					//retMesh.castShadow = (gOpts[name].castShadow !== undefined) ? gOpts[name].castShadow : false;
 					retMesh.receiveShadow = (gOpts[name].receiveShadow !== undefined) ? gOpts[name].receiveShadow : false;
 					return retMesh;
 				}
-				console.log(engines[name]);
+				//console.log(engines[name]);
 			}
 			else if(objData.type == 'railcar'){
 				railcars[name] = {};
@@ -48,7 +49,7 @@
 				railcars[name].newMesh = function(){
 					var retMesh = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial(materials));
 					retMesh.scale.set(gOpts[name].scale.x,gOpts[name].scale.y,gOpts[name].scale.z);
-					retMesh.castShadow = (gOpts[name].castShadow !== undefined) ? gOpts[name].castShadow : false;
+					//retMesh.castShadow = (gOpts[name].castShadow !== undefined) ? gOpts[name].castShadow : false;
 					retMesh.receiveShadow = (gOpts[name].receiveShadow !== undefined) ? gOpts[name].receiveShadow : false;
 					return retMesh;
 				}
@@ -64,7 +65,7 @@
 					return retMesh;
 				}
 			}
-			console.log('made it here',name,objData);
+			//console.log('made it here',name,objData);
 			countOfLoadedLoaderObjs++;
 		}
 	}
@@ -83,7 +84,7 @@
 					$name = end($ex);
 					if(strpos($name,'.') === false){
 						$numLoaded++;
-						echo "console.log('@@@$name');";
+						echo "//console.log('@@@$name');";
 						$data = file_get_contents($Loadobjs);
 						echo "\nloadedObjData['$name'] = $data;";
 						echo "\nloader.load(
@@ -101,11 +102,13 @@
 	}*/
 
 	function waitForAllLoadedObjs(){
-		if (countOfLoadedLoaderObjs == <?= $numLoaded; ?> & <?= $numLoaded; ?> > 0) {
-			console.log('num objs loaded: ',<?= $numLoaded; ?>);
-			console.log('worldObj',worldObj);
-			console.log('engines',engines);
-			console.log('railcars',railcars);
+		console.log('here', saveGame.loaded)
+		if (countOfLoadedLoaderObjs == <?= $numLoaded; ?> & <?= $numLoaded; ?> > 0 & saveGame.loaded) {
+
+			//console.log('num objs loaded: ',<?= $numLoaded; ?>);
+			//console.log('worldObj',worldObj);
+			//console.log('engines',engines);
+			//console.log('railcars',railcars);
 			//-- things to do once we have all of our objects loaded --//
 			/*train.addTrain('steamer040');
 			train.addRailcar('gondolacar',0);
@@ -118,6 +121,7 @@
 				train.addRailcar('flatcar',train.train.length-1);
 				train.addRailcar('flatcar',train.train.length-1);
 			},10000);*/
+			showLoadScreen(false);
 			render();
 		}
 		else{

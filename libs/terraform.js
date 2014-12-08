@@ -25,7 +25,12 @@ function raiseLowerTerrain(i,upDown){
   track.checkTrackInArea(worldObj['plane'].children[1].geometry.vertices[facei]);
 
   tree.trees.map(function(tree){
-    tree.Mesh.position.y = findY(tree.Mesh.position.x,tree.Mesh.position.z);
+    if(vv.distanceTo(tree[0].position) <= 200){
+      console.log('this one');
+      var oy = tree[0].position.y
+      tree[0].position.y = findY(tree[0].position.x,tree[0].position.z);
+      tree[1].position.y += (tree[0].position.y - oy);
+    }
   });
 
   building.building.map(function(b){

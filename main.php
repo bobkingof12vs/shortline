@@ -27,9 +27,11 @@
   <div id='game' style='bottom: 40px'>
     <canvas id='c'></canvas>
 
-    <script src="sources/threejs/build/three.js"></script>
+    <?php echo "\n".file_get_contents('libs/html/load.html')?>
+    <script src="sources/threejs/build/three.min.js"></script>
     <script src="sources/threejs/examples/js/controls/OrbitControls.js"></script>
     <script src="sources/threejs/examples/fonts/helvetiker_regular.typeface.js"></script>
+    <script src="sources/mousetrap.min.js"></script>
     <script src="libs/general.js"></script>
     <script src="libs/init.js"></script>
     <script src="libs/terraform.js"></script>
@@ -39,9 +41,9 @@
     <script src="libs/events.js"></script>
     <script src="libs/train.js"></script>
     <script src="libs/tree.js"></script>
+    <script src="libs/saveGame.js"></script>
     <?php include('libs/load.php') ?>
     <?php echo "\n".file_get_contents('libs/html/trainInfo.html')?>
-    <script src="libs/saveGame.js"></script>
 
     <script>
       //console.log(THREE.UniformsUtils)
@@ -55,20 +57,19 @@
 
       var work = working = 0;
       var render = function() {
-        //requestAnimationFrame(render);
+        //;
         //setTimeout(render,1000/2);
         if(m['m_hlt'].clicked != 1)
-          setTimeout(render,1000/20);
+          requestAnimationFrame(render)//setTimeout(render,1000/14);
         now = Date.now();
-        if(work != -1
-          && m['m_tgo'].clicked == 1){
+        if(work != -1 && m['m_tgo'].clicked == 1){
           work = train.workJobs(now - then);
           then = now;
         }//now-then);
         controls.update();
         renderer.render(scene, camera);
       }
-      render();
+      //render();
 
       var dispObjects = [];
       var demObjs = function(){
@@ -100,7 +101,7 @@
         }
         setTimeout(demObjs,10000);
       };
-      demObjs();
+      //demObjs();
     </script>
   </div>
   <?php include('libs/html/addTrain.php')?>

@@ -135,7 +135,7 @@ treeFunc = function(){
           var nextTest = this.smallerDist(sphereGeom.vertices[i],curBranches[j].twigs[k].start,curBranches[j].twigs[k].end);
           if (nextTest.dist < minLen.dist){
             minLen = nextTest;
-            var thickness = curBranches[j].thickness + 1;
+            var thickness = curBranches[j].thickness + 5;
           }
         }
       }

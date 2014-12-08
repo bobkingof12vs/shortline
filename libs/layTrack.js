@@ -1,3 +1,5 @@
+//trackpreline could be cleaned up to not use a new object for each child
+
  var layTrack = new (function(){
 
   this.trackPreLine = {};

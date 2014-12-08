@@ -76,7 +76,9 @@ function makeMenu( str, id, parent, order, oncmousedownEventFunc){
   menu.style.height = (mc.mh+2)+'px';
   menu.style.zIndex = '3';
 
-  func = function(){console.log('click called '+id);};
+  func = function(){
+    //console.log('click called '+id);
+  };
 
   menu.order = order;
 

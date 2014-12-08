@@ -14,12 +14,12 @@ var zoom = 5;
 
 var scene = new THREE.Scene();
 var camera =  new THREE.OrthographicCamera(window.innerWidth/-zoom, window.innerWidth/zoom, window.innerHeight/zoom,window.innerHeight/-zoom, -1, 100000);
+//camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
 camera.position.x = 1000;
 camera.position.y = 1500;
 camera.position.z = 1000;
 camera.lookAt(new THREE.Vector3(0,0,0));
-//camera.updateProjectionMatrix()
-console.log("'camera'",camera);
+//console.log("'camera'",camera);
 
 //var toonMaterial = new THREE.MeshLambertMaterial
 
@@ -27,7 +27,7 @@ console.log("'camera'",camera);
 var w = 20;
 var h = 20;
 var scale = 100;
-var color = 0x7CBA30;
+var color = 0x96A46B;
 var planeGeometry = new THREE.Geometry();
 var lineGeometry = new THREE.Geometry();
 var vertArray = lineGeometry.vertices;
@@ -65,52 +65,53 @@ var lineMaterial = new THREE.LineDashedMaterial( { color: 0x227733, linewidth: 2
 lineGeometry.computeLineDistances();
 var line = new THREE.Line( lineGeometry, lineMaterial, THREE.LinePieces );
 group.add(line);
-console.log("'line'",line);
+//console.log("'line'",line);
 //add plane
-var pm = new THREE.MeshLambertMaterial( {vertexColors: THREE.FaceColors} );
+var pm = new THREE.MeshLambertMaterial( {vertexColors: THREE.FaceColors, receiveShadow: true, castShadow: true} );
 pm.color.setHex(0x227733);
 plane = new THREE.Mesh(planeGeometry,pm);
 plane.receiveShadow = true;
-//plane.castShadow = true;
+plane.castShadow = true;
 group.add(plane);
-console.log("'plane'",plane);
+//console.log("'plane'",plane);
 worldObj['plane'] = group;
 scene.add(group);
-console.log("'group'",group)
+//console.log("'group'",group)
 
 //add track line object
 worldObj['trkPreLine'] = new THREE.Object3D();
-console.log('preline',worldObj['trkPreLine']);
+//console.log('preline',worldObj['trkPreLine']);
 
 //add track line object
 worldObj['trkLine'] = new THREE.Object3D();
-console.log('drawline',worldObj['trkLine']);
+//console.log('drawline',worldObj['trkLine']);
 
 //add track line object
 worldObj['switches'] = new THREE.Object3D();
-console.log('switches',worldObj['switches']);
+//console.log('switches',worldObj['switches']);
 
 //add lights
-var ambientLight = new THREE.AmbientLight(0xbbbbbb);
+var ambientLight = new THREE.AmbientLight(0xffffff);
 scene.add(ambientLight);
-console.log("'ambientLight'",ambientLight);
+//console.log("'ambientLight'",ambientLight);
 
 //add shadows
 var directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-directionalLight.position.set(-300, 400, 400);
+directionalLight.position.set(-3000, 4000, -4000).normalize();
 //directionalLight.castShadow = true;
+directionalLight.lookAt(new THREE.Vector3(0,0,0));
 //directionalLight.shadowOnly = true;
 //directionalLight.shadowDarkness = .5;
 scene.add(directionalLight);
-console.log("'directionalLight'",directionalLight);
+//console.log("'directionalLight'",directionalLight);
 
 
 //init renderer
 var renderer = new THREE.WebGLRenderer({canvas: document.getElementById('c'),  antialias: true});
 renderer.setSize(window.innerWidth, window.innerHeight);
-//renderer.shadowMapEnabled = true;
-//renderer.shadowMapSoft = true;
-console.log("'renderer'",renderer);
+renderer.shadowMapEnabled = true;
+renderer.shadowMapSoft = true;
+//console.log("'renderer'",renderer);
 
 //init controls
 var controls = new THREE.OrbitControls( camera, renderer.domElement );
@@ -127,8 +128,9 @@ var controls = new THREE.OrbitControls( camera, renderer.domElement );
 
 				controls.keys = [ 65, 83, 68 ];*/
 
-controls.maxPolarAngle = Math.PI/2.1;
+controls.maxPolarAngle = Math.PI/2.8;
 controls.noZoom = true;
+//controls.noRotate = true;
 //console.log("'controls'",controls);
 
 //init mouse intersections

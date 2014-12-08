@@ -277,7 +277,7 @@
       }
     })();
 
-    console.log('building',building)
+    //console.log('building',building)
   </script>
 
   <div class='ab_lowerMenu'>
