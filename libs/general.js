@@ -38,16 +38,19 @@ function angleBetweenFlattenedVectors(a,b,o){
 }
 
 function lerp1(p1,p2,t){
-  var x = ((p2.x-p1.x)*t)+p1.x;
-  var y = ((p2.y-p1.y)*t)+p1.y;
-  var z = ((p2.z-p1.z)*t)+p1.z;
-  return new THREE.Vector3(x,y,z);
+  return new THREE.Vector3(
+    ((p2.x-p1.x)*t)+p1.x,
+    ((p2.y-p1.y)*t)+p1.y,
+    ((p2.z-p1.z)*t)+p1.z
+  );
 }
 
 function lerp(p1,p2,p3,p4,t){
-  var p5 = lerp1(p1,p2,t);
-  var p6 = lerp1(p3,p4,t);
-  return lerp1(p5,p6,t);
+  return lerp1(
+    lerp1(p1,p2,t),
+    lerp1(p3,p4,t),
+    t
+  );
 }
 
 function equalXZ(p1,p2){
@@ -79,7 +82,12 @@ function lineLineIntersect(m1,b1,m2,b2) {
   else{return new THREE.Vector3(0,-1,0);}
 }
 
-function gridPointsOnLine(gridSize, p1, p2) {
+function gridPointsOnLine(gridSize, p1, p2, doublePoints) {
+
+  doublePoints == true ? true : false;
+
+  var up = 5;
+
   var gridsize = gridSize/2
   if (p1.x == p2.x & p1.z == p2.z) {return p1;}
 
@@ -93,7 +101,7 @@ function gridPointsOnLine(gridSize, p1, p2) {
   var m2 = ((p2.z-p1.z)/(p2.x-p1.x));
 
   var newPoints = [];
-  newPoints.push(recalcY(p1));
+  newPoints.push(recalcY(p1,up));
   if (maxX - gridSize > minX) {
     while(maxX > minX){
 
@@ -103,12 +111,18 @@ function gridPointsOnLine(gridSize, p1, p2) {
       var b1 = (Math.ceil(minZ/100)*100)-(m1*tempx);
       var b2 = p2.z-(m2*p2.x);
       var np = lineLineIntersect(m1,b1,m2,b2);
-      if (np.y != -1 & mx > np.x & minX < np.x & mz > np.z & minZ < np.z)
-        {newPoints.push(new THREE.Vector3(np.x,findY(np.x,np.z)+8,np.z));}
+      if (np.y != -1 & mx > np.x & minX < np.x & mz > np.z & minZ < np.z){
+        newPoints.push(new THREE.Vector3(np.x,findY(np.x,np.z)+up,np.z));
+        if(doublePoints == true)
+          newPoints.push(newPoints[newPoints.length - 1]);
+      }
 
 
-      if(maxX > tempx & minX < tempx)
-        {newPoints.push(new THREE.Vector3(tempx,findY(tempx,tempz)+5,tempz));}
+      if(maxX > tempx & minX < tempx){
+        newPoints.push(new THREE.Vector3(tempx,findY(tempx,tempz)+up,tempz));
+        if(doublePoints == true)
+          newPoints.push(newPoints[newPoints.length - 1]);
+      }
 
       maxX -= gridSize;
     }
@@ -121,16 +135,22 @@ function gridPointsOnLine(gridSize, p1, p2) {
       var b1 = tempz-(m1*(Math.ceil(minX/100)*100));
       var b2 = p2.z-(m2*p2.x);
       var np = lineLineIntersect(m1,b1,m2,b2);
-      if (np.y != -1 & mx > np.x & minX < np.x & mz > np.z & minZ < np.z)
-        {newPoints.push(new THREE.Vector3(np.x,findY(np.x,np.z)+5,np.z));}
+      if (np.y != -1 & mx > np.x & minX < np.x & mz > np.z & minZ < np.z){
+        newPoints.push(new THREE.Vector3(np.x,findY(np.x,np.z)+up,np.z));
+        if(doublePoints == true)
+          newPoints.push(newPoints[newPoints.length - 1]);
+      }
 
-      if(maxZ > tempz & minZ < tempz)
-        {newPoints.push(new THREE.Vector3(tempx,findY(tempx,tempz)+5,tempz));}
+      if(maxZ > tempz & minZ < tempz){
+        newPoints.push(new THREE.Vector3(tempx,findY(tempx,tempz)+up,tempz));
+        if(doublePoints == true)
+          newPoints.push(newPoints[newPoints.length - 1]);
+      }
 
       maxZ -= gridSize;
     }
   }
-  newPoints.push(recalcY(p2));
+  newPoints.push(recalcY(p2,up));
 
   newPoints.sort(function(a,b){return a.x-b.x});
 
@@ -263,3 +283,101 @@ function get(name) {
   var match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
   return match ? decodeURIComponent(match[1].replace(/\+/g, ' ')) : null;
 }
+
+addSpotToScene = function(point){
+  console.log('Called called');
+  var geometry = new THREE.TorusGeometry(10, 5, 5, 12);
+  var material = new THREE.MeshBasicMaterial( { color: 0x2222bb, side: THREE.DoubleSide } );
+  var mesh = new THREE.Mesh( geometry, material );
+  mesh.rotation.set(Math.PI/2, 0, 0)
+  mesh.position.x = point.x
+  mesh.position.z = point.z
+  mesh.position.y = point.y + 5
+
+  scene.add( mesh );
+  return mesh;
+}
+
+
+function testCube(p1,col,scale) {
+  scale = scale != undefined ? scale : 1;
+  col = col != undefined ? col : 0x00ff00;
+  var cubeMaterial = new THREE.MeshBasicMaterial( {color: col} );
+  var cubeGeometry = new THREE.BoxGeometry( 10*scale, 10*scale, 10*scale, 1, 1, 1 );
+  cube = new THREE.Mesh( cubeGeometry, cubeMaterial );
+  cube.position.set(p1.x, p1.y, p1.z);
+  scene.add(cube);
+  return cube;
+}
+
+function testText(text,p1,rot,scale,col1,col2){
+  var col1 = col1 != undefined ? col1 : 0xff0000
+  var col2 = col2 != undefined ? col2 : 0x000088
+  var scale = scale != undefined ? scale : 1;
+  // add 3D text
+  var materialFront = new THREE.MeshBasicMaterial( { color: col1 } );
+  var materialSide = new THREE.MeshBasicMaterial( { color: col2 } );
+  var materialArray = [ materialFront, materialSide ];
+  var textGeom = new THREE.TextGeometry( text,
+    {
+      size: 10, height: 4, curveSegments: 3,
+      font: "helvetiker", weight: "normal", style: "normal",
+      bevelThickness: 1, bevelSize: 2, bevelEnabled: true,
+      material: 0, extrudeMaterial: 1
+    });
+    // font: helvetiker, gentilis, droid sans, droid serif, optimer
+    // weight: normal, bold
+
+    var textMaterial = new THREE.MeshFaceMaterial(materialArray);
+    var textMesh = new THREE.Mesh(textGeom, textMaterial );
+
+    textGeom.computeBoundingBox();
+    var posx = (-0.5 * (textGeom.boundingBox.max.x - textGeom.boundingBox.min.x)) + p1.x;
+    var posy = (-0.5 * (textGeom.boundingBox.max.y - textGeom.boundingBox.min.y)) + p1.y;
+    var posz = (-0.5 * (textGeom.boundingBox.max.z - textGeom.boundingBox.min.z)) + p1.z;
+
+    textMesh.position.set(posx,posy,posz);
+
+    if (rot != -1) {
+      textMesh.rotation.x = (rot == undefined ? 0 : rot.x);
+      textMesh.rotation.y = (rot == undefined ? 0 : rot.y);
+      textMesh.rotation.z = (rot == undefined ? 0 : rot.z);
+    }
+    else{
+      textMesh.lookAt(camera.position);
+      controls.addEventListener( 'change', function(){
+
+        textMesh.lookAt(camera.position);
+        textGeom.computeBoundingBox();
+        posx = (-0.5 * (textGeom.boundingBox.max.x - textGeom.boundingBox.min.x)) + p1.x;
+        posy = (-0.5 * (textGeom.boundingBox.max.y - textGeom.boundingBox.min.y)) + p1.y;
+        posz = (-0.5 * (textGeom.boundingBox.max.z - textGeom.boundingBox.min.z)) + p1.z;
+        textMesh.position.set(posx,posy,posz);
+        textMesh.lookAt(camera.position);
+      });
+    };
+
+
+    scene.add(textMesh);
+
+    return textMesh;
+  }
+
+  //testText('this is test',new THREE.Vector3(10,10,10),new THREE.Vector3(3.1415/-2,0,0))
+  //testText('this is test',new THREE.Vector3(10,10,10),-1)
+
+  closePoint = function(point, distance){
+    point.x = Math.round(point.x/distance)*distance;
+    point.z = Math.round(point.z/distance)*distance;
+    return recalcY(point, 5);
+  }
+
+  function calcFaceNormals(geom){
+    var i = geom.faces.length;
+    while(i--){
+      var v1 = geom.vertices[geom.faces[i].a].clone().sub(geom.vertices[geom.faces[i].b])
+      var v2 = geom.vertices[geom.faces[i].c].clone().sub(geom.vertices[geom.faces[i].b])
+      geom.faces[i].normal = v1.clone().cross(v2);
+    }
+    return geom;
+  }

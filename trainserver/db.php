@@ -47,6 +47,13 @@ if(isset($_GET['type']) and $_GET['type'] == 'add'){
     $mysql->runQuery("insert into building (saveid, name, x, z, height, rotY) values".rtrim($values,','));
   }
 
+  if(!empty($data->roads)){
+    $values = '';
+    foreach($data->roads as $road)
+      $values .= "($id, {$road->x}, {$road->z}),";
+    $mysql->runQuery("insert into roads (saveid, x, z) values".rtrim($values,','));
+  }
+
   echo $id;
 }
 elseif(isset($_GET['type']) and $_GET['type'] == 'get'){
@@ -62,7 +69,8 @@ elseif(isset($_GET['type']) and $_GET['type'] == 'get'){
     'tree' => $mysql->getQuery("select x,z from tree where saveid = $id"),
     'track' => $mysql->getQuery("select x,z from track where saveid = $id"),
     'land' => $mysql->getQuery("select x,y,z from land where saveid = $id"),
-    'building' => $mysql->getQuery("select name,x,z,height,rotY from building where saveid = $id")
+    'building' => $mysql->getQuery("select name,x,z,height,rotY from building where saveid = $id"),
+    'roads' => $mysql->getQuery("select x,z from roads where saveid = $id")
   );
 
   echo json_encode($data, JSON_NUMERIC_CHECK);

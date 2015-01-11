@@ -2,7 +2,7 @@ m['m_sav'].onclickEvent = function(menuItem,clicked){
   if(clicked == 1){
     var test = false;
     while(!test){
-      var email = window.prompt("Enter an valid email address to save.");
+      var email = window.prompt("Enter a valid email address to save.");
       if(email == null){
         m['m_sav'].e.click();
         return
@@ -46,7 +46,8 @@ var saveGame = new (function(){
       tree: [],
       track: [],
       land: [],
-      building: []
+      building: [],
+      roads: []
     };
 
     for(var i = 0; i < tree.trees.length; i++)
@@ -74,6 +75,8 @@ var saveGame = new (function(){
           height: building.building[i].buildingHeight,
           rotY: building.building[i].rotation.y
         });
+
+    data.roads = layRoads.lay.saveData();
 
     console.log('save data',data);
 
@@ -143,6 +146,10 @@ var saveGame = new (function(){
         layTrack.trackPreLine.curSeg--;
 
       }
+
+      console.log('load save game: roads');
+      for(var i = 0; i < gameLoadData.roads.length; i += 2)
+        layRoads.lay.loadData(gameLoadData.roads[i],gameLoadData.roads[i + 1]);
 
       console.log('Save Loaded');
       saveGame.loaded = true;

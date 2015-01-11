@@ -910,11 +910,11 @@ trackFunc = function(){
 		}
 	}
 
-	this.checkTrackInArea = function(p1) {
-		var lft = p1.x - 100;
-		var rht = p1.x + 100;
-		var top = p1.z + 100;
-		var bot = p1.z - 100;
+	this.checkTrackInArea = function(p1, radius) {
+		var lft = p1.x - radius;
+		var rht = p1.x + radius;
+		var top = p1.z + radius;
+		var bot = p1.z - radius;
 
 		var i = this.segments.length
 		var affectedSegs = [];
@@ -926,7 +926,18 @@ trackFunc = function(){
 				(this.segments[i].p2.x >= lft && this.segments[i].p2.x <= rht && this.segments[i].p2.z >= bot && this.segments[i].p2.z <= top) |
 				(this.segments[i].p3.x >= lft && this.segments[i].p3.x <= rht && this.segments[i].p3.z >= bot && this.segments[i].p3.z <= top)
 			){
-				affectedSegs.push(i);
+				affectedSegs.push(i); continue;
+				var j = 3;
+				while(j--){
+					var k = this.segments[i].mesh.children[j].geometry.vertices.length;
+					while(k--){
+						var d = p1.distanceTo(this.segments[i].mesh.children[j].geometry.vertices[k]);
+						if(d < radius){
+							this.segments[i].mesh.children[j].geometry.vertices[k].y = findY(this.segments[i].mesh.children[j].geometry.vertices[k].x,this.segments[i].mesh.children[j].geometry.vertices[k].z)
+							this.segments[i].mesh.children[j].geometry.verticesNeedUpdate = true;
+						}
+					}
+				}
 			}
 		}
 

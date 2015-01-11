@@ -41,9 +41,11 @@
     <script src="libs/events.js"></script>
     <script src="libs/train.js"></script>
     <script src="libs/tree.js"></script>
+    <script src="libs/layRoadAndRiver.js"></script>
     <script src="libs/saveGame.js"></script>
     <?php include('libs/load.php') ?>
     <?php echo "\n".file_get_contents('libs/html/trainInfo.html')?>
+    <?php echo "\n".file_get_contents('libs/html/color.html')?>
 
     <script>
       //console.log(THREE.UniformsUtils)

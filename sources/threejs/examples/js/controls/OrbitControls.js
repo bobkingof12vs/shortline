@@ -326,7 +326,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 	}
 
 	function onMouseDown( event ) {
-		console.log(event)
+		
 		if ( scope.enabled === false ) return;
 		event.preventDefault();
 

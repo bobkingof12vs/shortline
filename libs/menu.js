@@ -184,17 +184,32 @@ var m = [];
 m['background'] = makeBackground('background');
 m['main'] = makeMenu('Tool Kit', 'main', 'main',0);
 
-m['m_ter'] = makeMenu('Terraform Tools', 'm_ter', 'main',1);
-m['m_tra_lay'] = makeMenu('Add Track', 'm_tra_lay', 'main',2); //makeMenu('Track Tools', 'm_tra', 'main',2);
-m['m_tad'] = makeMenu('Add Train', 'm_tad', 'main',3);
-m['m_bld'] = makeMenu('Add Building', 'm_bld', 'main',4);
-m['m_tre'] = makeMenu('Add Tree', 'm_tre', 'main',5);
-m['m_tgo'] = makeMenu('Run Trains', 'm_tgo', 'main',6);
-m['m_hlt'] = makeMenu('Halt Program', 'm_hlt', 'main',7);
-m['m_sav'] = makeMenu('Save Game', 'm_sav', 'main',8);
+m['m_ter'] = makeMenu('Terraform Tools', 'm_ter', 'main',1 );
+m['m_tra_lay'] = makeMenu('Add Track',   'm_tra_lay', 'main',2); //makeMenu('Track Tools', 'm_tra', 'main',2);
+m['m_tad'] = makeMenu('Add Train',       'm_tad', 'main',3 );
+m['m_bld'] = makeMenu('Add Building',    'm_bld', 'main',4 );
+m['m_tre'] = makeMenu('Add Tree',        'm_tre', 'main',5 );
+m['m_rod'] = makeMenu('Add Roads',       'm_rod', 'main',6 );
+m['m_riv'] = makeMenu('Add Rivers',      'm_riv', 'main',7 );
+m['m_tgo'] = makeMenu('Run Trains',      'm_tgo', 'main',8 );
+m['m_hlt'] = makeMenu('Halt Program',    'm_hlt', 'main',9 );
+m['m_sav'] = makeMenu('Save Game',       'm_sav', 'main',10);
 
-m['m_ter_raise'] = makeMenu('Raise Ground', 'm_ter_raise', 'm_ter',1);
-m['m_ter_lower'] = makeMenu('Lower Ground', 'm_ter_lower', 'm_ter',2);
+m['m_ter_raise'] =   makeMenu('Raise Ground',   'm_ter_raise',   'm_ter',1);
+m['m_ter_lower'] =   makeMenu('Lower Ground',   'm_ter_lower',   'm_ter',2);
+m['m_ter_flatten'] = makeMenu('Flatten Ground', 'm_ter_flatten', 'm_ter',3);
+m['m_ter_color'] =   makeMenu('Recolor Ground', 'm_ter_color',   'm_ter',4);
+
+m['m_ter_raise_lots'] =   makeMenu('A lot',    'm_ter_raise_lots',   'm_ter_raise',1);
+m['m_ter_raise_little'] = makeMenu('A little', 'm_ter_raise_little', 'm_ter_raise',2);
+
+m['m_ter_lower_lots'] = makeMenu('A lot', 'm_ter_lower_lots', 'm_ter_lower',1);
+m['m_ter_lower_little'] = makeMenu('A little', 'm_ter_lower_little', 'm_ter_lower',2);
+
+m['m_ter_flatten_top'] = makeMenu('Top', 'm_ter_flatten_top', 'm_ter_flatten',1);
+m['m_ter_flatten_mid'] = makeMenu('Middle', 'm_ter_flatten_mid', 'm_ter_flatten',2);
+m['m_ter_flatten_bot'] = makeMenu('Bottom', 'm_ter_flatten_bot', 'm_ter_flatten',3);
+m['m_ter_flatten_avg'] = makeMenu('Average', 'm_ter_flatten_avg', 'm_ter_flatten',4);
 
 m['m_tre_one'] =  makeMenu('One Tree', 'm_tre_one', 'm_tre',1);
 m['m_tre_five'] =  makeMenu('Five trees', 'm_tre_five', 'm_tre',2);

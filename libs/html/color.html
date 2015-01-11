@@ -1,0 +1,80 @@
+<span id='colorInfo' style='display: block;'>
+  <script>
+    var selectedColor = '';
+    function validTextColour(stringToTest) {
+      //Alter the following conditions according to your need.
+      if (stringToTest === "") { return false; }
+      if (stringToTest === "inherit") { return false; }
+      if (stringToTest === "transparent") { return false; }
+
+      var image = document.createElement("img");
+
+      image.style.color = "rgb(0, 0, 0)";
+      image.style.color = stringToTest;
+
+      if (image.style.color !== "rgb(0, 0, 0)") { return true; }
+
+      image.style.color = "rgb(255, 255, 255)";
+      image.style.color = stringToTest;
+
+      return image.style.color !== "rgb(255, 255, 255)";
+    }
+
+    function calcColors(fromHex){
+      document.getElementById('hex').style.borderColor = 'black'
+      document.getElementById('hex').style.borderWidth = '1px'
+      document.getElementById('hex').style.padding = '5px';
+      document.getElementById('color').innerHTML = '&nbsp;Sample'
+      if(fromHex){
+        var hex = document.getElementById('hex').value;
+        if(validTextColour(hex)){
+          document.getElementById('color').style.backgroundColor = hex
+        }
+        else{
+          document.getElementById('hex').style.borderColor = 'red'
+          document.getElementById('hex').style.borderWidth = '3px'
+          document.getElementById('hex').style.padding = '3px';
+          document.getElementById('color').innerHTML = '&nbsp;Invalid Color'
+          document.getElementById('color').style.backgroundColor = 'f00';
+          selectedColor = false;
+          return;
+        }
+        document.getElementById('color').style.backgroundColor = '#'+hex
+      }
+      else{
+        console.log(document.getElementById('red').value);
+        var r = document.getElementById('red').value * 2.55;
+        var g = document.getElementById('green').value * 2.55;
+        var b = document.getElementById('blue').value * 2.55;
+        var hex =
+          ("0" + parseInt(r,10).toString(16)).slice(-2) +
+          ("0" + parseInt(g,10).toString(16)).slice(-2) +
+          ("0" + parseInt(b,10).toString(16)).slice(-2);
+        document.getElementById('hex').value = hex;
+        document.getElementById('color').style.backgroundColor = '#'+hex
+      }
+
+      selectedColor = document.getElementById('color').style.backgroundColor.match(/^rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/i).slice(1,4);
+
+      document.getElementById('red').value = selectedColor[0] *.39215
+      document.getElementById('green').value = selectedColor[1] *.39215
+      document.getElementById('blue').value = selectedColor[2] *.39215
+    }
+  </script>
+  <div id='colorMenu' class='lowerMenu mono'>
+    &nbsp;color: <input id='hex' class='mono' style='border: 1px black solid; width: 100px; border-radius: 5px;' type='text' onkeyup='calcColors(true)' value='c37547'></input>
+    <div><input id='red' type='range' value=255  step=1 onchange='calcColors(false)'><span class='mono backwords'>Red</span></input></div>
+    <div><input id='green' type='range' value=255  step=1 onchange='calcColors(false)'><span class='mono backwords'>green</span></input></div>
+    <div><input id='blue' type='range' value=255  step=1 onchange='calcColors(false)'><span class='mono backwords'>blue</span></input></div>
+    <div id='color' style='border: 1px black solid; border-radius: 5px;' class='mono'>&nbsp; Sample</div>
+  </div>
+  <script>
+    calcColors(true)
+    m['m_ter_color'].onclickEvent = function(menuITem, clicked){
+      if(clicked == 1)
+        document.getElementById('colorMenu').style.zIndex = 5;
+      else
+        document.getElementById('colorMenu').style.zIndex = 0;
+    }
+  </script>
+</span>
