@@ -59,17 +59,17 @@
 
       var work = working = 0;
       var render = function() {
-        //;
-        //setTimeout(render,1000/2);
-        if(m['m_hlt'].clicked != 1)
-          requestAnimationFrame(render)//setTimeout(render,1000/14);
         now = Date.now();
         if(work != -1 && m['m_tgo'].clicked == 1){
+        console.log(now-then)
           work = train.workJobs(now - then);
           then = now;
         }//now-then);
         controls.update();
         renderer.render(scene, camera);
+        //setTimeout(render,1000/2);
+        if(m['m_hlt'].clicked != 1)
+          requestAnimationFrame(render)//setTimeout(render,1000/14);
       }
       //render();
 
@@ -87,6 +87,9 @@
           if(track.sections[i] != null){
             var j = Math.floor(track.sections[i].points.length/2);
             dispObjects.push(testText(i,recalcY(track.sections[i].points[j],30),THREE.Vector3(9,0,0),THREE.Vector3(.5,.5,.5)));
+            j = track.sections[i].points.length;
+            while(j--)
+              dispObjects.push(testText(j,recalcY(track.sections[i].points[j],20),THREE.Vector3(9,0,0),THREE.Vector3(.5,.5,.5),0xff0088,0xff55dd));
           }
         }
         var i = track.segments.length;

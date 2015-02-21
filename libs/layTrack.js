@@ -74,7 +74,7 @@
 
     if (this.trackPreLine.part == 'init') {
       this.trackPreLine.part = 'part2';
-      this.trackPreLine.curSeg++;
+      this.trackPreLine.curSeg = layTrack.trackPreLine.children.length;
       this.trackPreLine.origin = point;
 
       var geom = new THREE.Geometry();

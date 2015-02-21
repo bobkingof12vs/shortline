@@ -66,11 +66,18 @@
 			if(m['m_tgo'].clicked == 1){
 				document.getElementById('lowerMenu').style.zIndex = 4;
 				document.getElementById('curspeed').innerHTML = (Math.round(train.train[trainMenuTrain].engine.curSpeed*100)/100);
+
+				document.getElementById('topspeed').innerHTML = train.train[trainMenuTrain].engine.userSpeed;
+				document.getElementById('userSpeed').value = ((train.train[trainMenuTrain].engine.userSpeed / train.train[trainMenuTrain].engine.opts.top) * 50 + 50);
+
+				document.getElementById('accell').innerHTML = train.train[trainMenuTrain].engine.opts.acc;
+				document.getElementById('userAcc').value = ((train.train[trainMenuTrain].engine.opts.acc / train.train[trainMenuTrain].engine.opts.maxAcc) * 50 + 50);
+
 			}
 			else{
 				document.getElementById('lowerMenu').style.zIndex = 1;
 			}
-		},200)
+		},400)
 		function topUserSpeed(){
 			document.getElementById('topspeed').innerHTML =
 				train.train[trainMenuTrain].engine.userSpeed =

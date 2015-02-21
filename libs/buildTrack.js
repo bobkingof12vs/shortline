@@ -120,14 +120,28 @@ trackFunc = function(){
 
 	}
 
-	this.sectionDistanceRemaining = function(secId,secStartDirPoint,curSeg,curT){
-		var startT = equalXZ(secStartDirPoint,this.section[secId].ends[0].point) == 1 ? 0 : 1;
-		var endT = start == 1 ? 0 : 1;
-		var dist = this.lerpDistance(this.segments[curSeg],{startT: curT, endT: endT});
-		var i = this.sections[secId].segmentIds.indexOf(curSeg);
-		var j = endT == 0 ? 0 : this.section[secId].segmentIds.length;
-		var inc = (startT == 0 ? 1 : -1);
+	this.sectionDistanceRemaining = function(secId,dir,curPointId,remDist){
+
+		//console.log(secId,dir,curPointId,remDist);
+
+		var i = this.sections[secId].segmentIds.length;
+
+		if (curPointId == this.sections[secId].points.length)
+			curPointId -= 2;
+		if (curPointId == 0)
+			curPointId += 2;
+		while(i--){
+			//console.log(secId, i, this.segments[this.sections[secId].segmentIds[i]].p2,this.sections[secId].points[curPointId])
+			if(equalXZ(this.segments[this.sections[secId].segmentIds[i]].p2, this.sections[secId].points[curPointId]) == 1)
+				break;
+		}
+
+		var dist = remDist;
+		var j = (dir == 1 ? this.sections[secId].segmentIds.length - 1 : 0);
+		var inc = (dir == 1 ? 1 : -1);
+		//console.log(i,j,inc);
 		while(i != j){
+			//console.log('dist',dist,this.sections[secId].segmentIds[i+inc],secId,i+inc,this.segments[this.sections[secId].segmentIds[i+inc]]);
 			i += inc;
 			dist += this.segments[this.sections[secId].segmentIds[i]].len;
 		}

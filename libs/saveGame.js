@@ -126,16 +126,16 @@ var saveGame = new (function(){
       console.log('load save game: track');
       for(var i = 0; i < gameLoadData.track.length; i += 2){
         //if(i > 14) die();
-        layTrack.trackPreLine.curSeg++;
         var p1 = new THREE.Vector3(gameLoadData.track[i].x,   findY(gameLoadData.track[i].x,  gameLoadData.track[i].z),  gameLoadData.track[i].z);
         var p3 = new THREE.Vector3(gameLoadData.track[i+1].x, findY(gameLoadData.track[i+1].x,gameLoadData.track[i+1].z),gameLoadData.track[i+1].z);
 
-        track.addToSection(p1,recalcY(midpoint(p1,p3)),p3);
+        track.addToSection(p1,midpoint(p1,p3),p3);
 
         var loadLine = new THREE.Geometry();
         loadLine.vertices = gridPointsOnLine(100,p1,p3);
         lineGeometry.computeLineDistances();
-        layTrack.trackPreLine.children[layTrack.trackPreLine.curSeg] = new THREE.Line(loadLine, layTrack.trackPreLine.blinemat);
+        console.log(layTrack.trackPreLine.curSeg);
+        layTrack.trackPreLine.children[layTrack.trackPreLine.children.length] = new THREE.Line(loadLine, layTrack.trackPreLine.blinemat);
 
         trackPoints.push({
           p1: p1,
