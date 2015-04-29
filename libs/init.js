@@ -8,7 +8,7 @@ var globalMesh = [];
 var id = -1;
 var mouse = {};
 var click = 0;
-var zoom = 5;
+var zoom = 3;
 
 //initialize Three.js
 

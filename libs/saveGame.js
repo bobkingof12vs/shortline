@@ -101,58 +101,132 @@ var saveGame = new (function(){
     var xhr = this.CORSRequest('GET', loadURL, function(response){
       gameLoadData = JSON.parse(response);
 
+      var loadsDone = {
+        land: false,
+        trees: false,
+        buildings: false,
+        tracks: false,
+        roads: false
+      }
+
+      var intId = setInterval(function(){
+        var oneNotDone = false;
+        var done = 0;
+        if(loadsDone.land == false
+          || loadsDone.trees == false
+          || loadsDone.buildings == false
+          || loadsDone.tracks == false
+          || loadsDone.roads == false
+        ){
+          if(loadsDone.land == true) document.getElementById('loadLand').innerHTML = 'done';
+          if(loadsDone.trees == true) document.getElementById('loadTrees').innerHTML = 'done';
+          if(loadsDone.buildings == true) document.getElementById('loadBuildings').innerHTML = 'done';
+          if(loadsDone.tracks == true) document.getElementById('loadTracks').innerHTML = 'done';
+          if(loadsDone.roads == true) document.getElementById('loadRoads').innerHTML = 'done';
+        }
+        else{
+          console.log('Save Loaded');
+          saveGame.loaded = true;
+          clearInterval(intId);
+        }
+      });
+
       console.log('load save game: land');
-      for(var i = 0; i < gameLoadData.land.length; i++)
-        loadTerrain(gameLoadData.land[i]);
+
+      setTimeout(function(){
+        var i = gameLoadData.land.length;
+        var landInterval = setInterval(function(){
+          if(!--i){
+            loadsDone.land = true;
+            clearInterval(landInterval);
+            return;
+          }
+          loadTerrain(gameLoadData.land[i]);
+        });
+      }, 10);
 
       console.log('load save game: tree');
-      for(var i = 0; i < gameLoadData.tree.length; i++)
-        tree.onclickAddTree(gameLoadData.tree[i]);
+      setTimeout(function(){
+        var i = gameLoadData.tree.length;
+        var treeInterval = setInterval(function(){
+          if(!--i){
+            loadsDone.trees = true;
+            clearInterval(treeInterval);
+            return;
+          }
+          tree.onclickAddTree(gameLoadData.tree[i]);
+        });
+      }, 10);
 
       console.log('load save game: building');
-      for(var i = 0; i < gameLoadData.building.length; i++){
-        building.curBuildingId++;
-        building.building[building.curBuildingId] = worldObj[gameLoadData.building[i].name].newMesh();
-        building.building[building.curBuildingId].name = gameLoadData.building[i].name;
-        building.building[building.curBuildingId].position.x = gameLoadData.building[i].x;
-        building.building[building.curBuildingId].position.z = gameLoadData.building[i].z;
-        building.building[building.curBuildingId].baseY = gameLoadData.building[i].height
-        building.building[building.curBuildingId].buildingHeight = findY(gameLoadData.building[i].x,gameLoadData.building[i].z) + gameLoadData.building[i].height
-        building.building[building.curBuildingId].position.y = building.building[building.curBuildingId].buildingHeight;
-        building.building[building.curBuildingId].rotation.y = gameLoadData.building[i].rotY;
-        scene.add(building.building[building.curBuildingId]);
-      }
+      setTimeout(function(){
+        var i = gameLoadData.building.length;
+        var buildingInterval = setInterval(function(){
+          if(!--i){
+            loadsDone.buildings = true;
+            clearInterval(buildingInterval);
+            return;
+          }
 
-      console.log('load save game: track');
-      for(var i = 0; i < gameLoadData.track.length; i += 2){
-        //if(i > 14) die();
-        var p1 = new THREE.Vector3(gameLoadData.track[i].x,   findY(gameLoadData.track[i].x,  gameLoadData.track[i].z),  gameLoadData.track[i].z);
-        var p3 = new THREE.Vector3(gameLoadData.track[i+1].x, findY(gameLoadData.track[i+1].x,gameLoadData.track[i+1].z),gameLoadData.track[i+1].z);
-
-        track.addToSection(p1,midpoint(p1,p3),p3);
-
-        var loadLine = new THREE.Geometry();
-        loadLine.vertices = gridPointsOnLine(100,p1,p3);
-        lineGeometry.computeLineDistances();
-        console.log(layTrack.trackPreLine.curSeg);
-        layTrack.trackPreLine.children[layTrack.trackPreLine.children.length] = new THREE.Line(loadLine, layTrack.trackPreLine.blinemat);
-
-        trackPoints.push({
-          p1: p1,
-          p2: midpoint(p1,p2),
-          p3: p3
+          building.curBuildingId++;
+          building.building[building.curBuildingId] = worldObj[gameLoadData.building[i].name].newMesh();
+          building.building[building.curBuildingId].name = gameLoadData.building[i].name;
+          building.building[building.curBuildingId].position.x = gameLoadData.building[i].x;
+          building.building[building.curBuildingId].position.z = gameLoadData.building[i].z;
+          building.building[building.curBuildingId].baseY = gameLoadData.building[i].height
+          building.building[building.curBuildingId].buildingHeight = findY(gameLoadData.building[i].x,gameLoadData.building[i].z) + gameLoadData.building[i].height
+          building.building[building.curBuildingId].position.y = building.building[building.curBuildingId].buildingHeight;
+          building.building[building.curBuildingId].rotation.y = gameLoadData.building[i].rotY;
+          scene.add(building.building[building.curBuildingId]);
         });
+      }, 10);
 
-        layTrack.trackPreLine.curSeg--;
+      setTimeout(function(){
+        var i = -2;
+        var trackInterval = setInterval(function(){
+          i += 2;
+          if(i >= gameLoadData.track.length){
+            loadsDone.tracks = true;
+            clearInterval(trackInterval);
+            return;
+          }
 
-      }
+          //if(i > 14) die();
+          var p1 = new THREE.Vector3(gameLoadData.track[i].x,   findY(gameLoadData.track[i].x,  gameLoadData.track[i].z),  gameLoadData.track[i].z);
+          var p3 = new THREE.Vector3(gameLoadData.track[i+1].x, findY(gameLoadData.track[i+1].x,gameLoadData.track[i+1].z),gameLoadData.track[i+1].z);
+
+          track.addToSection(p1,midpoint(p1,p3),p3);
+
+          var loadLine = new THREE.Geometry();
+          loadLine.vertices = gridPointsOnLine(100,p1,p3);
+          lineGeometry.computeLineDistances();
+          layTrack.trackPreLine.children[layTrack.trackPreLine.children.length] = new THREE.Line(loadLine, layTrack.trackPreLine.blinemat);
+
+          trackPoints.push({
+            p1: p1,
+            p2: midpoint(p1,p2),
+            p3: p3
+          });
+
+          layTrack.trackPreLine.curSeg--;
+
+        });
+      }, 10);
 
       console.log('load save game: roads');
-      for(var i = 0; i < gameLoadData.roads.length; i += 2)
-        layRoads.lay.loadData(gameLoadData.roads[i],gameLoadData.roads[i + 1]);
-
-      console.log('Save Loaded');
-      saveGame.loaded = true;
+      setTimeout(function(){
+        var i = -2;
+        var roadInterval = setInterval(function(){
+          i += 2;
+          console.log(i)
+          if(i >= gameLoadData.roads.length || !gameLoadData.roads){
+            loadsDone.roads = true;
+            clearInterval(roadInterval);
+            return;
+          }
+          layRoads.lay.loadData(gameLoadData.roads[i],gameLoadData.roads[i + 1]);
+        });
+      }, 10);
     });
 
     //scene.remove(layTrack.trackPreLine.temp)

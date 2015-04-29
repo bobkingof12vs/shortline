@@ -61,7 +61,6 @@
       var render = function() {
         now = Date.now();
         if(work != -1 && m['m_tgo'].clicked == 1){
-        console.log(now-then)
           work = train.workJobs(now - then);
           then = now;
         }//now-then);
@@ -69,7 +68,8 @@
         renderer.render(scene, camera);
         //setTimeout(render,1000/2);
         if(m['m_hlt'].clicked != 1)
-          requestAnimationFrame(render)//setTimeout(render,1000/14);
+          requestAnimationFrame(render)//
+          //setTimeout(render,1000/14);
       }
       //render();
 
@@ -86,27 +86,27 @@
           i--;
           if(track.sections[i] != null){
             var j = Math.floor(track.sections[i].points.length/2);
-            dispObjects.push(testText(i,recalcY(track.sections[i].points[j],30),THREE.Vector3(9,0,0),THREE.Vector3(.5,.5,.5)));
+            dispObjects.push(testText(i,recalcY(track.sections[i].points[j],30),THREE.Vector3(9,0,0),.5));
             j = track.sections[i].points.length;
             while(j--)
-              dispObjects.push(testText(j,recalcY(track.sections[i].points[j],20),THREE.Vector3(9,0,0),THREE.Vector3(.5,.5,.5),0xff0088,0xff55dd));
+              dispObjects.push(testText(j,recalcY(track.sections[i].points[j],20),THREE.Vector3(9,0,0),.5,0xff0088,0xff55dd));
           }
         }
         var i = track.segments.length;
         while (i > 0){
           i--;
           if(track.segments[i] != null){
-            dispObjects.push(testText(i,recalcY(track.segments[i].p2,10),THREE.Vector3(9,0,0),THREE.Vector3(.5,.5,.5),0x000088,0xff0000));
+            dispObjects.push(testText(i,recalcY(track.segments[i].p2,10),THREE.Vector3(9,0,0),.5,0x000088,0xff0000));
           }
         }
         var i = track.switches.length
         while (i > 0){
           i--;
-          dispObjects.push(testText(i,recalcY(track.switches[i].origin,10),THREE.Vector3(9,0,0),THREE.Vector3(.5,.5,.5),0x00ff88,0xffff00));
+          dispObjects.push(testText(i,recalcY(track.switches[i].origin,10),THREE.Vector3(9,0,0),.5,0x00ff88,0xffff00));
         }
-        setTimeout(demObjs,10000);
+
       };
-      //demObjs();
+      //setTimeout(demObjs,10000);
     </script>
   </div>
   <?php include('libs/html/addTrain.php')?>

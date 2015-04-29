@@ -35,7 +35,7 @@
       var j = layTrack.trackPreLine.children.length;
       console.log('start j ',j)
       while (j--){
-        console.log(j)
+        //console.log(j)
         scene.remove(layTrack.trackPreLine.children[j]);
       }
       scene.remove(layTrack.trackPreLine.temp);

@@ -1,21 +1,18 @@
 <style scoped>
   #loadScreen{
     position: absolute;
-
     font-family: monospace;
     font-size: 3vh;
-
-    padding-top: 6%;
-    padding-bottom: 6%;
+    line-height: 1.5;
     width: 30%;
-
-    left: 35%;
-    top: 35%;
-    height: 3%;
-
-    text-align: center;
+    top: 50%;
+    left: 50%;
+    margin-right: -50%;
+    transform: translate(-50%, -50%);
+    padding: 4% 0% 4% 10%;
+    text-align: left;
     border: solid 2px #473119;
-    border-radius: 20px;
+    border-radius: 3vh;
     background-color: #c37547;
   }
 
@@ -29,12 +26,45 @@
     background: #444;
     margin: 0px;
   }
+
+  .loadScreenSpan{
+    border: solid 2px #222;
+    border-radius: 1vh;
+    background-color: #aaa;
+    padding: 1vh;
+  }
+
+  .loada{
+
+  }
 </style>
 <script>
-  var showLoadScreen = function(onOff){ document.getElementById('loadScreenBackground').style.display = onOff ? 'block' : 'none'; }
+  var loadscreenIntervalID = '';
+  var loadScreenNumDots = '...';
+  var showLoadScreen = function(onOff){
+    document.getElementById('loadScreenBackground').style.display = onOff ? 'block' : 'none';
+    if(onOff){
+      loadscreenIntervalID = setInterval(function(){
+        loadScreenNumDots = (loadScreenNumDots == '.....' ? '.' : loadScreenNumDots + '.');
+        document.getElementById('loadLand').innerHTML = document.getElementById('loadLand').innerHTML == 'done' ? 'done' : loadScreenNumDots;
+        document.getElementById('loadTrees').innerHTML = document.getElementById('loadTrees').innerHTML == 'done' ? 'done' : loadScreenNumDots; ;
+        document.getElementById('loadBuildings').innerHTML = document.getElementById('loadBuildings').innerHTML == 'done' ? 'done' : loadScreenNumDots; ;
+        document.getElementById('loadTracks').innerHTML = document.getElementById('loadTracks').innerHTML == 'done' ? 'done' : loadScreenNumDots; ;
+        document.getElementById('loadRoads').innerHTML = document.getElementById('loadRoads').innerHTML == 'done' ? 'done' : loadScreenNumDots; ;
+      },400);
+    }
+    else{
+      clearInterval(loadscreenIntervalID);
+    }
+  }
 </script>
 <div id='loadScreenBackground'>
-  <div id='loadScreen'>
-    Loading...
+  <code id='loadScreen'>
+    <br>Land: <span id = 'loadLand' class ='loada'> ...</span>
+    <br>Trees: <span id = 'loadTrees' class ='loada'> ...</span>
+    <br> Buildings: <span id = 'loadBuildings' class ='loada'> ...</span>
+    <br> Tracks: <span id = 'loadTracks' class ='loada'> ...</span>
+    <br> Roads: <span id = 'loadRoads' class ='loada'>...</span>
   </div>
 </div>
+<script>showLoadScreen(true);</script>

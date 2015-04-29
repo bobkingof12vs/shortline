@@ -135,13 +135,30 @@ function postTerrainAdjustments(point, radius){
 
   track.checkTrackInArea(point, radius + 145);
 
-  tree.trees.map(function(tree){
-    if(point.distanceTo(tree[0].position) <= radius){
-      var oy = tree[0].position.y
-      tree[0].position.y = findY(tree[0].position.x,tree[0].position.z);
-      tree[1].position.y += (tree[0].position.y - oy);
-    }
-  });
+  setTimeout(function(){
+    var i = -2;
+    var treeInterval = setInterval(function(){
+      i += 2;
+      if(i >= tree.trees.length){
+        clearInterval(treeInterval);
+        return;
+      }
+
+      if(point.distanceTo(tree.trees[i][0].position) <= radius){
+        var oy = tree.trees[i][0].position.y
+        tree.trees[i][0].position.y = findY(tree.trees[i][0].position.x,tree.trees[i][0].position.z);
+        tree.trees[i][1].position.y += (tree.trees[i][0].position.y - oy);
+      }
+    });
+  }, 10);
+
+  // tree.trees.map(function(tree){
+  //   if(point.distanceTo(tree[0].position) <= radius){
+  //     var oy = tree[0].position.y
+  //     tree[0].position.y = findY(tree[0].position.x,tree[0].position.z);
+  //     tree[1].position.y += (tree[0].position.y - oy);
+  //   }
+  // });
 
   building.building.map(function(b){
     b.baseY = findY(b.position.x,b.position.z);

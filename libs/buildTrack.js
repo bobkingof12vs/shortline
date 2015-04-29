@@ -47,10 +47,16 @@ trackFunc = function(){
 	}
 
 	this.getNextSec = function(secId,endId){
+		if(this.sections[secId].ends[0].id == this.sections[secId].ends[1].id)
+			console.warn('self enclosed loop')
 		end = this.sections[secId].ends[endId];
-		var segId = (endId == 0 ? this.sections[secId].segmentIds[0] : this.sections[secId].segmentIds[this.sections[secId].segmentIds.length - 1]);
+		var segId = (endId == 0
+			? this.sections[secId].segmentIds[0]
+			: this.sections[secId].segmentIds[this.sections[secId].segmentIds.length - 1]
+		);
 		if (end.type == 'switch') {
 			var switchThrow = this.getSwitchThrow(end.id,secId,segId);
+			console.log(this.sections,switchThrow.secId)
 			var dir = (this.sections[switchThrow.secId].segmentIds[0] === switchThrow.segId ? 1 : 0);
 			return {
 				sec: this.sections[switchThrow.secId],
@@ -114,32 +120,34 @@ trackFunc = function(){
 				startT: 0,
 				endT: vagueT
 			});
+
+		//var realT = vagueT*(dist/vagueDist)
 		//console.log('vague',vagueDist, vagueT)
 		//console.log(seg.p1,seg.p2,seg.p3,vagueT);
 		return lerp(seg.p1,seg.p2,seg.p2,seg.p3,vagueT);
 
 	}
 
-	this.sectionDistanceRemaining = function(secId,dir,curPointId,remDist){
+	this.sectionDistanceRemaining = function(sec,dir,curPointId,dist){
 
-		//console.log(secId,dir,curPointId,remDist);
+		if(sec == undefined)
+			return 0;
 
-		var i = this.sections[secId].segmentIds.length;
+		var i = sec.segmentIds.length;
 
-		if (curPointId == this.sections[secId].points.length)
+		if (curPointId == sec.points.length)
 			curPointId -= 2;
-		if (curPointId == 0)
+		if (curPointId == -1)
 			curPointId += 2;
 		while(i--){
 			//console.log(secId, i, this.segments[this.sections[secId].segmentIds[i]].p2,this.sections[secId].points[curPointId])
-			if(equalXZ(this.segments[this.sections[secId].segmentIds[i]].p2, this.sections[secId].points[curPointId]) == 1)
+			if(equalXZ(this.segments[sec.segmentIds[i]].p2, sec.points[curPointId]) == 1)
 				break;
 		}
 
-		var dist = remDist;
 		var j = (dir == 1 ? this.sections[secId].segmentIds.length - 1 : 0);
 		var inc = (dir == 1 ? 1 : -1);
-		//console.log(i,j,inc);
+
 		while(i != j){
 			//console.log('dist',dist,this.sections[secId].segmentIds[i+inc],secId,i+inc,this.segments[this.sections[secId].segmentIds[i+inc]]);
 			i += inc;
@@ -331,12 +339,13 @@ trackFunc = function(){
 		}
 	}
 	this.getSwitchThrow = function(switchId,secId,segId){
+		console.log('getswitchthrow',this.switches[switchId].secIds.length);
 		var i = this.switches[switchId].secIds.length;
 		while(i > 0){
 			i--;
-			//console.log(this.switches[switchId].secIds[i] , secId , this.switches[switchId].segIds[i] , segId, switchId)
+			console.log(this.switches[switchId].secIds[i] , secId , this.switches[switchId].segIds[i] , segId, switchId)
 			if(this.switches[switchId].secIds[i] === secId && this.switches[switchId].segIds[i] === segId){
-				//console.log('===',this.switches[switchId],this.switches[switchId].target[i],i)
+				console.log('===',this.switches[switchId],this.switches[switchId].target[i],i)
 				return this.switches[switchId].connectsTo[i][this.switches[switchId].target[i]];
 			}
 		}
@@ -364,7 +373,8 @@ trackFunc = function(){
 		var i = secs.length
 		while(i > 0){
 			i--;
-			points.push(this.sections[secs[i].secId].points[(secs[i].pointId == 0 ? this.sections[secs[i].secId].points.length - 1 : 0)]);
+			points.push(this.sections[secs[i].secId].points[0]);
+			points.push(this.sections[secs[i].secId].points[this.sections[secs[i].secId].points.length - 1]);
 		}
 		var p = points.length;
 		while(p > 0){
@@ -657,10 +667,10 @@ trackFunc = function(){
 				}
 			}
 			else if (pointsP3.length == 2) {
-				//console.log('point splits existing section and connects to a new switch and existing section');
+				//console.log('point splits existing section and connects to a new switch and existing section',p3);
 				this.splitSec(pointsP3[1],p3);
 				this.connectTo(p1,p2,p3,pointsP1[0],this.segments.length);
-				//this.removeEnd(p1);
+				this.removeEnd(p1);
 				//this.newSwitch(p3,p2,pointsP3[0],pointsP3[1],this.segments.length);
 				this.switchByPoint(p3,p2);
 			}
@@ -754,6 +764,38 @@ trackFunc = function(){
 			//console.log('no match -1',this.segments.length);
 		}
 
+		var s = this.sections.length
+		while(s--){
+			if(this.sections[s] == null)
+				continue;
+			if((this.sections[s].ends[0].secId != undefined && this.sections[s].ends[0].secId != s) || (this.sections[s].ends[0].secIds != undefined && this.sections[s].ends[0].secIds.indexOf(s) < 0)){
+				this.sections[s].ends[0].secId = s;
+			}
+			if((this.sections[s].ends[1].secId != undefined && this.sections[s].ends[1].secId != s) || (this.sections[s].ends[1].secIds != undefined && this.sections[s].ends[1].secIds.indexOf(s) < 0)){
+				this.sections[s].ends[1].secId = s;
+			}
+		}
+
+		var s = this.switches.length
+		while (s--){
+			if(this.switches[s] == null)
+				continue;
+			var e = this.ends.length
+			while(e--){
+				if(this.ends[e] == null)
+					continue;
+				if(equalXZ(this.switches[s].origin, this.ends[e].point) == 1){
+					if(this.sections[this.ends[e].secId].ends[0].id == this.ends[e].id)
+						this.sections[this.ends[e].secId].ends[0] = this.switches[s];
+					else
+						this.sections[this.ends[e].secId].ends[1] = this.switches[s];
+					this.ends[e] = null;
+					//die();
+				}
+			}
+		}
+
+
 		var segIdNext = this.segments.length;
 		this.segments.push({p1: p1,p2: p2,p3: p3});
 		this.segments[segIdNext].len = this.lerpDistance(this.segments[segIdNext]);
@@ -762,6 +804,16 @@ trackFunc = function(){
 		//uploader.queueData('sections',this.sections[0]);
 	}
 
+	this.findSwitchByPoint = function(p1){
+		var i = this.switches.length;
+		while(i--){
+			if(this.switches[i] == null)
+				continue;
+			if(equalXZ(this.switches[i].origin,p1) == 1)
+				return i
+		}
+		return false;
+	}
 	this.findP2OfConnectingSegs = function(p1,segId){
 		var ret = [];
 		var i = this.segments.length;
@@ -851,77 +903,86 @@ trackFunc = function(){
 	}
 
 	this.calcSegmentVertices = function(segIds){
-		var j = segIds.length;
-		while(j > 0){
-			j--;
-			var geom = new THREE.Geometry();
-			var trackLines = new THREE.Geometry();
-			var base = new THREE.Geometry();
 
-			//trackLines.vertices = [];
-			var p1 = recalcY(this.segments[segIds[j]].p1);
-			var p2 = recalcY(this.segments[segIds[j]].p2);
-			var p3 = recalcY(this.segments[segIds[j]].p3);
-			var pointsFromP1 = this.findP2OfConnectingSegs(p1,segIds[j]);
-			if (pointsFromP1 != false) {
-				var i = pointsFromP1.length;
-				while( i > 0){
-					i--;
-					if (angleBetweenFlattenedVectors(p2,pointsFromP1[i].p2,p1)) {
-						var builtPoints = this.calcFromP2toP2(p2,p1,pointsFromP1[i].p2,true);
+    setTimeout(function(){
+      var j = -2;
+      var trackInterval = setInterval(function(){
+        j += 2;
+        if(j >= segIds.length){
+          clearInterval(trackInterval);
+          return;
+        }
+
+				j--;
+				var geom = new THREE.Geometry();
+				var trackLines = new THREE.Geometry();
+				var base = new THREE.Geometry();
+
+				//trackLines.vertices = [];
+				var p1 = recalcY(this.segments[segIds[j]].p1);
+				var p2 = recalcY(this.segments[segIds[j]].p2);
+				var p3 = recalcY(this.segments[segIds[j]].p3);
+				var pointsFromP1 = this.findP2OfConnectingSegs(p1,segIds[j]);
+				if (pointsFromP1 != false) {
+					var i = pointsFromP1.length;
+					while( i > 0){
+						i--;
+						if (angleBetweenFlattenedVectors(p2,pointsFromP1[i].p2,p1)) {
+							var builtPoints = this.calcFromP2toP2(p2,p1,pointsFromP1[i].p2,true);
+							geom.merge( builtPoints.geom);
+							trackLines.merge( this.segments['trackShape'].extrude(builtPoints.lleft));
+							trackLines.merge( this.segments['trackShape'].extrude(builtPoints.lright));
+							base.merge( this.segments['baseShape'].extrude(builtPoints.base));
+						}
+					}
+				}
+				else{
+					var builtPoints = this.calcFromP2toP2(p2,midpoint(p2,p1),p1,false);
+					geom.merge( builtPoints.geom);
+					trackLines.merge( this.segments['trackShape'].extrude(builtPoints.lleft));
+					trackLines.merge( this.segments['trackShape'].extrude(builtPoints.lright));
+					base.merge( this.segments['baseShape'].extrude(builtPoints.base));
+					var tempGeom = this.buildGeomPoints(p1,p2,15,9,5)
+					tempGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0,-4,0));
+					trackLines.merge( tempGeom);
+				}
+				var pointsFromP3 = this.findP2OfConnectingSegs(p3,segIds[j]);
+				if (pointsFromP3 != false) {
+					var i = pointsFromP3.length;
+					while( i > 0){
+						i--;
+						var builtPoints = this.calcFromP2toP2(p2,p3,pointsFromP3[i].p2,true);
 						geom.merge( builtPoints.geom);
 						trackLines.merge( this.segments['trackShape'].extrude(builtPoints.lleft));
 						trackLines.merge( this.segments['trackShape'].extrude(builtPoints.lright));
 						base.merge( this.segments['baseShape'].extrude(builtPoints.base));
 					}
 				}
-			}
-			else{
-				var builtPoints = this.calcFromP2toP2(p2,midpoint(p2,p1),p1,false);
-				geom.merge( builtPoints.geom);
-				trackLines.merge( this.segments['trackShape'].extrude(builtPoints.lleft));
-				trackLines.merge( this.segments['trackShape'].extrude(builtPoints.lright));
-				base.merge( this.segments['baseShape'].extrude(builtPoints.base));
-				var tempGeom = this.buildGeomPoints(p1,p2,15,9,5)
-				tempGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0,-4,0));
-				trackLines.merge( tempGeom);
-			}
-			var pointsFromP3 = this.findP2OfConnectingSegs(p3,segIds[j]);
-			if (pointsFromP3 != false) {
-				var i = pointsFromP3.length;
-				while( i > 0){
-					i--;
-					var builtPoints = this.calcFromP2toP2(p2,p3,pointsFromP3[i].p2,true);
+				else{
+					var builtPoints = this.calcFromP2toP2(p2,midpoint(p2,p3),p3,false);
 					geom.merge( builtPoints.geom);
 					trackLines.merge( this.segments['trackShape'].extrude(builtPoints.lleft));
 					trackLines.merge( this.segments['trackShape'].extrude(builtPoints.lright));
 					base.merge( this.segments['baseShape'].extrude(builtPoints.base));
+					var tempGeom = this.buildGeomPoints(p3,p2,15,9,5)
+					tempGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0,-4,0));
+					trackLines.merge( tempGeom);
 				}
-			}
-			else{
-				var builtPoints = this.calcFromP2toP2(p2,midpoint(p2,p3),p3,false);
-				geom.merge( builtPoints.geom);
-				trackLines.merge( this.segments['trackShape'].extrude(builtPoints.lleft));
-				trackLines.merge( this.segments['trackShape'].extrude(builtPoints.lright));
-				base.merge( this.segments['baseShape'].extrude(builtPoints.base));
-				var tempGeom = this.buildGeomPoints(p3,p2,15,9,5)
-				tempGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0,-4,0));
-				trackLines.merge( tempGeom);
-			}
-			if (this.segments[segIds[j]].mesh != undefined){
-				scene.remove(this.segments[segIds[j]].mesh)
-			}
+				if (this.segments[segIds[j]].mesh != undefined){
+					scene.remove(this.segments[segIds[j]].mesh)
+				}
 
-			trackLines.applyMatrix(new THREE.Matrix4().makeTranslation(0,3,0));
-			base.applyMatrix(new THREE.Matrix4().makeTranslation(0,-8,0));
+				trackLines.applyMatrix(new THREE.Matrix4().makeTranslation(0,3,0));
+				base.applyMatrix(new THREE.Matrix4().makeTranslation(0,-8,0));
 
-			var mesh = new THREE.Object3D();
-			mesh.add(new THREE.Mesh( geom, this.segments['material']));
-			mesh.add(new THREE.Mesh( trackLines, this.segments['lineMaterial']));
-			mesh.add(new THREE.Mesh( base, this.segments['baseMaterial']));
-			this.segments[segIds[j]].mesh = mesh;
-			scene.add(this.segments[segIds[j]].mesh)
-		}
+				var mesh = new THREE.Object3D();
+				mesh.add(new THREE.Mesh( geom, this.segments['material']));
+				mesh.add(new THREE.Mesh( trackLines, this.segments['lineMaterial']));
+				mesh.add(new THREE.Mesh( base, this.segments['baseMaterial']));
+				this.segments[segIds[j]].mesh = mesh;
+				scene.add(this.segments[segIds[j]].mesh)
+			});
+		}, 10);
 	}
 
 	this.checkTrackInArea = function(p1, radius) {

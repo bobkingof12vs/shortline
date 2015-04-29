@@ -15,6 +15,7 @@
 			color: #bbb;
 			padding: 1px;
 			z-index: 50;
+			pointer-events: none;
 		}
 		.lowerMenu{
 			position: fixed;
@@ -68,35 +69,50 @@
 				document.getElementById('curspeed').innerHTML = (Math.round(train.train[trainMenuTrain].engine.curSpeed*100)/100);
 
 				document.getElementById('topspeed').innerHTML = train.train[trainMenuTrain].engine.userSpeed;
-				document.getElementById('userSpeed').value = ((train.train[trainMenuTrain].engine.userSpeed / train.train[trainMenuTrain].engine.opts.top) * 50 + 50);
-
-				document.getElementById('accell').innerHTML = train.train[trainMenuTrain].engine.opts.acc;
-				document.getElementById('userAcc').value = ((train.train[trainMenuTrain].engine.opts.acc / train.train[trainMenuTrain].engine.opts.maxAcc) * 50 + 50);
+				//document.getElementById('userSpeed').value = ((train.train[trainMenuTrain].engine.userSpeed / train.train[trainMenuTrain].engine.opts.top) * 50 + 50);
 
 			}
 			else{
 				document.getElementById('lowerMenu').style.zIndex = 1;
 			}
 		},400)
+
 		function topUserSpeed(){
 			document.getElementById('topspeed').innerHTML =
 				train.train[trainMenuTrain].engine.userSpeed =
 					(train.train[trainMenuTrain].engine.opts.top * ((document.getElementById('userSpeed').value - 50) / 50));
 		}
-		function userAcc(){
-			document.getElementById('accell').innerHTML =
-				train.train[trainMenuTrain].engine.opts.acc =
-					(train.train[trainMenuTrain].engine.opts.maxAcc * ((document.getElementById('userAcc').value - 50) / 50));
-		}
+
+		Mousetrap.bind(['w','e','r'],function(e){
+			if(m['m_tgo'].clicked != 1)
+				return
+
+			us = parseInt(document.getElementById('userSpeed').value);
+			
+			switch(String.fromCharCode(e.which)){
+				case 'r':
+					document.getElementById('userSpeed').value = us + 5;
+					break;
+				case 'w':
+					document.getElementById('userSpeed').value = us - 5;
+					break;
+				case 'e':
+					document.getElementById('userSpeed').value = 50;
+					break;
+
+			}
+
+			topUserSpeed();
+		});
 	</script>
 	<div id='lowerMenu' class='lowerMenu'>
 		<div class='speed mono'>
-			current&nbsp; <span id='curspeed'>0</span><br>
-			accell&nbsp;&nbsp; <span id='accell'>1</span><br>
-			throttle <span id='topspeed'>1</span>
+			Current&nbsp; <span id='curspeed'>0</span><br>
+			<!--accell&nbsp;&nbsp; <span id='accell'>1</span><br>-->
+			Throttle <span id='topspeed'>1</span>
 		</div>
-		<input id='userAcc' type='range' value=100  step=2.5 onchange='userAcc()'><span class='mono backwords'>Acceleration</span></input>
-		<input id='userSpeed' type='range' value=100  step=2.5 onchange='topUserSpeed()'><span class='backwords mono'>Top Speed</span></input>
+		<!-- <input id='userAcc' type='range' value=100  step=2.5 onchange='userAcc()'><span class='mono backwords'>Acceleration</span></input> -->
+		<input id='userSpeed' type='range' value=100  step=2.5 onchange='topUserSpeed()'><span class='backwords mono'>Throttle</span></input>
 		<script>document.onload = function(){userAcc(); topUserSpeed();}</script>
 	</div>
 </span>

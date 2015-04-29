@@ -43,6 +43,7 @@ function makeBackground(id){
 }
 
 function makeMenu( str, id, parent, order, oncmousedownEventFunc){
+  str = order != 0 ? order + '. ' + str : str;
   var posx = 1000, posy = 1000;
   var menuCanvas = document.createElement('canvas');
   menuCanvas.style.position = 'absolute';
@@ -180,20 +181,50 @@ function setAllMenu(){
   }
 }
 
+Mousetrap.bind(['q','`','1','2','3','4','5','6','7','8','9','0'],function(e){
+
+  var k = String.fromCharCode(e.which) == '`' ? '0' : String.fromCharCode(e.which);
+
+  if (k == 'q')
+    return m['main'].e.click();
+
+  var clicked = [];
+  for(var i in m)
+    if(m[i].clicked == 1)
+      clicked[i] = true;
+
+  for(var i in clicked)
+    if(clicked[m[i].parent] != undefined)
+      delete(clicked[m[i].parent]);
+
+  var menuParent = '';
+  for(var i in clicked)
+    menuParent = i;
+
+  menuParent = menuParent == '' ? 'main' : menuParent;
+
+  if (k == 0)
+    m[menuParent].e.click();
+  else
+    for(var i in m)
+      if(m[i].parent == menuParent && k == m[i].order)
+        m[i].e.click();
+});
+
 var m = [];
 m['background'] = makeBackground('background');
 m['main'] = makeMenu('Tool Kit', 'main', 'main',0);
 
-m['m_ter'] = makeMenu('Terraform Tools', 'm_ter', 'main',1 );
-m['m_tra_lay'] = makeMenu('Add Track',   'm_tra_lay', 'main',2); //makeMenu('Track Tools', 'm_tra', 'main',2);
-m['m_tad'] = makeMenu('Add Train',       'm_tad', 'main',3 );
-m['m_bld'] = makeMenu('Add Building',    'm_bld', 'main',4 );
-m['m_tre'] = makeMenu('Add Tree',        'm_tre', 'main',5 );
-m['m_rod'] = makeMenu('Add Roads',       'm_rod', 'main',6 );
-m['m_riv'] = makeMenu('Add Rivers',      'm_riv', 'main',7 );
-m['m_tgo'] = makeMenu('Run Trains',      'm_tgo', 'main',8 );
-m['m_hlt'] = makeMenu('Halt Program',    'm_hlt', 'main',9 );
-m['m_sav'] = makeMenu('Save Game',       'm_sav', 'main',10);
+m['m_tgo'] = makeMenu('Run Trains',      'm_tgo', 'main',1 );
+m['m_ter'] = makeMenu('Terraform Tools', 'm_ter', 'main',2 );
+m['m_tra_lay'] = makeMenu('Add Track',   'm_tra_lay', 'main',3); //makeMenu('Track Tools', 'm_tra', 'main',2);
+m['m_tad'] = makeMenu('Add Trains',       'm_tad', 'main',4 );
+m['m_bld'] = makeMenu('Add Building',    'm_bld', 'main',5 );
+m['m_tre'] = makeMenu('Add Trees',        'm_tre', 'main',6 );
+m['m_rod'] = makeMenu('Add Roads',       'm_rod', 'main',7 );
+//m['m_riv'] = makeMenu('Add Rivers',      'm_riv', 'main',7 );
+m['m_hlt'] = makeMenu('Halt Program',    'm_hlt', 'main',8 );
+m['m_sav'] = makeMenu('Save Game',       'm_sav', 'main',9 );
 
 m['m_ter_raise'] =   makeMenu('Raise Ground',   'm_ter_raise',   'm_ter',1);
 m['m_ter_lower'] =   makeMenu('Lower Ground',   'm_ter_lower',   'm_ter',2);

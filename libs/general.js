@@ -300,13 +300,14 @@ addSpotToScene = function(point){
 
 
 function testCube(p1,col,scale) {
+  p1 = p1 != undefined ? p1 : new THREE.Vector3(0,0,0);
   scale = scale != undefined ? scale : 1;
   col = col != undefined ? col : 0x00ff00;
   var cubeMaterial = new THREE.MeshBasicMaterial( {color: col} );
   var cubeGeometry = new THREE.BoxGeometry( 10*scale, 10*scale, 10*scale, 1, 1, 1 );
   cube = new THREE.Mesh( cubeGeometry, cubeMaterial );
   cube.position.set(p1.x, p1.y, p1.z);
-  scene.add(cube);
+  //scene.add(cube);
   return cube;
 }
 
@@ -320,9 +321,9 @@ function testText(text,p1,rot,scale,col1,col2){
   var materialArray = [ materialFront, materialSide ];
   var textGeom = new THREE.TextGeometry( text,
     {
-      size: 10, height: 4, curveSegments: 3,
+      size: 10 * scale, height: 4 * scale, curveSegments: 3,
       font: "helvetiker", weight: "normal", style: "normal",
-      bevelThickness: 1, bevelSize: 2, bevelEnabled: true,
+      bevelThickness: 1 * scale, bevelSize: 2, bevelEnabled: true,
       material: 0, extrudeMaterial: 1
     });
     // font: helvetiker, gentilis, droid sans, droid serif, optimer

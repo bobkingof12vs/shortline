@@ -135,7 +135,7 @@ var lay = function(menuItem, gridValue, color, pointValidator, mouseClickFunctio
   }
 
   this.loadData = function(p1,p2){
-    console.log(p1,p2)
+    //console.log(p1,p2)
     scope.line.geometry.vertices = scope.line.geometry.vertices.concat(gridPointsOnLine(100, p1, p2, true));
     scope.segments.push(p1);
     scope.segments.push(p2);
