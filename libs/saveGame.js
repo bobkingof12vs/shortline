@@ -133,17 +133,11 @@ var saveGame = new (function(){
 
       console.log('load save game: land');
 
-      setTimeout(function(){
-        var i = gameLoadData.land.length;
-        var landInterval = setInterval(function(){
-          if(!--i){
-            loadsDone.land = true;
-            clearInterval(landInterval);
-            return;
-          }
-          loadTerrain(gameLoadData.land[i]);
-        });
-      }, 10);
+      var i = gameLoadData.land.length;
+      while(--i)
+        loadTerrain(gameLoadData.land[i]);
+
+      loadsDone.land = true;
 
       console.log('load save game: tree');
       setTimeout(function(){

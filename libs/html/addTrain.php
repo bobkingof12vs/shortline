@@ -1,4 +1,4 @@
-<span id='addTrain'>
+<div id='addTrain'>
   <style scoped>
     #addTrain{
       -webkit-touch-callout: none;
@@ -292,4 +292,4 @@
     <div id='at_selectArea' class='at_selectArea'>
     </div>
   </div>
-</span>
+</div>
