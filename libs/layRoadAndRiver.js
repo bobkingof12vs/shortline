@@ -23,7 +23,7 @@ var lay = function(menuItem, gridValue, color, pointValidator, mouseClickFunctio
   this.segments = [];
 
   var scope = this;
-
+  console.log(menuItem,m);
   m[menuItem].onclickEvent = function(menu, clicked){
     if(clicked == 1){
       var i = scope.line.geometry.vertices.length;
@@ -116,8 +116,6 @@ var lay = function(menuItem, gridValue, color, pointValidator, mouseClickFunctio
 
       document.body.removeEventListener('mousemove', scope.mousemove, false);
       document.body.removeEventListener('click', scope.click, false);
-
-      console.log('yo',scope.segments.length, scope.segments)
     }
   }
 
@@ -443,6 +441,6 @@ var layRoads = new(function(){
 
 });
 
-var layRivers = new(function(){
-  this.lay = new lay('m_riv',0xffff00);
-});
+// var layRivers = new(function(){
+//   this.lay = new lay('m_riv',0xffff00);
+// });

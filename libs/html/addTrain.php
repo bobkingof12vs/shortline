@@ -273,6 +273,7 @@
     }
 
     m['m_tad'].onclickEvent = function(menu,click){
+      console.log('m_tad');
       if(click == 1){
         document.getElementById('addTrain').style.zIndex = 4;
       }

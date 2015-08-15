@@ -1,7 +1,7 @@
 var trackPoints = [];
 
 trackFunc = function(){
-
+	var _this = this;
 	this.segments = [];
 	this.segments['material'] = new THREE.MeshBasicMaterial({ color: 0x49311c })
 	this.segments['lineMaterial'] = new THREE.MeshBasicMaterial({ color: 0x222222 })
@@ -903,84 +903,83 @@ trackFunc = function(){
 	}
 
 	this.calcSegmentVertices = function(segIds){
-
+		console.log(segIds);
     setTimeout(function(){
-      var j = -2;
+      var j = -1;
       var trackInterval = setInterval(function(){
-        j += 2;
+        j++;
         if(j >= segIds.length){
           clearInterval(trackInterval);
           return;
         }
 
-				j--;
 				var geom = new THREE.Geometry();
 				var trackLines = new THREE.Geometry();
 				var base = new THREE.Geometry();
 
 				//trackLines.vertices = [];
-				var p1 = recalcY(this.segments[segIds[j]].p1);
-				var p2 = recalcY(this.segments[segIds[j]].p2);
-				var p3 = recalcY(this.segments[segIds[j]].p3);
-				var pointsFromP1 = this.findP2OfConnectingSegs(p1,segIds[j]);
+				var p1 = recalcY(_this.segments[segIds[j]].p1);
+				var p2 = recalcY(_this.segments[segIds[j]].p2);
+				var p3 = recalcY(_this.segments[segIds[j]].p3);
+				var pointsFromP1 = _this.findP2OfConnectingSegs(p1,segIds[j]);
 				if (pointsFromP1 != false) {
 					var i = pointsFromP1.length;
 					while( i > 0){
 						i--;
 						if (angleBetweenFlattenedVectors(p2,pointsFromP1[i].p2,p1)) {
-							var builtPoints = this.calcFromP2toP2(p2,p1,pointsFromP1[i].p2,true);
+							var builtPoints = _this.calcFromP2toP2(p2,p1,pointsFromP1[i].p2,true);
 							geom.merge( builtPoints.geom);
-							trackLines.merge( this.segments['trackShape'].extrude(builtPoints.lleft));
-							trackLines.merge( this.segments['trackShape'].extrude(builtPoints.lright));
-							base.merge( this.segments['baseShape'].extrude(builtPoints.base));
+							trackLines.merge( _this.segments['trackShape'].extrude(builtPoints.lleft));
+							trackLines.merge( _this.segments['trackShape'].extrude(builtPoints.lright));
+							base.merge( _this.segments['baseShape'].extrude(builtPoints.base));
 						}
 					}
 				}
 				else{
-					var builtPoints = this.calcFromP2toP2(p2,midpoint(p2,p1),p1,false);
+					var builtPoints = _this.calcFromP2toP2(p2,midpoint(p2,p1),p1,false);
 					geom.merge( builtPoints.geom);
-					trackLines.merge( this.segments['trackShape'].extrude(builtPoints.lleft));
-					trackLines.merge( this.segments['trackShape'].extrude(builtPoints.lright));
-					base.merge( this.segments['baseShape'].extrude(builtPoints.base));
-					var tempGeom = this.buildGeomPoints(p1,p2,15,9,5)
+					trackLines.merge( _this.segments['trackShape'].extrude(builtPoints.lleft));
+					trackLines.merge( _this.segments['trackShape'].extrude(builtPoints.lright));
+					base.merge( _this.segments['baseShape'].extrude(builtPoints.base));
+					var tempGeom = _this.buildGeomPoints(p1,p2,15,9,5)
 					tempGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0,-4,0));
 					trackLines.merge( tempGeom);
 				}
-				var pointsFromP3 = this.findP2OfConnectingSegs(p3,segIds[j]);
+				var pointsFromP3 = _this.findP2OfConnectingSegs(p3,segIds[j]);
 				if (pointsFromP3 != false) {
 					var i = pointsFromP3.length;
 					while( i > 0){
 						i--;
-						var builtPoints = this.calcFromP2toP2(p2,p3,pointsFromP3[i].p2,true);
+						var builtPoints = _this.calcFromP2toP2(p2,p3,pointsFromP3[i].p2,true);
 						geom.merge( builtPoints.geom);
-						trackLines.merge( this.segments['trackShape'].extrude(builtPoints.lleft));
-						trackLines.merge( this.segments['trackShape'].extrude(builtPoints.lright));
-						base.merge( this.segments['baseShape'].extrude(builtPoints.base));
+						trackLines.merge( _this.segments['trackShape'].extrude(builtPoints.lleft));
+						trackLines.merge( _this.segments['trackShape'].extrude(builtPoints.lright));
+						base.merge( _this.segments['baseShape'].extrude(builtPoints.base));
 					}
 				}
 				else{
-					var builtPoints = this.calcFromP2toP2(p2,midpoint(p2,p3),p3,false);
+					var builtPoints = _this.calcFromP2toP2(p2,midpoint(p2,p3),p3,false);
 					geom.merge( builtPoints.geom);
-					trackLines.merge( this.segments['trackShape'].extrude(builtPoints.lleft));
-					trackLines.merge( this.segments['trackShape'].extrude(builtPoints.lright));
-					base.merge( this.segments['baseShape'].extrude(builtPoints.base));
-					var tempGeom = this.buildGeomPoints(p3,p2,15,9,5)
+					trackLines.merge( _this.segments['trackShape'].extrude(builtPoints.lleft));
+					trackLines.merge( _this.segments['trackShape'].extrude(builtPoints.lright));
+					base.merge( _this.segments['baseShape'].extrude(builtPoints.base));
+					var tempGeom = _this.buildGeomPoints(p3,p2,15,9,5)
 					tempGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0,-4,0));
 					trackLines.merge( tempGeom);
 				}
-				if (this.segments[segIds[j]].mesh != undefined){
-					scene.remove(this.segments[segIds[j]].mesh)
+				if (_this.segments[segIds[j]].mesh != undefined){
+					scene.remove(_this.segments[segIds[j]].mesh)
 				}
 
 				trackLines.applyMatrix(new THREE.Matrix4().makeTranslation(0,3,0));
 				base.applyMatrix(new THREE.Matrix4().makeTranslation(0,-8,0));
 
 				var mesh = new THREE.Object3D();
-				mesh.add(new THREE.Mesh( geom, this.segments['material']));
-				mesh.add(new THREE.Mesh( trackLines, this.segments['lineMaterial']));
-				mesh.add(new THREE.Mesh( base, this.segments['baseMaterial']));
-				this.segments[segIds[j]].mesh = mesh;
-				scene.add(this.segments[segIds[j]].mesh)
+				mesh.add(new THREE.Mesh( geom, _this.segments['material']));
+				mesh.add(new THREE.Mesh( trackLines, _this.segments['lineMaterial']));
+				mesh.add(new THREE.Mesh( base, _this.segments['baseMaterial']));
+				_this.segments[segIds[j]].mesh = mesh;
+				scene.add(_this.segments[segIds[j]].mesh)
 			});
 		}, 10);
 	}
