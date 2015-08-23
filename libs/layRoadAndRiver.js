@@ -119,6 +119,15 @@ var lay = function(menuItem, gridValue, color, pointValidator, mouseClickFunctio
     }
   }
 
+  m[menuItem+'_nxt'].onclickEvent = function(){
+    if(m[menuItem+'_nxt'].clicked == 1){
+      m[menuItem].e.click();
+      m[menuItem].e.click();
+      document.body.removeEventListener('mousemove', scope.mousemove, false);
+      document.body.removeEventListener('click', scope.click, false);
+    }
+  }
+
   this.saveData = function(){
 
     console.log(Object.keys(scope.segments))
@@ -348,7 +357,6 @@ var layRoads = new(function(){
           midpoint(scope.segments[i].points[0],mid),
           mid
         ];
-        console.log(p);
         obj = new THREE.Mesh(
           createPathGeom(p[0], p[1], p[2], divisions, scope.roadWidth, scope.roadHeight, scope.roadColor),
           new THREE.MeshBasicMaterial({ color: scope.roadColor })
@@ -383,7 +391,7 @@ var layRoads = new(function(){
           createPathGeom(p[0], p[1], p[2], divisions, scope.roadWidth, scope.roadHeight, scope.roadColor),
           new THREE.MeshBasicMaterial({ color: scope.roadColor })
         );
-        scope.segments[i].obj[-1] = obj;
+        scope.segments[i].obj[-2] = obj;
         scene.add(obj);
 
         var divisions = p[0].distanceTo(p[2]) / scope.roadChunks;

@@ -96,7 +96,7 @@ document.addEventListener( 'mousedown', function (e){
       if(m['m_ter_flatten_avg'].clicked == 1)
         flattenGround(i,'average')
 
-      if(m['m_tra_lay'].clicked == 1 ){layTrack.processClick(i);}
+      if(m['m_tra_lay'].clicked == 1){layTrack.processClick(i);}
       if(m['m_tre_one'].clicked == 1){tree.onclickAddTree(i[0].point);}
       if(m['m_tre_five'].clicked == 1){tree.onclickAddManyTrees(5,i[0].point);}
       if(m['m_bld'].clicked == 1){building.processBuildingClick(i[0].point);}

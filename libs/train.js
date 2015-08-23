@@ -19,7 +19,7 @@ var trainFunc = function(){
 			if(this.train[i].railcars.length > 0)
 				this.train[i].path.trainLength = trainLength = this.train[i].railcars[this.train[i].railcars.length - 1].distanceBehind + this.train[i].railcars[this.train[i].railcars.length - 1].opts.sizeLength
 
-			var brakeDist = ((Math.pow(this.train[i].engine.opts.top,2)/(2*this.train[i].engine.opts.dec)) + this.train[i].engine.curSpeed);
+			var brakeDist = (this.train[i].engine.opts.top * (this.train[i].engine.opts.top/this.train[i].engine.opts.dec)) + trainLength;
 
 			var nextTotalDist = 0;
 			var prevTotalDist = 0;
@@ -179,7 +179,7 @@ var trainFunc = function(){
 		});
 		this.train[trainNum].path = {
 			currentP: {
-				sec: track.sections[track.sections.length - 1],
+				sec: track.sections[0],
 				dir: 0
 			},
 			nextP: [],
@@ -223,34 +223,51 @@ var trainFunc = function(){
 		while(i < this.train.length - 1) {
 			i++;
 
-			brakeDist = (Math.pow(this.train[i].engine.curSpeed,2)*(9/this.train[i].engine.opts.dec));
+			var brakeDist = (this.train[i].engine.curSpeed * (this.train[i].engine.curSpeed)/this.train[i].engine.opts.dec)/2;
+			//brakeDist += (this.train[i].engine.opts.maxAcc * dTime)
+				console.log('speed', this.train[i].engine.curSpeed, 'sd', this.train[i].segmentDistance, 'ptd', this.train[i].path.previousPTotalDist, 'ntd', this.train[i].path.nextPTotalDist, 'bd', brakeDist, 'tl', this.train[i].path.trainLength)
 
 			if(this.train[i].engine.curSpeed > 0
-				&& (this.train[i].segmentDistance + this.train[i].path.nextPTotalDist < brakeDist)
+				&& ((this.train[i].segmentDistance + this.train[i].path.nextPTotalDist) < brakeDist)
 			){
+				console.warn('1', this.train[i].segmentDistance, '+', this.train[i].path.nextPTotalDist, '<', brakeDist)
 				this.train[i].engine.userSpeed = 0;
 			}
 			if(this.train[i].engine.curSpeed < 0
-				&& (this.train[i].path.currentPTotalDist - this.train[i].segmentDistance) + this.train[i].path.previousPTotalDist < brakeDist + this.train[i].path.trainLength
+				&& (this.train[i].segmentDistance + this.train[i].path.previousPTotalDist) < (brakeDist + this.train[i].path.trainLength)
 			){
+				console.warn('1', this.train[i].segmentDistance, '+', this.train[i].path.previousPTotalDist, '<', brakeDist, '+', this.train[i].path.trainLength)
 				this.train[i].engine.userSpeed = 0;
 			}
 
 			var speedWas = this.train[i].engine.curSpeed;
+			var ma = this.train[i].engine.opts.maxAcc * dTime;
+			var md = this.train[i].engine.opts.dec * dTime;
 
-			console.log((this.train[i].engine.curSpeed - (this.train[i].engine.opts.dec * dTime)));
-
-			if((this.train[i].engine.curSpeed + (this.train[i].engine.opts.maxAcc * dTime)) < this.train[i].engine.userSpeed){
-				console.log('a');
-				this.train[i].engine.curSpeed = this.train[i].engine.curSpeed + (this.train[i].engine.opts.maxAcc * dTime)
+			var ad = 0;
+			if(this.train[i].engine.userSpeed > 0){
+				if ((this.train[i].engine.curSpeed + ma) < this.train[i].engine.userSpeed)
+					this.train[i].engine.curSpeed = this.train[i].engine.curSpeed + ma;
+				else if((this.train[i].engine.curSpeed - md) > this.train[i].engine.userSpeed)
+					this.train[i].engine.curSpeed = this.train[i].engine.curSpeed - md;
+				else
+					this.train[i].engine.curSpeed = this.train[i].engine.userSpeed;
 			}
-			else if((this.train[i].engine.curSpeed - (this.train[i].engine.opts.dec * dTime)) > this.train[i].engine.userSpeed){
-				console.log('b');
-				this.train[i].engine.curSpeed = this.train[i].engine.curSpeed - (this.train[i].engine.opts.dec * dTime)
+			else if(this.train[i].engine.userSpeed < 0){
+				if ((this.train[i].engine.curSpeed - ma) > this.train[i].engine.userSpeed)
+					this.train[i].engine.curSpeed = this.train[i].engine.curSpeed - ma;
+				else if((this.train[i].engine.curSpeed + md) < this.train[i].engine.userSpeed)
+					this.train[i].engine.curSpeed = this.train[i].engine.curSpeed + md;
+				else
+					this.train[i].engine.curSpeed = this.train[i].engine.userSpeed;
 			}
 			else{
-				console.log('c');
-				this.train[i].engine.curSpeed = this.train[i].engine.userSpeed
+				if(this.train[i].engine.curSpeed < 0 && (this.train[i].engine.curSpeed + md) < 0)
+					this.train[i].engine.curSpeed = this.train[i].engine.curSpeed + md;
+				else if(this.train[i].engine.curSpeed > 0 && (this.train[i].engine.curSpeed - md) > 0)
+					this.train[i].engine.curSpeed = this.train[i].engine.curSpeed - md;
+				else
+					this.train[i].engine.curSpeed = 0;
 			}
 
 			travDist = this.train[i].engine.curSpeed*dTime;
@@ -293,7 +310,8 @@ var trainFunc = function(){
 				this.train[i].curPointId = moved.pointId;
 			}
 
-			this.train[i].segmentDistance -= Math.abs(travDist);
+			//this.train[i].segmentDistance -= Math.abs(travDist);
+			this.train[i].segmentDistance = (moved.curSegDist - Math.abs(moved.remDist));
 
 			this.train[i].curDist = moved.remDist;
 			console.log(this.train[i].segmentDistance);
@@ -319,7 +337,7 @@ var trainFunc = function(){
 			//-- apply to curP --//
 
 			//then loop through railcars
-			j = this.train[i].railcars.length
+			var j = this.train[i].railcars.length
 			while(j--){
 				var newpos = this.moveOnPath(
 					this.train[i].curDist,
@@ -353,7 +371,7 @@ var trainFunc = function(){
 	}
 
 	this.moveOnPath = function(curDist, moveDist, path, curPointId, trainSpeed, followFlag){
-		pathPoints = path.pathPoints;
+		var pathPoints = path.pathPoints;
 
 		if(curPointId == undefined)
 			throw new Error('curPointId is undefined');

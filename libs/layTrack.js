@@ -90,7 +90,7 @@
         mouse.x = e.clientX;
         mouse.y = e.clientY;
 
-        if (m['m_tra_lay'].clicked == 1 & mouseInMenu == 0) {
+        if (m['m_tra_lay'].clicked == 1 && mouseInMenu == 0) {
           getMouseIntersect(mouse, [plane],function(i){
 
             if (i != 1) {
@@ -116,6 +116,13 @@
 
       }
       document.body.addEventListener('mousemove',listener,false);
+      m['m_tra_lay_nxt'].onclickEvent = function(){
+        if(m['m_tra_lay_nxt'].clicked == 1){
+          m['m_tra_lay'].e.click();
+          document.body.removeEventListener('mousemove',listener,false);
+          m['m_tra_lay'].e.click();
+        }
+      }
     }
 
     else if (this.trackPreLine.part == 'part3') {

@@ -226,6 +226,9 @@ m['m_rod'] = makeMenu('Add Roads',       'm_rod', 'main',7 );
 m['m_hlt'] = makeMenu('Halt Program',    'm_hlt', 'main',8 );
 m['m_sav'] = makeMenu('Save Game',       'm_sav', 'main',9 );
 
+m['m_tra_lay_nxt'] = makeMenu('Next', 'm_tra_lay_nxt', 'm_tra_lay',1); //makeMenu('Track Tools', 'm_tra', 'main',2);
+m['m_rod_nxt'] = makeMenu('Next', 'm_rod_nxt', 'm_rod', 1);
+
 m['m_ter_raise'] =   makeMenu('Raise Ground',   'm_ter_raise',   'm_ter',1);
 m['m_ter_lower'] =   makeMenu('Lower Ground',   'm_ter_lower',   'm_ter',2);
 m['m_ter_flatten'] = makeMenu('Flatten Ground', 'm_ter_flatten', 'm_ter',3);
