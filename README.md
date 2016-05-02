@@ -56,7 +56,7 @@ There are a few tools in the menu on the top left. Here is a brief description o
   
   One bug... switches need to have 2 points between them (not including the switch points). If you do not have 2 points between them, the trains will do odd things
   
-4. add trains
+4. Add Trains
   
   This will ask you to pick an engine first, followed by as many railcars as you would like.
   
