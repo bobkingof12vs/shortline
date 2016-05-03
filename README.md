@@ -4,7 +4,7 @@ Railroad Simulator
 
 Load a new game: http://68.110.126.152:33033/shortline/main.php
 
-Load an example:  http://68.110.126.152:33033/shortline/main.php?id=1
+Load an example:  http://68.110.126.152:33033/shortline/main.php?id=91
 
 
 Read this first!
