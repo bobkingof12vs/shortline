@@ -83,7 +83,7 @@ var saveGame = new (function(){
     var form = new FormData();
     form.append('data', JSON.stringify(data));
 
-    var saveURL = 'http://71.209.160.45/shortline/trainserver/db.php?email='+email+'&type=add';
+    var saveURL = 'http://71.209.147.118/shortline/trainserver/db.php?email='+email+'&type=add';
     var xhr = this.CORSRequest('POST', saveURL, function(response){
       alert("saveid: "+response);
       m['m_sav'].e.click();
@@ -97,7 +97,7 @@ var saveGame = new (function(){
       return;
     }
 
-    var loadURL = 'http://:33033/shortline/trainserver/db.php?id='+id+'&type=get';
+    var loadURL = 'http://71.209.147.118/shortline/trainserver/db.php?id='+id+'&type=get';
     var xhr = this.CORSRequest('GET', loadURL, function(response){
       gameLoadData = JSON.parse(response);
 
