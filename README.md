@@ -2,9 +2,9 @@
 Railroad Simulator
 
 
-Load a new game: http://71.209.128.172/shrtln/main.php
+Load a new game: http://71.209.173.218/shrtln/main.php
 
-Load an example:  http://71.209.128.172/shrtln/main.php?id=91
+Load an example:  http://71.209.173.218/shrtln/main.php?id=91
 
 
 Read this first!
@@ -96,4 +96,4 @@ There are a few tools in the menu on the top left. Here is a brief description o
   
   to load the save, you need to go to this link, adding your id at the end the link (ie. ..main.php?id=1234)
   
-  http://71.209.128.172/shrtln/main.php?id=
+  http://71.209.173.218/shrtln/main.php?id=
